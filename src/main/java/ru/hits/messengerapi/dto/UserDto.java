@@ -3,6 +3,7 @@ package ru.hits.messengerapi.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.hits.messengerapi.entity.UserEntity;
 import ru.hits.messengerapi.enumeration.Sex;
 
 import java.time.LocalDate;
@@ -21,6 +22,8 @@ public class UserDto {
 
     private String patronymic;
 
+    private String email;
+
     private String login;
 
     private String password;
@@ -30,5 +33,18 @@ public class UserDto {
     private LocalDate birthdate;
 
     private LocalDate registrationDate;
+
+    public UserDto(UserEntity userEntity) {
+        this.id = userEntity.getId();
+        this.name = userEntity.getName();
+        this.surname = userEntity.getSurname();
+        this.patronymic = userEntity.getPatronymic();
+        this.email = userEntity.getEmail();
+        this.login = userEntity.getLogin();
+        this.password = userEntity.getPassword();
+        this.sex = userEntity.getSex();
+        this.birthdate = userEntity.getBirthdate();
+        this.registrationDate = userEntity.getRegistrationDate();
+    }
 
 }

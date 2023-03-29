@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "_user")
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -27,13 +27,15 @@ public class User {
     )
     private UUID id;
 
-    private String login;
-
     private String name;
 
     private String surname;
 
     private String patronymic;
+
+    private String email;
+
+    private String login;
 
     private String password;
 
@@ -42,5 +44,6 @@ public class User {
 
     private LocalDate birthdate;
 
+    @Column(name = "registration_date")
     private LocalDate registrationDate;
 }
