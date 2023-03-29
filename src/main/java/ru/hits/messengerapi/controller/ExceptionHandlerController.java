@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.hits.messengerapi.dto.ApiError;
+import ru.hits.messengerapi.exception.BadRequestException;
 import ru.hits.messengerapi.exception.NotFoundException;
 
 import java.util.ArrayList;
@@ -56,6 +57,23 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
                                                             WebRequest request
     ) {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiError> handleBadRequestException(BadRequestException exception,
+                                                              WebRequest request
+    ) {
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpectedInternalException(Exception exception,
+                                                                      WebRequest request
+    ) {
+        return new ResponseEntity<>(
+                new ApiError("Непредвиденная внутренняя ошибка сервера"),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 
 }

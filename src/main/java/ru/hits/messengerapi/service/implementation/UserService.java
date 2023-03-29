@@ -6,6 +6,7 @@ import ru.hits.messengerapi.dto.UpdateUserInfoDto;
 import ru.hits.messengerapi.dto.UserDto;
 import ru.hits.messengerapi.dto.UserSignUpDto;
 import ru.hits.messengerapi.entity.UserEntity;
+import ru.hits.messengerapi.exception.BadRequestException;
 import ru.hits.messengerapi.exception.NotFoundException;
 import ru.hits.messengerapi.repository.UserRepository;
 import ru.hits.messengerapi.service.UserServiceInterface;
@@ -18,9 +19,13 @@ public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
 
-
     @Override
     public UserDto userSignUp(UserSignUpDto userSignUpDto) {
+
+        if (userRepository.findByLogin(userSignUpDto.getLogin()) != null) {
+            throw new BadRequestException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
+        }
+
         UserEntity user = new UserEntity();
 
         user.setName(userSignUpDto.getName());
