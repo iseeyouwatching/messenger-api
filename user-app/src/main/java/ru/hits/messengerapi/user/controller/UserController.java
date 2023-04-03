@@ -28,10 +28,10 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserInfo(login), HttpStatus.OK);
     }
 
-    @PutMapping("/{login}")
-    public ResponseEntity<UserDto> updateUserInfo(@PathVariable("login") String login,
-                                                  @RequestBody @Valid UpdateUserInfoDto updateUserInfoDto) {
-        return new ResponseEntity<>(userService.updateUserInfo(login, updateUserInfoDto), HttpStatus.OK);
-    }
+//    @PutMapping("/{login}")
+//    public ResponseEntity<UserDto> updateUserInfo(@PathVariable("login") String login,
+//                                                  @RequestBody @Valid UpdateUserInfoDto updateUserInfoDto) {
+//        return new ResponseEntity<>(userService.updateUserInfo(login, updateUserInfoDto), HttpStatus.OK);
+//    }
 
 }

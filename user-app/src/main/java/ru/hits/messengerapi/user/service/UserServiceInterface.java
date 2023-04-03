@@ -10,6 +10,6 @@ public interface UserServiceInterface {
 
     UserDto getUserInfo(String login);
 
-    UserDto updateUserInfo(String login, UpdateUserInfoDto updateUserInfoDto);
+//    UserDto updateUserInfo(String login, UpdateUserInfoDto updateUserInfoDto);
 
 }

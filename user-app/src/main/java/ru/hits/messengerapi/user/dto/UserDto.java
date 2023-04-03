@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.hits.messengerapi.user.entity.UserEntity;
-import ru.hits.messengerapi.user.enumeration.Sex;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -16,34 +16,34 @@ public class UserDto {
 
     private UUID id;
 
-    private String name;
-
-    private String surname;
-
-    private String patronymic;
+    private String login;
 
     private String email;
 
-    private String login;
-
     private String password;
 
-    private Sex sex;
+    private String fullName;
 
-    private LocalDate birthdate;
+    private LocalDate birthDate;
 
-    private LocalDate registrationDate;
+    private String phoneNumber;
+
+    private String city;
+
+    private UUID avatar;
+
+    private LocalDateTime registrationDate;
 
     public UserDto(UserEntity userEntity) {
         this.id = userEntity.getId();
-        this.name = userEntity.getName();
-        this.surname = userEntity.getSurname();
-        this.patronymic = userEntity.getPatronymic();
-        this.email = userEntity.getEmail();
         this.login = userEntity.getLogin();
+        this.email = userEntity.getEmail();
         this.password = userEntity.getPassword();
-        this.sex = userEntity.getSex();
-        this.birthdate = userEntity.getBirthdate();
+        this.fullName = userEntity.getFullName();
+        this.birthDate = userEntity.getBirthDate();
+        this.phoneNumber = userEntity.getPhoneNumber();
+        this.city = userEntity.getCity();
+        this.avatar = userEntity.getAvatar();
         this.registrationDate = userEntity.getRegistrationDate();
     }
 
