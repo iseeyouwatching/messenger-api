@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
-import ru.hits.messengerapi.user.enumeration.Sex;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -27,23 +27,27 @@ public class UserEntity {
     )
     private UUID id;
 
-    private String name;
+    @Column(name = "registration_date")
+    private LocalDateTime registrationDate = LocalDateTime.now();
 
-    private String surname;
-
-    private String patronymic;
-
-    private String email;
-
+    @Column(unique = true)
     private String login;
+
+    @Column(unique = true)
+    private String email;
 
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Sex sex;
+    @Column(name = "full_name")
+    private String fullName;
 
-    private LocalDate birthdate;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
-    @Column(name = "registration_date")
-    private LocalDate registrationDate;
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    private String city;
+
+    private UUID avatar;
 }
