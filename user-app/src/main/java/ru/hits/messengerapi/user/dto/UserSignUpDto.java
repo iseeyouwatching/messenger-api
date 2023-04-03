@@ -3,13 +3,9 @@ package ru.hits.messengerapi.user.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.hits.messengerapi.user.enumeration.Sex;
 
-import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -37,4 +33,5 @@ public class UserSignUpDto {
     private String city;
 
     private UUID avatar;
+
 }
