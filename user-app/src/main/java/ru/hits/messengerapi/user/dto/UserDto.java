@@ -1,8 +1,6 @@
 package ru.hits.messengerapi.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.hits.messengerapi.user.entity.UserEntity;
 
 import java.time.LocalDate;
@@ -12,6 +10,8 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class UserDto {
 
     private UUID id;

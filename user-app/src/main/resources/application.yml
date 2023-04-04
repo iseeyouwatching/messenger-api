@@ -10,3 +10,8 @@ spring:
 
 server:
   port: 8191
+
+jwt:
+  token:
+    secret: secret-key
+    issuer: messenger-api

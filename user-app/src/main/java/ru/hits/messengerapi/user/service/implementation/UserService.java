@@ -1,21 +1,21 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
-import ru.hits.messengerapi.user.dto.UserDto;
-import ru.hits.messengerapi.user.dto.UserProfileDto;
-import ru.hits.messengerapi.user.dto.UserSignInDto;
-import ru.hits.messengerapi.user.dto.UserSignUpDto;
+import ru.hits.messengerapi.user.dto.*;
 import ru.hits.messengerapi.user.entity.UserEntity;
 
 import ru.hits.messengerapi.user.repository.UserRepository;
+import ru.hits.messengerapi.user.security.JWTUtil;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -25,32 +25,28 @@ public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JWTUtil jwtUtil;
+    private final ModelMapper modelMapper;
 
     @Override
-    public UserDto userSignUp(UserSignUpDto userSignUpDto) {
+    public Map<String, String> userSignUp(UserSignUpDto userSignUpDto) {
 
         if (userRepository.findByLogin(userSignUpDto.getLogin()).isPresent()) {
             throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
         }
 
-        UserEntity user = new UserEntity();
-
-        user.setLogin(userSignUpDto.getLogin());
-        user.setEmail(userSignUpDto.getEmail());
+        UserEntity user = modelMapper.map(userSignUpDto, UserEntity.class);
         user.setPassword(passwordEncoder.encode(userSignUpDto.getPassword()));
-        user.setFullName(userSignUpDto.getFullName());
-        user.setBirthDate(userSignUpDto.getBirthDate());
-        user.setPhoneNumber(userSignUpDto.getPhoneNumber());
-        user.setCity(userSignUpDto.getCity());
-        user.setAvatar(userSignUpDto.getAvatar());
 
         userRepository.save(user);
 
-        return new UserDto(user);
+        System.out.println(jwtUtil.generateToken(user.getLogin()));
+
+        return Map.of("token", jwtUtil.generateToken(user.getLogin()));
     }
 
     @Override
-    public UserDto userSignIn(UserSignInDto userSignInDto) {
+    public Map<String, String> userSignIn(UserSignInDto userSignInDto) {
         Optional<UserEntity> user = userRepository.findByLogin(userSignInDto.getLogin());
 
         if (user.isEmpty() ||
@@ -58,7 +54,7 @@ public class UserService implements UserServiceInterface {
             throw new UnauthorizedException("Некорректные данные.");
         }
 
-        return new UserDto(user.get());
+        return Map.of("token", jwtUtil.generateToken(user.get().getLogin()));
     }
 
     @Override
