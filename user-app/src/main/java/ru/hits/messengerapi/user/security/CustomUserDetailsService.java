@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.service.implementation;
+package ru.hits.messengerapi.user.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

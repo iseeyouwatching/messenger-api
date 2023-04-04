@@ -14,6 +14,7 @@ import ru.hits.messengerapi.common.dto.ApiError;
 import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
+import ru.hits.messengerapi.common.exception.UnauthorizedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,6 +74,13 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
                                                             WebRequest request
     ) {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiError> handleConflictException(UnauthorizedException exception,
+                                                            WebRequest request
+    ) {
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
