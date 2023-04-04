@@ -6,11 +6,14 @@ import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.user.dto.UserDto;
+import ru.hits.messengerapi.user.dto.UserProfileDto;
 import ru.hits.messengerapi.user.dto.UserSignUpDto;
 import ru.hits.messengerapi.user.entity.UserEntity;
 
 import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
+
+import java.util.Optional;
 
 
 @Service
@@ -22,7 +25,7 @@ public class UserService implements UserServiceInterface {
     @Override
     public UserDto userSignUp(UserSignUpDto userSignUpDto) {
 
-        if (userRepository.findByLogin(userSignUpDto.getLogin()) != null) {
+        if (userRepository.findByLogin(userSignUpDto.getLogin()).isPresent()) {
             throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
         }
 
@@ -43,14 +46,14 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public UserDto getUserInfo(String login) {
-        UserEntity user = userRepository.findByLogin(login);
+    public UserProfileDto getUserInfo(String login) {
+        Optional<UserEntity> user = userRepository.findByLogin(login);
 
-        if (user == null) {
+        if (user.isEmpty()) {
             throw new NotFoundException("Пользователь с логином " + login + " не найден.");
         }
 
-        return new UserDto(user);
+        return new UserProfileDto(user.get());
     }
 
 //    @Override
