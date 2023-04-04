@@ -40,8 +40,6 @@ public class UserService implements UserServiceInterface {
 
         userRepository.save(user);
 
-        System.out.println(jwtUtil.generateToken(user.getLogin()));
-
         return Map.of("token", jwtUtil.generateToken(user.getLogin()));
     }
 

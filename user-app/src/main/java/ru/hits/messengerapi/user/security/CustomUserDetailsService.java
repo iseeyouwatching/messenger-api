@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
-import ru.hits.messengerapi.user.security.CustomUserDetails;
 
 import java.util.Optional;
 
