@@ -3,6 +3,7 @@ package ru.hits.messengerapi.user.service.implementation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.BadRequestException;
+import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.user.dto.UserDto;
 import ru.hits.messengerapi.user.dto.UserSignUpDto;
@@ -11,7 +12,6 @@ import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
 
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class UserService implements UserServiceInterface {
     public UserDto userSignUp(UserSignUpDto userSignUpDto) {
 
         if (userRepository.findByLogin(userSignUpDto.getLogin()) != null) {
-            throw new BadRequestException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
+            throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
         }
 
         UserEntity user = new UserEntity();

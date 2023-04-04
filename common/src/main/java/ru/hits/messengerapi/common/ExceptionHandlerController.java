@@ -12,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.hits.messengerapi.common.dto.ApiError;
 import ru.hits.messengerapi.common.exception.BadRequestException;
+import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 
 import java.util.ArrayList;
@@ -65,6 +66,13 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
                                                               WebRequest request
     ) {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiError> handleConflictException(ConflictException exception,
+                                                            WebRequest request
+    ) {
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
