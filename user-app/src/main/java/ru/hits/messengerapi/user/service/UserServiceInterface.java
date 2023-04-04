@@ -1,13 +1,12 @@
 package ru.hits.messengerapi.user.service;
 
-import ru.hits.messengerapi.user.dto.UpdateUserInfoDto;
-import ru.hits.messengerapi.user.dto.UserDto;
-import ru.hits.messengerapi.user.dto.UserProfileDto;
-import ru.hits.messengerapi.user.dto.UserSignUpDto;
+import ru.hits.messengerapi.user.dto.*;
 
 public interface UserServiceInterface {
 
     UserDto userSignUp(UserSignUpDto userSignUpDto);
+
+    UserDto userSignIn(UserSignInDto userSignInDto);
 
     UserProfileDto getUserInfo(String login);
 

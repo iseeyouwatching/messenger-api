@@ -1,12 +1,15 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
+import ru.hits.messengerapi.common.exception.UnauthorizedException;
 import ru.hits.messengerapi.user.dto.UserDto;
 import ru.hits.messengerapi.user.dto.UserProfileDto;
+import ru.hits.messengerapi.user.dto.UserSignInDto;
 import ru.hits.messengerapi.user.dto.UserSignUpDto;
 import ru.hits.messengerapi.user.entity.UserEntity;
 
@@ -21,6 +24,7 @@ import java.util.Optional;
 public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto userSignUp(UserSignUpDto userSignUpDto) {
@@ -33,7 +37,7 @@ public class UserService implements UserServiceInterface {
 
         user.setLogin(userSignUpDto.getLogin());
         user.setEmail(userSignUpDto.getEmail());
-        user.setPassword(userSignUpDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userSignUpDto.getPassword()));
         user.setFullName(userSignUpDto.getFullName());
         user.setBirthDate(userSignUpDto.getBirthDate());
         user.setPhoneNumber(userSignUpDto.getPhoneNumber());
@@ -43,6 +47,18 @@ public class UserService implements UserServiceInterface {
         userRepository.save(user);
 
         return new UserDto(user);
+    }
+
+    @Override
+    public UserDto userSignIn(UserSignInDto userSignInDto) {
+        Optional<UserEntity> user = userRepository.findByLogin(userSignInDto.getLogin());
+
+        if (user.isEmpty() ||
+                !passwordEncoder.matches(userSignInDto.getPassword(), user.get().getPassword())) {
+            throw new UnauthorizedException("Некорректные данные.");
+        }
+
+        return new UserDto(user.get());
     }
 
     @Override
