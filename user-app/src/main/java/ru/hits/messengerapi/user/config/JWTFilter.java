@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -41,8 +42,8 @@ public class JWTFilter extends OncePerRequestFilter {
                         "Невалидный JWT токен в Bearer Header.");
             } else {
                 try {
-                    String login = jwtUtil.validateTokenAndRetrieveClaim(jwt);
-                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(login);
+                    UUID id = jwtUtil.validateTokenAndRetrieveClaim(jwt);
+                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(id.toString());
 
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(

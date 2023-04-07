@@ -2,15 +2,16 @@ package ru.hits.messengerapi.user.service;
 
 import ru.hits.messengerapi.user.dto.*;
 
-import java.util.Map;
 
 public interface UserServiceInterface {
 
-    Map<String, String> userSignUp(UserSignUpDto userSignUpDto);
+    UserProfileAndTokenDto userSignUp(UserSignUpDto userSignUpDto);
 
-    Map<String, String> userSignIn(UserSignInDto userSignInDto);
+    UserProfileAndTokenDto userSignIn(UserSignInDto userSignInDto);
 
     UserProfileDto getUserInfo(String login);
+
+    UserProfileDto viewYourProfile();
 
 //    UserDto updateUserInfo(String login, UpdateUserInfoDto updateUserInfoDto);
 

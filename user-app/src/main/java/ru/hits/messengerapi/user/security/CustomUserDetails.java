@@ -23,7 +23,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.user.getLogin();
+        return this.user.getId().toString();
     }
 
     @Override
