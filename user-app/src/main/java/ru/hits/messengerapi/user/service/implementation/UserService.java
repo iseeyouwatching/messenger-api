@@ -1,15 +1,11 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
@@ -92,46 +88,39 @@ public class UserService implements UserServiceInterface {
         return new UserProfileDto(user.get());
     }
 
+    @Override
+    public UserProfileDto updateUserInfo(UpdateUserInfoDto updateUserInfoDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID id = UUID.fromString(authentication.getName());
+        Optional<UserEntity> user = userRepository.findById(id);
 
-//    @Override
-//    public UserDto updateUserInfo(String login, UpdateUserInfoDto updateUserInfoDto) {
-//        UserEntity user = userRepository.findByLogin(login);
-//
-//        if (user == null) {
-//            throw new NotFoundException("Пользователь с логином " + login + " не найден.");
-//        }
-//
-//        if (updateUserInfoDto.getName() != null) {
-//            user.setName(updateUserInfoDto.getName());
-//        }
-//
-//        if (updateUserInfoDto.getSurname() != null) {
-//            user.setSurname(updateUserInfoDto.getSurname());
-//        }
-//
-//        if (updateUserInfoDto.getPatronymic() != null) {
-//            user.setPatronymic(updateUserInfoDto.getPatronymic());
-//        }
-//
-//        if (updateUserInfoDto.getEmail() != null) {
-//            user.setEmail(updateUserInfoDto.getEmail());
-//        }
-//
-//        if (updateUserInfoDto.getPassword() != null) {
-//            user.setPassword(updateUserInfoDto.getPassword());
-//        }
-//
-//        if (updateUserInfoDto.getSex() != null) {
-//            user.setSex(updateUserInfoDto.getSex());
-//        }
-//
-//        if (updateUserInfoDto.getBirthdate() != null) {
-//            user.setBirthdate(updateUserInfoDto.getBirthdate());
-//        }
-//
-//        userRepository.save(user);
-//
-//        return new UserDto(user);
-//    }
+        if (user.isEmpty()) {
+            throw new NotFoundException("Пользователь с ID " + id + " не найден.");
+        }
+
+        if (updateUserInfoDto.getFullName() != null) {
+            user.get().setFullName(updateUserInfoDto.getFullName());
+        }
+
+        if (updateUserInfoDto.getBirthDate() != null) {
+            user.get().setBirthDate(updateUserInfoDto.getBirthDate());
+        }
+
+        if (updateUserInfoDto.getPhoneNumber() != null) {
+            user.get().setPhoneNumber(updateUserInfoDto.getPhoneNumber());
+        }
+
+        if (updateUserInfoDto.getCity() != null) {
+            user.get().setCity(updateUserInfoDto.getCity());
+        }
+
+        if (updateUserInfoDto.getAvatar() != null) {
+            user.get().setAvatar(updateUserInfoDto.getAvatar());
+        }
+
+        user = Optional.of(userRepository.save(user.get()));
+
+        return new UserProfileDto(user.get());
+    }
 
 }

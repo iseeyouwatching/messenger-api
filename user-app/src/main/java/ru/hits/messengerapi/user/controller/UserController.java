@@ -61,11 +61,13 @@ public class UserController {
         return new ResponseEntity<>(userService.viewYourProfile(), HttpStatus.OK);
     }
 
-
-//    @PutMapping("/{login}")
-//    public ResponseEntity<UserDto> updateUserInfo(@PathVariable("login") String login,
-//                                                  @RequestBody @Valid UpdateUserInfoDto updateUserInfoDto) {
-//        return new ResponseEntity<>(userService.updateUserInfo(login, updateUserInfoDto), HttpStatus.OK);
-//    }
+    @Operation(
+            summary = "Изменение профиля.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PutMapping()
+    public ResponseEntity<UserProfileDto> updateUserInfo(@RequestBody @Valid UpdateUserInfoDto updateUserInfoDto) {
+        return new ResponseEntity<>(userService.updateUserInfo(updateUserInfoDto), HttpStatus.OK);
+    }
 
 }

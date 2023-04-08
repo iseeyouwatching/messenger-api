@@ -13,6 +13,6 @@ public interface UserServiceInterface {
 
     UserProfileDto viewYourProfile();
 
-//    UserDto updateUserInfo(String login, UpdateUserInfoDto updateUserInfoDto);
+    UserProfileDto updateUserInfo(UpdateUserInfoDto updateUserInfoDto);
 
 }
