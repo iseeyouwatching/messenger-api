@@ -9,6 +9,8 @@ public interface UserServiceInterface {
 
     UserProfileAndTokenDto userSignIn(UserSignInDto userSignInDto);
 
+    UsersPageListDto getUserList(PaginationDto paginationDto);
+
     UserProfileDto getUserInfo(String login);
 
     UserProfileDto viewYourProfile();

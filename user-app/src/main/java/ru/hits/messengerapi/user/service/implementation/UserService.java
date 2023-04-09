@@ -1,7 +1,10 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +19,8 @@ import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.security.JWTUtil;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,6 +67,55 @@ public class UserService implements UserServiceInterface {
         userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.get().getId()));
 
         return userProfileAndTokenDto;
+    }
+
+    @Override
+    public UsersPageListDto getUserList(PaginationDto paginationDto) {
+        int pageNumber = paginationDto.getPageInfo().getPageNumber();
+        int pageSize = paginationDto.getPageInfo().getPageSize();
+
+        FiltersDto filtersDto = paginationDto.getFilters();
+
+        Example<UserEntity> example = Example.of(UserEntity
+                .builder()
+                .login(filtersDto.getLogin())
+                .email(filtersDto.getEmail())
+                .fullName(filtersDto.getFullName())
+                .birthDate(filtersDto.getBirthDate())
+                .phoneNumber(filtersDto.getPhoneNumber())
+                .city(filtersDto.getCity())
+                .build());
+
+        Pageable pageable;
+        List<SortingDto> sortings = paginationDto.getSorting();
+        List<Order> orders = new ArrayList<>();
+        if (!sortings.isEmpty()) {
+            for (SortingDto sorting : sortings) {
+                orders.add(new Order(Sort.Direction.fromString(sorting.getDirection()),
+                        sorting.getField()));
+            }
+            pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orders));
+        } else {
+            pageable = PageRequest.of(pageNumber - 1, pageSize);
+        }
+
+        Page<UserEntity> users = userRepository.findAll(example, pageable);
+
+        List<UserEntity> userEntities = users.getContent();
+        List<UserProfileDto> userProfileDtos = new ArrayList<>();
+
+        for (UserEntity userEntity: userEntities) {
+            userProfileDtos.add(new UserProfileDto(userEntity));
+        }
+
+        UsersPageListDto usersPageListDto = new UsersPageListDto();
+
+        usersPageListDto.setUsers(userProfileDtos);
+        usersPageListDto.setPagination(paginationDto.getPageInfo());
+        usersPageListDto.setFilters(paginationDto.getFilters());
+        usersPageListDto.setSorting(paginationDto.getSorting());
+
+        return usersPageListDto;
     }
 
     @Override
