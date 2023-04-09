@@ -18,6 +18,7 @@ import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.security.JWTUtil;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
+import ru.hits.messengerapi.user.service.helpingservices.implementation.CheckPaginationInfoService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class UserService implements UserServiceInterface {
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil jwtUtil;
     private final ModelMapper modelMapper;
+    private final CheckPaginationInfoService checkPaginationInfoService;
 
     @Override
     public UserProfileAndTokenDto userSignUp(UserSignUpDto userSignUpDto) {
@@ -73,33 +75,41 @@ public class UserService implements UserServiceInterface {
     public UsersPageListDto getUserList(PaginationDto paginationDto) {
         int pageNumber = paginationDto.getPageInfo().getPageNumber();
         int pageSize = paginationDto.getPageInfo().getPageSize();
-
-        FiltersDto filtersDto = paginationDto.getFilters();
-
-        Example<UserEntity> example = Example.of(UserEntity
-                .builder()
-                .login(filtersDto.getLogin())
-                .email(filtersDto.getEmail())
-                .fullName(filtersDto.getFullName())
-                .birthDate(filtersDto.getBirthDate())
-                .phoneNumber(filtersDto.getPhoneNumber())
-                .city(filtersDto.getCity())
-                .build());
+        checkPaginationInfoService.checkPagination(pageNumber, pageSize);
 
         Pageable pageable;
-        List<SortingDto> sortings = paginationDto.getSorting();
-        List<Order> orders = new ArrayList<>();
-        if (!sortings.isEmpty()) {
+        if (paginationDto.getSorting() != null) {
+            List<SortingDto> sortings = paginationDto.getSorting();
+            List<Order> orders = new ArrayList<>();
             for (SortingDto sorting : sortings) {
-                orders.add(new Order(Sort.Direction.fromString(sorting.getDirection()),
-                        sorting.getField()));
+                orders.add(new Order(Sort.Direction.fromString(sorting.getDirection().toString()),
+                        sorting.getField().toString()));
             }
             pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orders));
-        } else {
+        }
+        else {
             pageable = PageRequest.of(pageNumber - 1, pageSize);
         }
 
-        Page<UserEntity> users = userRepository.findAll(example, pageable);
+        Page<UserEntity> users;
+        if (paginationDto.getFilters() != null) {
+            FiltersDto filtersDto = paginationDto.getFilters();
+
+            Example<UserEntity> example = Example.of(UserEntity
+                    .builder()
+                    .login(filtersDto.getLogin())
+                    .email(filtersDto.getEmail())
+                    .fullName(filtersDto.getFullName())
+                    .birthDate(filtersDto.getBirthDate())
+                    .phoneNumber(filtersDto.getPhoneNumber())
+                    .city(filtersDto.getCity())
+                    .build());
+
+            users = userRepository.findAll(example, pageable);
+        }
+        else {
+            users = userRepository.findAll(pageable);
+        }
 
         List<UserEntity> userEntities = users.getContent();
         List<UserProfileDto> userProfileDtos = new ArrayList<>();
