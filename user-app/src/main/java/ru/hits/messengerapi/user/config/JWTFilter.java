@@ -1,16 +1,12 @@
 package ru.hits.messengerapi.user.config;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.hits.messengerapi.common.dto.ApiError;
 import ru.hits.messengerapi.user.security.CustomUserDetailsService;
 import ru.hits.messengerapi.user.security.JWTUtil;
 
@@ -19,9 +15,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.UUID;
 
+/**
+ * Фильтр для обработки JWT-токена, полученного из заголовка "Authorization".
+ * Проверяет валидность токена и устанавливает аутентификацию пользователя.
+ */
 @Component
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -29,6 +28,16 @@ public class JWTFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
     private final CustomUserDetailsService customUserDetailsService;
 
+    /**
+     * Метод для обработки каждого запроса и проверки валидности JWT-токена.
+     * Если токен валидный, то устанавливает аутентификацию пользователя.
+     *
+     * @param httpServletRequest HTTP-запрос.
+     * @param httpServletResponse HTTP-ответ.
+     * @param filterChain фильтр цепочки.
+     * @throws ServletException в случае ошибки при обработке запроса.
+     * @throws IOException в случае ошибки ввода-вывода.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
                                     HttpServletResponse httpServletResponse,

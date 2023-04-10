@@ -6,6 +6,12 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Класс конфигурации Swagger для API-интерфейса.
+ * Swagger - это инструмент для создания документации по API.
+ * Этот класс содержит конфигурацию Swagger, которая устанавливает название и версию API,
+ * а также определяет тип авторизации (Bearer token) для доступа к документации.
+ */
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "messenger-api", version = "v1"))
 @SecurityScheme(
@@ -15,6 +21,4 @@ import org.springframework.context.annotation.Configuration;
         scheme = "Bearer"
 )
 public class SwaggerConfig {
-
-
 }

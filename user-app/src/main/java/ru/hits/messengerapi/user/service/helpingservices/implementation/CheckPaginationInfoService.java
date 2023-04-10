@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.user.service.helpingservices.CheckPaginationInfoInterface;
 
+/**
+ * Вспомогательный сервис для проверки на корректность данных необходимых для пагинации.
+ */
 @Service
 @RequiredArgsConstructor
 public class CheckPaginationInfoService implements CheckPaginationInfoInterface {

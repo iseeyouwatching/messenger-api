@@ -13,9 +13,9 @@ public class UsersPageListDto {
 
     private List<UserProfileDto> users;
 
-    private PageInfoDto pagination;
+    private PageInfoDto pageInfo;
 
     private FiltersDto filters;
 
-    private List<SortingDto> sorting;
+    private List<SortingDto> sortings;
 }

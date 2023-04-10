@@ -1,7 +1,6 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Order;
@@ -9,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
@@ -20,12 +20,15 @@ import ru.hits.messengerapi.user.security.JWTUtil;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
 import ru.hits.messengerapi.user.service.helpingservices.implementation.CheckPaginationInfoService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
+/**
+ *  Сервис, предназначенный для бизнес-логики эндпоинтов пользователя.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserServiceInterface {
@@ -36,11 +39,24 @@ public class UserService implements UserServiceInterface {
     private final ModelMapper modelMapper;
     private final CheckPaginationInfoService checkPaginationInfoService;
 
+    /**
+     * Метод для регистрации пользователя.
+     *
+     * @param userSignUpDto DTO с данными нового пользователя.
+     * @return объект класса {@link UserProfileAndTokenDto} с данными профиля пользователя и
+     * сгенерированным JWT-токеном.
+     * @throws ConflictException в случае, если пользователь с заданным логином уже существует.
+     * @throws BadRequestException в случае, если дата рождения в DTO задана позже текущей даты.
+     */
     @Override
     public UserProfileAndTokenDto userSignUp(UserSignUpDto userSignUpDto) {
 
         if (userRepository.findByLogin(userSignUpDto.getLogin()).isPresent()) {
             throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
+        }
+
+        if (userSignUpDto.getBirthDate().isAfter(LocalDate.now())) {
+            throw new BadRequestException("Дата рождения не может быть позже текущей.");
         }
 
         UserEntity user = modelMapper.map(userSignUpDto, UserEntity.class);
@@ -55,6 +71,14 @@ public class UserService implements UserServiceInterface {
         return userProfileAndTokenDto;
     }
 
+    /**
+     * Метод для аутентификации пользователя.
+     *
+     * @param userSignInDto DTO с данными для входа пользователя.
+     * @return объект класса {@link UserProfileAndTokenDto} с данными профиля пользователя и
+     * сгенерированным JWT-токеном.
+     * @throws UnauthorizedException в случае, если заданы неверные данные для входа.
+     */
     @Override
     public UserProfileAndTokenDto userSignIn(UserSignInDto userSignInDto) {
         Optional<UserEntity> user = userRepository.findByLogin(userSignInDto.getLogin());
@@ -71,6 +95,13 @@ public class UserService implements UserServiceInterface {
         return userProfileAndTokenDto;
     }
 
+    /**
+     * Метод для получения списка пользователей с учетом фильтрации, сортировки и постраничной навигации.
+     *
+     * @param paginationDto DTO объект, содержащий информацию о постраничной навигации, фильтрации и сортировке.
+     * @return объект класса {@link UsersPageListDto}, содержащий список пользователей, соответствующий запросу и
+     * информацию о постраничной навигации, фильтрации и сортировке.
+     */
     @Override
     public UsersPageListDto getUserList(PaginationDto paginationDto) {
         int pageNumber = paginationDto.getPageInfo().getPageNumber();
@@ -78,8 +109,8 @@ public class UserService implements UserServiceInterface {
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
 
         Pageable pageable;
-        if (paginationDto.getSorting() != null) {
-            List<SortingDto> sortings = paginationDto.getSorting();
+        if (paginationDto.getSortings() != null) {
+            List<SortingDto> sortings = paginationDto.getSortings();
             List<Order> orders = new ArrayList<>();
             for (SortingDto sorting : sortings) {
                 orders.add(new Order(Sort.Direction.fromString(sorting.getDirection().toString()),
@@ -121,13 +152,20 @@ public class UserService implements UserServiceInterface {
         UsersPageListDto usersPageListDto = new UsersPageListDto();
 
         usersPageListDto.setUsers(userProfileDtos);
-        usersPageListDto.setPagination(paginationDto.getPageInfo());
+        usersPageListDto.setPageInfo(paginationDto.getPageInfo());
         usersPageListDto.setFilters(paginationDto.getFilters());
-        usersPageListDto.setSorting(paginationDto.getSorting());
+        usersPageListDto.setSortings(paginationDto.getSortings());
 
         return usersPageListDto;
     }
 
+    /**
+     * Метод для получения информации о пользователе по его логину.
+     *
+     * @param login логин пользователя.
+     * @return объект класса {@link UserProfileDto}, содержащий информацию о пользователе с указанным логином.
+     * @throws NotFoundException если пользователь с указанным логином не найден.
+     */
     @Override
     public UserProfileDto getUserInfo(String login) {
         Optional<UserEntity> user = userRepository.findByLogin(login);
@@ -139,6 +177,12 @@ public class UserService implements UserServiceInterface {
         return new UserProfileDto(user.get());
     }
 
+    /**
+     * Метод для получения информации о профиле текущего пользователя.
+     *
+     * @return объект класса {@link UserProfileDto} с информацией о профиле текущего пользователя.
+     * @throws NotFoundException если пользователь с указанным ID не найден.
+     */
     @Override
     public UserProfileDto viewYourProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -152,6 +196,14 @@ public class UserService implements UserServiceInterface {
         return new UserProfileDto(user.get());
     }
 
+    /**
+     * Метод для обновления информации о профиле текущего пользователя.
+     *
+     * @param updateUserInfoDto объект класса {@link UpdateUserInfoDto} с обновленными данными пользователя.
+     * @return объект класса {@link UserProfileDto} с обновленной информацией о профиле текущего пользователя.
+     * @throws NotFoundException если пользователь с указанным ID не найден.
+     * @throws BadRequestException если дата рождения позже текущей даты.
+     */
     @Override
     public UserProfileDto updateUserInfo(UpdateUserInfoDto updateUserInfoDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -160,6 +212,10 @@ public class UserService implements UserServiceInterface {
 
         if (user.isEmpty()) {
             throw new NotFoundException("Пользователь с ID " + id + " не найден.");
+        }
+
+        if (updateUserInfoDto.getBirthDate().isAfter(LocalDate.now())) {
+            throw new BadRequestException("Дата рождения не может быть позже текущей.");
         }
 
         if (updateUserInfoDto.getFullName() != null) {

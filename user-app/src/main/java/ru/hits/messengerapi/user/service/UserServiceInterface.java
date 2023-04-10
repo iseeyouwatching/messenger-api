@@ -2,7 +2,9 @@ package ru.hits.messengerapi.user.service;
 
 import ru.hits.messengerapi.user.dto.*;
 
-
+/**
+ * Интерфейс для работы с пользовательскими данными.
+ */
 public interface UserServiceInterface {
 
     UserProfileAndTokenDto userSignUp(UserSignUpDto userSignUpDto);
