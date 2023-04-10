@@ -55,7 +55,7 @@ public class UserService implements UserServiceInterface {
             throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
         }
 
-        if (userSignUpDto.getBirthDate().isAfter(LocalDate.now())) {
+        if (userSignUpDto.getBirthDate() != null && userSignUpDto.getBirthDate().isAfter(LocalDate.now())) {
             throw new BadRequestException("Дата рождения не может быть позже текущей.");
         }
 
@@ -214,7 +214,8 @@ public class UserService implements UserServiceInterface {
             throw new NotFoundException("Пользователь с ID " + id + " не найден.");
         }
 
-        if (updateUserInfoDto.getBirthDate().isAfter(LocalDate.now())) {
+        if (updateUserInfoDto.getBirthDate() != null &&
+                updateUserInfoDto.getBirthDate().isAfter(LocalDate.now())) {
             throw new BadRequestException("Дата рождения не может быть позже текущей.");
         }
 
