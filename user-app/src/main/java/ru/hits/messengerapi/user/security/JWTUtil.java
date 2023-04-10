@@ -53,7 +53,7 @@ public class JWTUtil {
      *
      * @param token JWT-токен.
      * @return ID пользователя.
-     * @throws JWTVerificationException
+     * @throws JWTVerificationException если токен не прошел верификацию.
      */
     public UUID validateTokenAndRetrieveClaim(String token) throws JWTVerificationException {
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
