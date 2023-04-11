@@ -21,6 +21,8 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
      */
     Optional<UserEntity> findByLogin(String login);
 
+    Optional<UserEntity> findByIdAndFullName(UUID id, String fullName);
+
     /**
      * Метод, который находит пользователя по его почте.
      *

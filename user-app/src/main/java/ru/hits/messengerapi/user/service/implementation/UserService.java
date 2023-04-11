@@ -13,6 +13,7 @@ import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
 import ru.hits.messengerapi.common.JWTUtil;
+import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.user.dto.*;
 
 import ru.hits.messengerapi.user.entity.UserEntity;
@@ -190,7 +191,8 @@ public class UserService implements UserServiceInterface {
     @Override
     public UserProfileDto viewYourProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID id = UUID.fromString(authentication.getName());
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID id = userData.getId();
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
@@ -211,7 +213,8 @@ public class UserService implements UserServiceInterface {
     @Override
     public UserProfileDto updateUserInfo(UpdateUserInfoDto updateUserInfoDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID id = UUID.fromString(authentication.getName());
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID id = userData.getId();
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {

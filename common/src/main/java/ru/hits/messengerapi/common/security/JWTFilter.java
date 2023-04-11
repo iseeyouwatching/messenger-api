@@ -2,6 +2,7 @@ package ru.hits.messengerapi.common.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -47,8 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
             if (jwt.isBlank()) {
-                httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        "Невалидный JWT токен в Bearer Header.");
+                httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             } else {
                 try {
                     UUID id = UUID.fromString(jwtUtil.validateTokenAndRetrieveClaim(jwt).get(0));
@@ -60,8 +60,7 @@ public class JWTFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 } catch (JWTVerificationException exception) {
-                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                            "Невалидный JWT токен.");
+                    httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
                 }
             }
         }

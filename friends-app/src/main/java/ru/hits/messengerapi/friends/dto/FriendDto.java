@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.dto;
 
 import lombok.*;
+import ru.hits.messengerapi.friends.entity.FriendEntity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,5 +24,14 @@ public class FriendDto {
     private UUID addedUserId;
 
     private String friendName;
+
+    public FriendDto(FriendEntity friend) {
+        this.id = friend.getId();
+        this.addedDate = friend.getAddedDate();
+        this.deletedDate = friend.getDeletedDate();
+        this.targetUserId = friend.getTargetUserId();
+        this.addedUserId = friend.getAddedUserId();
+        this.friendName = friend.getFriendName();
+    }
 
 }

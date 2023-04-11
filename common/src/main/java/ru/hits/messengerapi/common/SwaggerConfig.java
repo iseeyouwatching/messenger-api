@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.config;
+package ru.hits.messengerapi.common;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
