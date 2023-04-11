@@ -45,7 +45,7 @@ public class UserService implements UserServiceInterface {
      * @param userSignUpDto DTO с данными нового пользователя.
      * @return объект класса {@link UserProfileAndTokenDto} с данными профиля пользователя и
      * сгенерированным JWT-токеном.
-     * @throws ConflictException в случае, если пользователь с заданным логином уже существует.
+     * @throws ConflictException в случае, если пользователь с заданным логином/почтой уже существует.
      * @throws BadRequestException в случае, если дата рождения в DTO задана позже текущей даты.
      */
     @Override
@@ -53,6 +53,10 @@ public class UserService implements UserServiceInterface {
 
         if (userRepository.findByLogin(userSignUpDto.getLogin()).isPresent()) {
             throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
+        }
+
+        if (userRepository.findByEmail(userSignUpDto.getEmail()).isPresent()) {
+            throw new ConflictException("Пользователь с почтой " + userSignUpDto.getEmail() + " уже существует.");
         }
 
         if (userSignUpDto.getBirthDate() != null && userSignUpDto.getBirthDate().isAfter(LocalDate.now())) {

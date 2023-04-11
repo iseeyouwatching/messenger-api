@@ -21,4 +21,12 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
      * @return найденный пользователь.
      */
     Optional<UserEntity> findByLogin(String login);
+
+    /**
+     * Метод, который находит пользователя по его почте.
+     *
+     * @param email почта пользователя.
+     * @return найденный пользователь.
+     */
+    Optional<UserEntity> findByEmail(String email);
 }
