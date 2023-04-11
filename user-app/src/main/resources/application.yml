@@ -1,3 +1,13 @@
+app:
+  security:
+    jwt-token:
+      secret: qqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrttty
+      issuer: messenger-api
+      subject: User details
+    integrations:
+      root-path: /integration
+      api-key: ac816388c1c44ac2b2ae431f89c82e7e345d25a0e6474e75a78f9a5ce496060c
+
 spring:
   application:
     name: users
@@ -17,8 +27,3 @@ spring:
 
 server:
   port: 8191
-
-jwt:
-  token:
-    secret: secret-key
-    issuer: messenger-api

@@ -1,12 +1,11 @@
-package ru.hits.messengerapi.user.security;
+package ru.hits.messengerapi.common.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.hits.messengerapi.common.JWTUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
+
+import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_JWT;
 
 /**
  * Фильтр для обработки JWT-токена, полученного из заголовка "Authorization".
@@ -24,7 +25,6 @@ import java.util.UUID;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
-    private final CustomUserDetailsService customUserDetailsService;
 
     /**
      * Метод для обработки каждого запроса и проверки валидности JWT-токена.
@@ -37,10 +37,12 @@ public class JWTFilter extends OncePerRequestFilter {
      * @throws IOException в случае ошибки ввода-вывода.
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest,
-                                    HttpServletResponse httpServletResponse,
-                                    FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = httpServletRequest.getHeader("Authorization");
+    protected void doFilterInternal(
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+        String authHeader = httpServletRequest.getHeader(HEADER_JWT);
 
         if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
@@ -49,17 +51,13 @@ public class JWTFilter extends OncePerRequestFilter {
                         "Невалидный JWT токен в Bearer Header.");
             } else {
                 try {
-                    UUID id = jwtUtil.validateTokenAndRetrieveClaim(jwt);
-                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(id.toString());
+                    UUID id = UUID.fromString(jwtUtil.validateTokenAndRetrieveClaim(jwt).get(0));
+                    String login = jwtUtil.validateTokenAndRetrieveClaim(jwt).get(1);
+                    var userData = new JwtUserData(login, id);
+                    var authentication = new JwtAuthentication(userData);
 
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    userDetails.getPassword(),
-                                    userDetails.getAuthorities()
-                            );
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 } catch (JWTVerificationException exception) {
                     httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,

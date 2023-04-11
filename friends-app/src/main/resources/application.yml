@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: friends
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:5432/friends_db
+    user: hits
+    password: hits
+  datasource:
+    url: jdbc:postgresql://localhost:5432/friends_db
+    username: hits
+    password: hits
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port: 8192

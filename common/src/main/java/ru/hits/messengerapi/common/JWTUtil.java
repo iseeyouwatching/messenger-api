@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.security;
+package ru.hits.messengerapi.common;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,14 +23,17 @@ public class JWTUtil {
     /**
      * Секретный ключ.
      */
-    @Value("${jwt.token.secret}")
+    @Value("${app.security.jwt-token.secret}")
     private String secret;
 
     /**
      * Приложение, из которого отправляется токен.
      */
-    @Value("${jwt.token.issuer}")
+    @Value("${app.security.jwt-token.issuer}")
     private String issuer;
+
+    @Value("${app.security.jwt-token.subject}")
+    private String subject;
 
     /**
      * Метод для генерации JWT-токена.
@@ -36,12 +41,13 @@ public class JWTUtil {
      * @param id ID пользователя, для которого нужно сгенерировать токен.
      * @return сгенерированный JWT-токен.
      */
-    public String generateToken(UUID id) {
+    public String generateToken(UUID id, String login) {
         Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());
 
         return JWT.create()
-                .withSubject("User details")
+                .withSubject(subject)
                 .withClaim("id", id.toString())
+                .withClaim("login", login)
                 .withIssuedAt(new Date())
                 .withIssuer(issuer)
                 .withExpiresAt(expirationDate)
@@ -55,15 +61,21 @@ public class JWTUtil {
      * @return ID пользователя.
      * @throws JWTVerificationException если токен не прошел верификацию.
      */
-    public UUID validateTokenAndRetrieveClaim(String token) throws JWTVerificationException {
+    public List<String> validateTokenAndRetrieveClaim(String token) throws JWTVerificationException {
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
                 .withSubject("User details")
                 .withIssuer(issuer)
                 .build();
 
         DecodedJWT decodedJWT = verifier.verify(token);
-        return UUID.fromString(decodedJWT.getClaim("id").asString());
-    }
 
+        String id = decodedJWT.getClaim("id").asString();
+        String login = String.valueOf(decodedJWT.getClaim("login"));
+
+        List<String> claims = new ArrayList<>();
+        claims.add(id);
+        claims.add(login);
+        return claims;
+    }
 
 }

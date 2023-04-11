@@ -6,16 +6,16 @@ import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
-import ru.hits.messengerapi.user.security.JWTUtil;
+import ru.hits.messengerapi.common.JWTUtil;
 import ru.hits.messengerapi.user.dto.*;
-import ru.hits.messengerapi.user.entity.UserEntity;
 
+import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
 import ru.hits.messengerapi.user.service.helpingservices.implementation.CheckPaginationInfoService;
@@ -34,7 +34,7 @@ import java.util.UUID;
 public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTUtil jwtUtil;
     private final ModelMapper modelMapper;
     private final CheckPaginationInfoService checkPaginationInfoService;
@@ -64,13 +64,13 @@ public class UserService implements UserServiceInterface {
         }
 
         UserEntity user = modelMapper.map(userSignUpDto, UserEntity.class);
-        user.setPassword(passwordEncoder.encode(userSignUpDto.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(userSignUpDto.getPassword()));
 
         user = userRepository.save(user);
 
         UserProfileAndTokenDto userProfileAndTokenDto = new UserProfileAndTokenDto();
         userProfileAndTokenDto.setUserProfileDto(new UserProfileDto(user));
-        userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.getId()));
+        userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.getId(), user.getLogin()));
 
         return userProfileAndTokenDto;
     }
@@ -88,13 +88,13 @@ public class UserService implements UserServiceInterface {
         Optional<UserEntity> user = userRepository.findByLogin(userSignInDto.getLogin());
 
         if (user.isEmpty() ||
-                !passwordEncoder.matches(userSignInDto.getPassword(), user.get().getPassword())) {
+                !bCryptPasswordEncoder.matches(userSignInDto.getPassword(), user.get().getPassword())) {
             throw new UnauthorizedException("Некорректные данные.");
         }
 
         UserProfileAndTokenDto userProfileAndTokenDto = new UserProfileAndTokenDto();
         userProfileAndTokenDto.setUserProfileDto(new UserProfileDto(user.get()));
-        userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.get().getId()));
+        userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.get().getId(), user.get().getLogin()));
 
         return userProfileAndTokenDto;
     }
