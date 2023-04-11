@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Метод для получения списка прав доступа пользователя.
      *
-     * @return null
+     * @return null.
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -56,6 +56,8 @@ public class CustomUserDetails implements UserDetails {
 
     /**
      * Метод для проверки того, не истек ли срок действия учетной записи пользователя.
+     *
+     * @return true.
      */
     @Override
     public boolean isAccountNonExpired() {
@@ -64,6 +66,8 @@ public class CustomUserDetails implements UserDetails {
 
     /**
      * Метод для проверки того, не заблокирован ли пользователь.
+     *
+     * @return true.
      */
     @Override
     public boolean isAccountNonLocked() {
@@ -72,6 +76,8 @@ public class CustomUserDetails implements UserDetails {
 
     /**
      * Метод для проверки того, не истек ли срок действия учетных данных пользователя.
+     *
+     * @return true.
      */
     @Override
     public boolean isCredentialsNonExpired() {
@@ -80,6 +86,8 @@ public class CustomUserDetails implements UserDetails {
 
     /**
      * Метод для проверки того, активен ли пользователь.
+     *
+     * @return true.
      */
     @Override
     public boolean isEnabled() {

@@ -12,11 +12,11 @@ import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
+import ru.hits.messengerapi.user.security.JWTUtil;
 import ru.hits.messengerapi.user.dto.*;
 import ru.hits.messengerapi.user.entity.UserEntity;
 
 import ru.hits.messengerapi.user.repository.UserRepository;
-import ru.hits.messengerapi.user.security.JWTUtil;
 import ru.hits.messengerapi.user.service.UserServiceInterface;
 import ru.hits.messengerapi.user.service.helpingservices.implementation.CheckPaginationInfoService;
 

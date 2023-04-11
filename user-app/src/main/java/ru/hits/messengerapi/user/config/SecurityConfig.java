@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.hits.messengerapi.user.security.CustomUserDetailsService;
+import ru.hits.messengerapi.user.security.JWTFilter;
 
 /**
  * Конфигурация безопасности приложения

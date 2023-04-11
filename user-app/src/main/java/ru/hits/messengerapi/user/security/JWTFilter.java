@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.config;
+package ru.hits.messengerapi.user.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.RequiredArgsConstructor;
@@ -7,8 +7,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.hits.messengerapi.user.security.CustomUserDetailsService;
-import ru.hits.messengerapi.user.security.JWTUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -34,7 +32,7 @@ public class JWTFilter extends OncePerRequestFilter {
      *
      * @param httpServletRequest HTTP-запрос.
      * @param httpServletResponse HTTP-ответ.
-     * @param filterChain фильтр цепочки.
+     * @param filterChain цепочка фильтров.
      * @throws ServletException в случае ошибки при обработке запроса.
      * @throws IOException в случае ошибки ввода-вывода.
      */
