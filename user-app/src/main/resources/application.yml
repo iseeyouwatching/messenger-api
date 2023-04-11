@@ -1,14 +1,19 @@
 spring:
   application:
     name: users
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:5432/users_db
+    user: hits
+    password: hits
   datasource:
-    url: jdbc:postgresql://localhost:5432/spring_db
+    url: jdbc:postgresql://localhost:5432/users_db
     username: hits
     password: hits
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
 
 server:
   port: 8191
