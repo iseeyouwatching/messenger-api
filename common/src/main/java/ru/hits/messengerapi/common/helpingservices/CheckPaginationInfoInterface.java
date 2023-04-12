@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.service.helpingservices;
+package ru.hits.messengerapi.common.helpingservices;
 
 /**
  * Интерфейс для проверки параметров пагинации страницы и размера страницы.

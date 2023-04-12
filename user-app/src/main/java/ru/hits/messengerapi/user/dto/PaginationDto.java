@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.user.dto;
 
 import lombok.*;
+import ru.hits.messengerapi.common.dto.PageInfoDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

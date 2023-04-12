@@ -1,9 +1,9 @@
-package ru.hits.messengerapi.user.service.helpingservices.implementation;
+package ru.hits.messengerapi.common.helpingservices.implementation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.BadRequestException;
-import ru.hits.messengerapi.user.service.helpingservices.CheckPaginationInfoInterface;
+import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoInterface;
 
 /**
  * Вспомогательный сервис для проверки на корректность данных необходимых для пагинации.

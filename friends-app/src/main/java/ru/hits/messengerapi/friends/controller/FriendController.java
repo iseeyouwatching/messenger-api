@@ -9,11 +9,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
-import ru.hits.messengerapi.friends.dto.AddToFriendsDto;
-import ru.hits.messengerapi.friends.dto.FriendDto;
+import ru.hits.messengerapi.friends.dto.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendService;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
@@ -28,6 +28,11 @@ public class FriendController {
     private final SecurityProps securityProps;
 
     @PostMapping
+    public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationDto paginationDto) {
+        return new ResponseEntity<>(friendService.getFriends(paginationDto), HttpStatus.OK);
+    }
+
+    @PostMapping("/add")
     public ResponseEntity<FriendDto> addToFriends(@RequestBody @Valid AddToFriendsDto addToFriendsDto) {
         String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
                 .getHeader("Authorization").substring(7);

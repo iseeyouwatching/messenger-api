@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.dto;
+package ru.hits.messengerapi.common.dto;
 
 import lombok.*;
 

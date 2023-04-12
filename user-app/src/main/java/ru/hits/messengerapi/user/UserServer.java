@@ -2,9 +2,9 @@ package ru.hits.messengerapi.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import ru.hits.messengerapi.common.EnableJWTUtil;
+import ru.hits.messengerapi.common.EnableCommonClasses;
 
-@EnableJWTUtil
+@EnableCommonClasses
 @SpringBootApplication
 public class UserServer {
 
