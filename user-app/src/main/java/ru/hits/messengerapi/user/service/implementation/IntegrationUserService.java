@@ -21,7 +21,7 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
         Optional<UserEntity> user = userRepository.findByIdAndFullName(UUID.fromString(id), fullName);
 
         if (user.isEmpty()) {
-            throw new NotFoundException("Пользователя с id " + id + " и ФИО " + fullName + " не существует.");
+            return "dont exist";
         }
 
         return "exist";

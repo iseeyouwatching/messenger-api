@@ -30,13 +30,10 @@ class ApiIntegrationFilter extends OncePerRequestFilter {
             HttpServletResponse httpServletResponse,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String authHeader = httpServletRequest.getHeader(HEADER_JWT);
-        if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ") &&
-                Objects.equals(httpServletRequest.getHeader(HEADER_API_KEY), apiKey)) {
+        if (Objects.equals(httpServletRequest.getHeader(HEADER_API_KEY), apiKey)) {
             SecurityContextHolder.getContext().setAuthentication(new IntegrationAuthentication());
         }
         else {
-            System.out.println("ПРАЫФАЫААЫАФЫИВЕТ!!");
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
         }
