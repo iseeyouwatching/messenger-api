@@ -15,6 +15,7 @@ import ru.hits.messengerapi.friends.service.implementation.FriendService;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_JWT;
@@ -30,6 +31,11 @@ public class FriendController {
     @PostMapping
     public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationDto paginationDto) {
         return new ResponseEntity<>(friendService.getFriends(paginationDto), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<FriendDto> getFriend(@PathVariable("id") UUID id) {
+        return new ResponseEntity<>(friendService.getFriend(id), HttpStatus.OK);
     }
 
     @PostMapping("/add")

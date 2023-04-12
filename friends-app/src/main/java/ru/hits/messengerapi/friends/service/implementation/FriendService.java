@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.ConflictException;
+import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.*;
@@ -17,6 +18,7 @@ import ru.hits.messengerapi.friends.service.FriendServiceInterface;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -60,6 +62,25 @@ public class FriendService implements FriendServiceInterface {
                 paginationDto.getPageInfo(),
                 paginationDto.getFullNameFilter()
         );
+    }
+
+    @Override
+    public FriendDto getFriend(UUID addedUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID targetUserId = userData.getId();
+
+        Optional<FriendEntity> friend = friendRepository.findByTargetUserIdAndAddedUserId(
+                targetUserId,
+                addedUserId
+        );
+
+        if (friend.isEmpty()) {
+            throw new NotFoundException("Пользователя с ID " + addedUserId
+                    + " нет в списке друзей у пользователя с ID " + targetUserId + ".");
+        }
+
+        return new FriendDto(friend.get());
     }
 
     @Override
