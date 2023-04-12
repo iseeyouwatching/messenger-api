@@ -8,7 +8,10 @@ public interface FriendServiceInterface {
 
     FriendsPageListDto getFriends(PaginationDto paginationDto);
 
-    FriendDto getFriend(UUID id);
+    FriendDto getFriend(UUID addedUserId);
 
     FriendDto addToFriends(AddToFriendsDto addToFriendsDto);
+
+    FriendDto deleteFriend(UUID addedUserId);
+
 }

@@ -108,13 +108,54 @@ public class FriendService implements FriendServiceInterface {
         friend = friendRepository.save(friend);
 
         FriendEntity mutualFriendship = new FriendEntity();
-        mutualFriendship.setAddedDate(LocalDateTime.now());
+        mutualFriendship.setAddedDate(friend.getAddedDate());
         mutualFriendship.setTargetUserId(addToFriendsDto.getAddedUserId());
         mutualFriendship.setAddedUserId(targetUserId);
-        mutualFriendship.setFriendName(userData.getFullName().toString());
+        mutualFriendship.setFriendName(userData.getFullName());
 
         friendRepository.save(mutualFriendship);
 
         return new FriendDto(friend);
+    }
+
+    @Override
+    public FriendDto deleteFriend(UUID addedUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID targetUserId = userData.getId();
+
+        Optional<FriendEntity> friend = friendRepository.findByTargetUserIdAndAddedUserId(
+                targetUserId,
+                addedUserId
+        );
+
+        if (friend.isEmpty()) {
+            throw new NotFoundException("Пользователя с ID " + addedUserId
+                    + " нет в списке друзей у пользователя с ID " + targetUserId + ".");
+        }
+
+        if (friend.get().getDeletedDate() == null) {
+            Optional<FriendEntity> addedFriend = friendRepository.findByTargetUserIdAndAddedUserId(
+                    addedUserId,
+                    targetUserId
+            );
+
+            if (addedFriend.isEmpty()) {
+                throw new NotFoundException("Пользователя с ID " + targetUserId
+                        + " нет в списке друзей у пользователя с ID " + addedUserId + ".");
+            }
+
+            friend.get().setDeletedDate(LocalDateTime.now());
+            addedFriend.get().setDeletedDate(friend.get().getDeletedDate());
+
+            friendRepository.save(friend.get());
+            friendRepository.save(addedFriend.get());
+        }
+        else {
+            throw new ConflictException("Пользователь с ID " + addedUserId
+                    + " уже удален из списка друзей пользователя с ID " + targetUserId + ".");
+        }
+
+        return new FriendDto(friend.get());
     }
 }

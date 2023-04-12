@@ -65,4 +65,9 @@ public class FriendController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<FriendDto> deleteFriend(@PathVariable("id") UUID id) {
+        return new ResponseEntity<>(friendService.deleteFriend(id), HttpStatus.OK);
+    }
+
 }
