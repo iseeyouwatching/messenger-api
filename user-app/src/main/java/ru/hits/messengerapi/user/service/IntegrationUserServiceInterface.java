@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public interface IntegrationUserServiceInterface {
 
+    String checkUserByIdAndFullName(UUID id, String fullName);
 
-    String checkUserByIdAndFullName(String id, String fullName);
+    String getFullName(UUID id);
 }

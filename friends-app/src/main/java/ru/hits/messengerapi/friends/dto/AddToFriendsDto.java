@@ -14,10 +14,10 @@ import java.util.UUID;
 public class AddToFriendsDto {
 
     @NotNull(message = "ID добавляемого пользователя является обязательным к заполнению.")
-    private UUID addedUserId;
+    private UUID id;
 
     @NotNull(message = "ФИО пользователя является обязательным к заполнению.")
     @NotBlank(message = "ФИО пользователя не может быть пустым.")
-    private String friendName;
+    private String fullName;
 
 }

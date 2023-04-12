@@ -16,10 +16,7 @@ import ru.hits.messengerapi.friends.repository.FriendRepository;
 import ru.hits.messengerapi.friends.service.FriendServiceInterface;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -89,33 +86,45 @@ public class FriendService implements FriendServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
-        if (addToFriendsDto.getAddedUserId().equals(targetUserId)) {
+        if (addToFriendsDto.getId().equals(targetUserId)) {
             throw new ConflictException("Пользователь не может добавить самого себя в друзья.");
         }
 
         if (friendRepository.findByTargetUserIdAndAddedUserId(
-                targetUserId, addToFriendsDto.getAddedUserId()).isPresent()) {
-            throw new ConflictException("Пользователь с ID " + addToFriendsDto.getAddedUserId() + " и ФИО "
-                    + addToFriendsDto.getFriendName() + " уже добавлен в список друзей.");
+                targetUserId, addToFriendsDto.getId()).isPresent()) {
+            throw new ConflictException("Пользователь с ID " + addToFriendsDto.getId() + " и ФИО "
+                    + addToFriendsDto.getFullName() + " уже добавлен в список друзей.");
         }
 
         FriendEntity friend = new FriendEntity();
         friend.setAddedDate(LocalDateTime.now());
         friend.setTargetUserId(targetUserId);
-        friend.setAddedUserId(addToFriendsDto.getAddedUserId());
-        friend.setFriendName(addToFriendsDto.getFriendName());
+        friend.setAddedUserId(addToFriendsDto.getId());
+        friend.setFriendName(addToFriendsDto.getFullName());
 
         friend = friendRepository.save(friend);
 
         FriendEntity mutualFriendship = new FriendEntity();
         mutualFriendship.setAddedDate(friend.getAddedDate());
-        mutualFriendship.setTargetUserId(addToFriendsDto.getAddedUserId());
+        mutualFriendship.setTargetUserId(addToFriendsDto.getId());
         mutualFriendship.setAddedUserId(targetUserId);
         mutualFriendship.setFriendName(userData.getFullName());
 
         friendRepository.save(mutualFriendship);
 
         return new FriendDto(friend);
+    }
+
+    @Override
+    public Map<String, String> syncFriendData(UUID id, String fullName) {
+        List<FriendEntity> friends = friendRepository.findAllByAddedUserId(id);
+
+        for (FriendEntity friend: friends) {
+            friend.setFriendName(fullName);
+            friendRepository.save(friend);
+        }
+
+        return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
     @Override

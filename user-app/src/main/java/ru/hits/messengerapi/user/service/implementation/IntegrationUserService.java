@@ -17,13 +17,24 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
     private final UserRepository userRepository;
 
     @Override
-    public String checkUserByIdAndFullName(String id, String fullName) {
-        Optional<UserEntity> user = userRepository.findByIdAndFullName(UUID.fromString(id), fullName);
+    public String checkUserByIdAndFullName(UUID id, String fullName) {
+        Optional<UserEntity> user = userRepository.findByIdAndFullName(id, fullName);
 
         if (user.isEmpty()) {
             return "dont exist";
         }
 
         return "exist";
+    }
+
+    @Override
+    public String getFullName(UUID id) {
+        Optional<UserEntity> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            return "dont exist";
+        }
+
+        return user.get().getFullName();
     }
 }

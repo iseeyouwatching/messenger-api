@@ -24,4 +24,6 @@ public interface FriendRepository  extends JpaRepository<FriendEntity, UUID> {
                                                                             LocalDateTime deletedDate,
                                                                             Pageable pageable);
 
+    List<FriendEntity> findAllByAddedUserId(UUID addedUserId);
+
 }
