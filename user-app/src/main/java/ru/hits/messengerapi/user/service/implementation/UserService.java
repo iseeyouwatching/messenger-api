@@ -71,7 +71,7 @@ public class UserService implements UserServiceInterface {
 
         UserProfileAndTokenDto userProfileAndTokenDto = new UserProfileAndTokenDto();
         userProfileAndTokenDto.setUserProfileDto(new UserProfileDto(user));
-        userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.getId(), user.getLogin()));
+        userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.getId(), user.getLogin(), user.getFullName()));
 
         return userProfileAndTokenDto;
     }
@@ -95,7 +95,11 @@ public class UserService implements UserServiceInterface {
 
         UserProfileAndTokenDto userProfileAndTokenDto = new UserProfileAndTokenDto();
         userProfileAndTokenDto.setUserProfileDto(new UserProfileDto(user.get()));
-        userProfileAndTokenDto.setToken(jwtUtil.generateToken(user.get().getId(), user.get().getLogin()));
+        userProfileAndTokenDto.setToken(jwtUtil.generateToken(
+                user.get().getId(),
+                user.get().getLogin(),
+                user.get().getFullName()))
+        ;
 
         return userProfileAndTokenDto;
     }

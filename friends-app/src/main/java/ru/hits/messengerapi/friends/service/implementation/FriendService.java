@@ -28,6 +28,10 @@ public class FriendService implements FriendServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
+        if (addToFriendsDto.getAddedUserId().equals(targetUserId)) {
+            throw new ConflictException("Пользователь не может добавить самого себя в друзья.");
+        }
+
         if (friendRepository.findByTargetUserIdAndAddedUserId(
                 targetUserId, addToFriendsDto.getAddedUserId()).isPresent()) {
             throw new ConflictException("Пользователь с ID " + addToFriendsDto.getAddedUserId() + " и ФИО "
@@ -41,6 +45,14 @@ public class FriendService implements FriendServiceInterface {
         friend.setFriendName(addToFriendsDto.getFriendName());
 
         friend = friendRepository.save(friend);
+
+        FriendEntity mutualFriendship = new FriendEntity();
+        mutualFriendship.setAddedDate(LocalDateTime.now());
+        mutualFriendship.setTargetUserId(addToFriendsDto.getAddedUserId());
+        mutualFriendship.setAddedUserId(targetUserId);
+        mutualFriendship.setFriendName(userData.getFullName().toString());
+
+        friendRepository.save(mutualFriendship);
 
         return new FriendDto(friend);
     }

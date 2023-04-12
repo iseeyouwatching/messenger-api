@@ -1,6 +1,5 @@
 package ru.hits.messengerapi.user.controller;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.hits.messengerapi.user.service.implementation.IntegrationUserService;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/integration/users")
@@ -26,7 +23,7 @@ public class IntegrationUserController {
 
     private final IntegrationUserService integrationUserService;
 
-    @GetMapping("/checkUserByIdAndFullName")
+    @GetMapping("/check-existence")
     public ResponseEntity<String> checkUserByIdAndFullName(@RequestParam MultiValueMap<String, String> queryParams) {
         Collection<List<String>> values = queryParams.values();
         for (List<String> value : values) {

@@ -53,7 +53,8 @@ public class JWTFilter extends OncePerRequestFilter {
                 try {
                     UUID id = UUID.fromString(jwtUtil.validateTokenAndRetrieveClaim(jwt).get(0));
                     String login = jwtUtil.validateTokenAndRetrieveClaim(jwt).get(1);
-                    var userData = new JwtUserData(login, id);
+                    String fullName = jwtUtil.validateTokenAndRetrieveClaim(jwt).get(2);
+                    var userData = new JwtUserData(login, id, fullName);
                     var authentication = new JwtAuthentication(userData);
 
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {

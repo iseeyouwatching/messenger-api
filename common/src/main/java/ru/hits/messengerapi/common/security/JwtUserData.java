@@ -12,4 +12,6 @@ public class JwtUserData {
 
     private final UUID id;
 
+    private final String fullName;
+
 }

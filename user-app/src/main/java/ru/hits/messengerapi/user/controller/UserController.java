@@ -1,8 +1,5 @@
 package ru.hits.messengerapi.user.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,7 +16,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "Пользователь")
 public class UserController {
 
     private final UserService userService;
@@ -30,7 +26,6 @@ public class UserController {
      * @param userSignUpDto DTO для регистрации пользователя.
      * @return {@link ResponseEntity} с {@link UserProfileDto} и заголовком авторизации.
      */
-    @Operation(summary = "Регистрация.")
     @PostMapping("/register")
     public ResponseEntity<UserProfileDto> userSignUp(@RequestBody @Valid UserSignUpDto userSignUpDto) {
         UserProfileAndTokenDto userProfileAndTokenDto = userService.userSignUp(userSignUpDto);
@@ -50,7 +45,6 @@ public class UserController {
      * @param userSignInDto DTO для аутентификации пользователя.
      * @return {@link ResponseEntity} с {@link UserProfileDto} и заголовком авторизации.
      */
-    @Operation(summary = "Аутентификация.")
     @PostMapping("/login")
     public ResponseEntity<UserProfileDto> userSignIn(@RequestBody @Valid UserSignInDto userSignInDto) {
         UserProfileAndTokenDto userProfileAndTokenDto = userService.userSignIn(userSignInDto);
@@ -70,7 +64,6 @@ public class UserController {
      * @param paginationDto DTO для пагинации списка пользователей.
      * @return @link ResponseEntity} с {@link UsersPageListDto}.
      */
-    @Operation(summary = "Список пользователей.")
     @PostMapping
     public ResponseEntity<UsersPageListDto> getUsers(@RequestBody @Valid PaginationDto paginationDto) {
         return new ResponseEntity<>(userService.getUserList(paginationDto), HttpStatus.OK);
@@ -82,7 +75,6 @@ public class UserController {
      * @param login логин пользователя.
      * @return {@link ResponseEntity} с {@link UserProfileDto}.
      */
-    @Operation(summary = "Просмотр профиля пользователя.", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/{login}")
     public ResponseEntity<UserProfileDto> getUserInfo(@PathVariable("login") String login) {
         return new ResponseEntity<>(userService.getUserInfo(login), HttpStatus.OK);
@@ -93,8 +85,6 @@ public class UserController {
      *
      * @return {@link ResponseEntity} с {@link UserProfileDto}.
      */
-    @Operation(summary = "Просмотр информации о профиле текущего пользователя.",
-            security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping
     public ResponseEntity<UserProfileDto> viewYourProfile() {
         return new ResponseEntity<>(userService.viewYourProfile(), HttpStatus.OK);
@@ -106,7 +96,6 @@ public class UserController {
      * @param updateUserInfoDto объект с обновленной информацией о пользователе.
      * @return {@link ResponseEntity} с {@link UserProfileDto}.
      */
-    @Operation(summary = "Изменение профиля.", security = @SecurityRequirement(name = "bearerAuth"))
     @PutMapping()
     public ResponseEntity<UserProfileDto> updateUserInfo(@RequestBody @Valid UpdateUserInfoDto updateUserInfoDto) {
         return new ResponseEntity<>(userService.updateUserInfo(updateUserInfoDto), HttpStatus.OK);

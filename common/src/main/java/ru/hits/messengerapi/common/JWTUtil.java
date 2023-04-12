@@ -41,13 +41,14 @@ public class JWTUtil {
      * @param id ID пользователя, для которого нужно сгенерировать токен.
      * @return сгенерированный JWT-токен.
      */
-    public String generateToken(UUID id, String login) {
+    public String generateToken(UUID id, String login, String fullName) {
         Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());
 
         return JWT.create()
                 .withSubject(subject)
                 .withClaim("id", id.toString())
                 .withClaim("login", login)
+                .withClaim("fullName", fullName)
                 .withIssuedAt(new Date())
                 .withIssuer(issuer)
                 .withExpiresAt(expirationDate)
@@ -70,11 +71,13 @@ public class JWTUtil {
         DecodedJWT decodedJWT = verifier.verify(token);
 
         String id = decodedJWT.getClaim("id").asString();
-        String login = String.valueOf(decodedJWT.getClaim("login"));
+        String login = decodedJWT.getClaim("login").asString();
+        String fullName = decodedJWT.getClaim("fullName").asString();
 
         List<String> claims = new ArrayList<>();
         claims.add(id);
         claims.add(login);
+        claims.add(fullName);
         return claims;
     }
 
