@@ -75,7 +75,7 @@ public class FriendService implements FriendServiceInterface {
                 addedUserId
         );
 
-        if (friend.isEmpty()) {
+        if (friend.isEmpty() || friend.get().getDeletedDate() != null) {
             throw new NotFoundException("Пользователя с ID " + addedUserId
                     + " нет в списке друзей у пользователя с ID " + targetUserId + ".");
         }

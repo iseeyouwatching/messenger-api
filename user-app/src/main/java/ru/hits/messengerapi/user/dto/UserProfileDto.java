@@ -17,6 +17,11 @@ import java.util.UUID;
 public class UserProfileDto {
 
     /**
+     * UUID пользователя.
+     */
+    private UUID id;
+
+    /**
      * Логин пользователя.
      */
     private String login;
@@ -56,6 +61,7 @@ public class UserProfileDto {
      * @param userEntity объект сущности пользователя.
      */
     public UserProfileDto(UserEntity userEntity) {
+        this.id = userEntity.getId();
         this.login = userEntity.getLogin();
         this.email = userEntity.getEmail();
         this.fullName = userEntity.getFullName();
