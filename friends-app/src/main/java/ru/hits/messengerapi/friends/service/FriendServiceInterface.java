@@ -17,4 +17,6 @@ public interface FriendServiceInterface {
 
     FriendDto deleteFriend(UUID addedUserId);
 
+    SearchedFriendsDto searchFriends(PaginationWithFriendFiltersDto filters);
+
 }

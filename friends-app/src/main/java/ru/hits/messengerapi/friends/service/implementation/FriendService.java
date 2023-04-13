@@ -1,6 +1,8 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -166,5 +168,42 @@ public class FriendService implements FriendServiceInterface {
         }
 
         return new FriendDto(friend.get());
+    }
+
+    @Override
+    public SearchedFriendsDto searchFriends(PaginationWithFriendFiltersDto paginationAndFilters) {
+        int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
+        int pageSize = paginationAndFilters.getPageInfo().getPageSize();
+        checkPaginationInfoService.checkPagination(pageNumber, pageSize);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID targetUserId = userData.getId();
+
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        Example<FriendEntity> example = Example.of(FriendEntity
+                .builder()
+                .addedDate(paginationAndFilters.getFilters().getAddedDate())
+                .addedUserId(paginationAndFilters.getFilters().getAddedUserId())
+                .deletedDate(paginationAndFilters.getFilters().getDeletedDate())
+                .friendName(paginationAndFilters.getFilters().getFriendName())
+                .targetUserId(targetUserId)
+                .build());
+
+        Page<FriendEntity> friends = friendRepository.findAll(example, pageable);
+        List<FriendEntity> friendEntities = friends.getContent();
+        List<FriendInfoDto> friendInfoDtos = new ArrayList<>();
+
+        for (FriendEntity friend: friendEntities) {
+            friendInfoDtos.add(new FriendInfoDto(friend));
+        }
+
+        SearchedFriendsDto searchedFriendsDto = new SearchedFriendsDto();
+        searchedFriendsDto.setFriends(friendInfoDtos);
+        searchedFriendsDto.setFilters(paginationAndFilters.getFilters());
+        searchedFriendsDto.setPageInfo(paginationAndFilters.getPageInfo());
+
+        return searchedFriendsDto;
     }
 }

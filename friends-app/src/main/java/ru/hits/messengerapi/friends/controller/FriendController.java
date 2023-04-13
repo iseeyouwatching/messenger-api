@@ -12,12 +12,12 @@ import ru.hits.messengerapi.friends.dto.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendService;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
-import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_JWT;
 
 @RestController
 @RequestMapping("/api/friends")
@@ -86,6 +86,12 @@ public class FriendController {
     @DeleteMapping("/{id}")
     public ResponseEntity<FriendDto> deleteFriend(@PathVariable("id") UUID id) {
         return new ResponseEntity<>(friendService.deleteFriend(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<SearchedFriendsDto> searchFriends(
+            @RequestBody @Valid PaginationWithFriendFiltersDto paginationAndFilters) {
+        return new ResponseEntity<>(friendService.searchFriends(paginationAndFilters), HttpStatus.OK);
     }
 
 }
