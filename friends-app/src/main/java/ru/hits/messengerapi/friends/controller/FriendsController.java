@@ -36,25 +36,7 @@ public class FriendsController {
 
     @PostMapping("/add")
     public ResponseEntity<FriendDto> addToFriends(@RequestBody @Valid AddToFriendsDto addToFriendsDto) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url =
-                "http://localhost:8191/integration/users/check-existence";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
-        HttpEntity<AddToFriendsDto> requestEntity = new HttpEntity<>(addToFriendsDto, headers);
-
-        ResponseEntity<String> responseEntity = restTemplate
-                .exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-        if (Objects.equals(responseEntity.getBody(), "exist")) {
-            return new ResponseEntity<>(friendsService.addToFriends(addToFriendsDto), HttpStatus.OK);
-        }
-        else {
-            throw new NotFoundException("Пользователя с id " + addToFriendsDto.getId()
-                    + " и ФИО " + addToFriendsDto.getFullName() + " не существует.");
-        }
+        return new ResponseEntity<>(friendsService.addToFriends(addToFriendsDto), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")

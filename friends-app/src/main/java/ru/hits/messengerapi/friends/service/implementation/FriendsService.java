@@ -89,6 +89,23 @@ public class FriendsService implements FriendsServiceInterface {
 
     @Override
     public FriendDto addToFriends(AddToFriendsDto addToFriendsDto) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url =
+                "http://localhost:8191/integration/users/check-existence";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+        HttpEntity<AddToFriendsDto> requestEntity = new HttpEntity<>(addToFriendsDto, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+        if (Objects.equals(responseEntity.getBody(), "dont exist")) {
+            throw new NotFoundException("Пользователя с id " + addToFriendsDto.getId()
+                    + " и ФИО " + addToFriendsDto.getFullName() + " не существует.");
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
