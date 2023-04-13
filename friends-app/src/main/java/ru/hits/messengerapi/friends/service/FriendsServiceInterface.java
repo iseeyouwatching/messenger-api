@@ -11,7 +11,7 @@ public interface FriendsServiceInterface {
 
     FriendDto getFriend(UUID addedUserId);
 
-    FriendDto addToFriends(AddToFriendsDto addToFriendsDto);
+    FriendDto addToFriends(AddPersonDto addPersonDto);
 
     void syncFriendData(UUID id);
 

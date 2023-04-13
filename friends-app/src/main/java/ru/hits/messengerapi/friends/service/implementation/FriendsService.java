@@ -5,26 +5,23 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
-import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.*;
 import ru.hits.messengerapi.friends.dto.friends.*;
+import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
+import ru.hits.messengerapi.friends.repository.BlacklistRepository;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
 import java.time.LocalDateTime;
 import java.util.*;
-
-import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +29,9 @@ public class FriendsService implements FriendsServiceInterface {
 
     private final FriendsRepository friendsRepository;
     private final CheckPaginationInfoService checkPaginationInfoService;
-    private final SecurityProps securityProps;
-
+    private final IntegrationRequestsService integrationRequestsService;
+    private final BlacklistService blacklistService;
+    private final BlacklistRepository blacklistRepository;
 
     @Override
     public FriendsPageListDto getFriends(PaginationDto paginationDto) {
@@ -88,48 +86,43 @@ public class FriendsService implements FriendsServiceInterface {
     }
 
     @Override
-    public FriendDto addToFriends(AddToFriendsDto addToFriendsDto) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url =
-                "http://localhost:8191/integration/users/check-existence";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
-        HttpEntity<AddToFriendsDto> requestEntity = new HttpEntity<>(addToFriendsDto, headers);
-
-        ResponseEntity<String> responseEntity = restTemplate
-                .exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-        if (Objects.equals(responseEntity.getBody(), "dont exist")) {
-            throw new NotFoundException("Пользователя с id " + addToFriendsDto.getId()
-                    + " и ФИО " + addToFriendsDto.getFullName() + " не существует.");
-        }
+    public FriendDto addToFriends(AddPersonDto addPersonDto) {
+        integrationRequestsService.checkUserExistence(addPersonDto);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
-        if (addToFriendsDto.getId().equals(targetUserId)) {
+        if (addPersonDto.getId().equals(targetUserId)) {
             throw new ConflictException("Пользователь не может добавить самого себя в друзья.");
         }
 
         Optional<FriendEntity> friend = friendsRepository.findByTargetUserIdAndAddedUserId(
-                targetUserId, addToFriendsDto.getId());
+                targetUserId, addPersonDto.getId());
 
         if (friend.isPresent() && friend.get().getDeletedDate() == null) {
-            throw new ConflictException("Пользователь с ID " + addToFriendsDto.getId() + " и ФИО "
-                    + addToFriendsDto.getFullName() + " уже добавлен в список друзей.");
+            throw new ConflictException("Пользователь с ID " + addPersonDto.getId() + " и ФИО "
+                    + addPersonDto.getFullName() + " уже добавлен в список друзей.");
         }
+
+//        Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
+//                targetUserId,
+//                addPersonDto.getId());
+
+//        if (blockedUser.isPresent() && (blockedUser.get().getDeletedDate() == null)) {
+//            blacklistService.deleteFriend(addPersonDto.getId());
+//        }
+//        blacklistService.syncFriendData(addPersonDto.getId());
+
 
         if (friend.isPresent()) {
             friend.get().setDeletedDate(null);
             friend.get().setAddedDate(LocalDateTime.now());
-            syncFriendData(addToFriendsDto.getId());
+            syncFriendData(addPersonDto.getId());
             friendsRepository.save(friend.get());
 
             Optional<FriendEntity> mutualFriendship = friendsRepository.findByTargetUserIdAndAddedUserId(
-                    addToFriendsDto.getId(), targetUserId);
+                    addPersonDto.getId(), targetUserId);
 
             if (mutualFriendship.isPresent()) {
                 mutualFriendship.get().setDeletedDate(null);
@@ -144,14 +137,14 @@ public class FriendsService implements FriendsServiceInterface {
         FriendEntity newFriend = new FriendEntity();
         newFriend.setAddedDate(LocalDateTime.now());
         newFriend.setTargetUserId(targetUserId);
-        newFriend.setAddedUserId(addToFriendsDto.getId());
-        newFriend.setFriendName(addToFriendsDto.getFullName());
+        newFriend.setAddedUserId(addPersonDto.getId());
+        newFriend.setFriendName(addPersonDto.getFullName());
 
         newFriend = friendsRepository.save(newFriend);
 
         FriendEntity mutualFriendship = new FriendEntity();
         mutualFriendship.setAddedDate(newFriend.getAddedDate());
-        mutualFriendship.setTargetUserId(addToFriendsDto.getId());
+        mutualFriendship.setTargetUserId(addPersonDto.getId());
         mutualFriendship.setAddedUserId(targetUserId);
         mutualFriendship.setFriendName(userData.getFullName());
 
@@ -162,26 +155,12 @@ public class FriendsService implements FriendsServiceInterface {
 
     @Override
     public void syncFriendData(UUID id) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url =
-                "http://localhost:8191/integration/users/get-full-name";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
-        HttpEntity<UUID> requestEntity = new HttpEntity<>(id, headers);
-
-        ResponseEntity<String> responseEntity = restTemplate
-                .exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-        if (Objects.equals(responseEntity.getBody(), "dont exist")) {
-            throw new NotFoundException("Пользователя с id " + id + " не существует.");
-        }
+        String fullName = integrationRequestsService.getFullName(id);
 
         List<FriendEntity> friends = friendsRepository.findAllByAddedUserId(id);
 
         for (FriendEntity friend: friends) {
-            friend.setFriendName(responseEntity.getBody());
+            friend.setFriendName(fullName);
             friendsRepository.save(friend);
         }
     }

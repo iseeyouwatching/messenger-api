@@ -3,18 +3,12 @@ package ru.hits.messengerapi.friends.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import ru.hits.messengerapi.common.exception.NotFoundException;
-import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.*;
 import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendsService;
 
 import javax.validation.Valid;
-import java.util.Objects;
 import java.util.UUID;
-
-import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 
 @RestController
 @RequestMapping("/api/friends")
@@ -22,7 +16,6 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 public class FriendsController {
 
     private final FriendsService friendsService;
-    private final SecurityProps securityProps;
 
     @PostMapping
     public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationDto paginationDto) {
@@ -35,8 +28,8 @@ public class FriendsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<FriendDto> addToFriends(@RequestBody @Valid AddToFriendsDto addToFriendsDto) {
-        return new ResponseEntity<>(friendsService.addToFriends(addToFriendsDto), HttpStatus.OK);
+    public ResponseEntity<FriendDto> addToFriends(@RequestBody @Valid AddPersonDto addPersonDto) {
+        return new ResponseEntity<>(friendsService.addToFriends(addPersonDto), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")

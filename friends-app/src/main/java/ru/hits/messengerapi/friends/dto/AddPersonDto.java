@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.dto.friends;
+package ru.hits.messengerapi.friends.dto;
 
 import lombok.*;
 
@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AddToFriendsDto {
+public class AddPersonDto {
 
     @NotNull(message = "ID добавляемого пользователя является обязательным к заполнению.")
     private UUID id;
