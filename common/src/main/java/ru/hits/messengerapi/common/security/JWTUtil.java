@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.common;
+package ru.hits.messengerapi.common.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

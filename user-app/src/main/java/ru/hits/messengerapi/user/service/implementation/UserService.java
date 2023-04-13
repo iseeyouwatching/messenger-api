@@ -12,7 +12,7 @@ import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
-import ru.hits.messengerapi.common.JWTUtil;
+import ru.hits.messengerapi.common.security.JWTUtil;
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.user.dto.*;
 

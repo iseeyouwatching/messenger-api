@@ -5,7 +5,7 @@ import ru.hits.messengerapi.friends.dto.*;
 import java.util.Map;
 import java.util.UUID;
 
-public interface FriendServiceInterface {
+public interface FriendsServiceInterface {
 
     FriendsPageListDto getFriends(PaginationDto paginationDto);
 
@@ -13,7 +13,7 @@ public interface FriendServiceInterface {
 
     FriendDto addToFriends(AddToFriendsDto addToFriendsDto);
 
-    Map<String, String> syncFriendData(UUID id, String fullName);
+    void syncFriendData(UUID id);
 
     FriendDto deleteFriend(UUID addedUserId);
 

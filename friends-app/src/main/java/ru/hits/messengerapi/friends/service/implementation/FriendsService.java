@@ -5,28 +5,33 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
+import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.*;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
-import ru.hits.messengerapi.friends.repository.FriendRepository;
-import ru.hits.messengerapi.friends.service.FriendServiceInterface;
+import ru.hits.messengerapi.friends.repository.FriendsRepository;
+import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
+
 @Service
 @RequiredArgsConstructor
-public class FriendService implements FriendServiceInterface {
+public class FriendsService implements FriendsServiceInterface {
 
-    private final FriendRepository friendRepository;
+    private final FriendsRepository friendsRepository;
     private final CheckPaginationInfoService checkPaginationInfoService;
-
+    private final SecurityProps securityProps;
 
 
     @Override
@@ -42,11 +47,11 @@ public class FriendService implements FriendServiceInterface {
 
         List<FriendEntity> friends;
         if (paginationDto.getFullNameFilter() == null || paginationDto.getFullNameFilter().isBlank()) {
-             friends = friendRepository.findAllByTargetUserIdAndDeletedDate(targetUserId, null, pageable);
+             friends = friendsRepository.findAllByTargetUserIdAndDeletedDate(targetUserId, null, pageable);
         }
         else {
             String wildcardFullNameFilter = "%" + paginationDto.getFullNameFilter() + "%";
-            friends = friendRepository.findAllByTargetUserIdAndFriendNameLikeAndDeletedDate(
+            friends = friendsRepository.findAllByTargetUserIdAndFriendNameLikeAndDeletedDate(
                     targetUserId, wildcardFullNameFilter, null, pageable);
         }
 
@@ -69,7 +74,7 @@ public class FriendService implements FriendServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
-        Optional<FriendEntity> friend = friendRepository.findByTargetUserIdAndAddedUserId(
+        Optional<FriendEntity> friend = friendsRepository.findByTargetUserIdAndAddedUserId(
                 targetUserId,
                 addedUserId
         );
@@ -92,41 +97,76 @@ public class FriendService implements FriendServiceInterface {
             throw new ConflictException("Пользователь не может добавить самого себя в друзья.");
         }
 
-        if (friendRepository.findByTargetUserIdAndAddedUserId(
-                targetUserId, addToFriendsDto.getId()).isPresent()) {
+        Optional<FriendEntity> friend = friendsRepository.findByTargetUserIdAndAddedUserId(
+                targetUserId, addToFriendsDto.getId());
+
+        if (friend.isPresent() && friend.get().getDeletedDate() == null) {
             throw new ConflictException("Пользователь с ID " + addToFriendsDto.getId() + " и ФИО "
                     + addToFriendsDto.getFullName() + " уже добавлен в список друзей.");
         }
 
-        FriendEntity friend = new FriendEntity();
-        friend.setAddedDate(LocalDateTime.now());
-        friend.setTargetUserId(targetUserId);
-        friend.setAddedUserId(addToFriendsDto.getId());
-        friend.setFriendName(addToFriendsDto.getFullName());
+        if (friend.isPresent()) {
+            friend.get().setDeletedDate(null);
+            friend.get().setAddedDate(LocalDateTime.now());
+            syncFriendData(addToFriendsDto.getId());
+            friendsRepository.save(friend.get());
 
-        friend = friendRepository.save(friend);
+            Optional<FriendEntity> mutualFriendship = friendsRepository.findByTargetUserIdAndAddedUserId(
+                    addToFriendsDto.getId(), targetUserId);
+
+            if (mutualFriendship.isPresent()) {
+                mutualFriendship.get().setDeletedDate(null);
+                mutualFriendship.get().setAddedDate(LocalDateTime.now());
+                syncFriendData(targetUserId);
+                friendsRepository.save(mutualFriendship.get());
+
+                return new FriendDto(friend.get());
+            }
+        }
+
+        FriendEntity newFriend = new FriendEntity();
+        newFriend.setAddedDate(LocalDateTime.now());
+        newFriend.setTargetUserId(targetUserId);
+        newFriend.setAddedUserId(addToFriendsDto.getId());
+        newFriend.setFriendName(addToFriendsDto.getFullName());
+
+        newFriend = friendsRepository.save(newFriend);
 
         FriendEntity mutualFriendship = new FriendEntity();
-        mutualFriendship.setAddedDate(friend.getAddedDate());
+        mutualFriendship.setAddedDate(newFriend.getAddedDate());
         mutualFriendship.setTargetUserId(addToFriendsDto.getId());
         mutualFriendship.setAddedUserId(targetUserId);
         mutualFriendship.setFriendName(userData.getFullName());
 
-        friendRepository.save(mutualFriendship);
+        friendsRepository.save(mutualFriendship);
 
-        return new FriendDto(friend);
+        return new FriendDto(newFriend);
     }
 
     @Override
-    public Map<String, String> syncFriendData(UUID id, String fullName) {
-        List<FriendEntity> friends = friendRepository.findAllByAddedUserId(id);
+    public void syncFriendData(UUID id) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url =
+                "http://localhost:8191/integration/users/get-full-name";
 
-        for (FriendEntity friend: friends) {
-            friend.setFriendName(fullName);
-            friendRepository.save(friend);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+        HttpEntity<UUID> requestEntity = new HttpEntity<>(id, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+        if (Objects.equals(responseEntity.getBody(), "dont exist")) {
+            throw new NotFoundException("Пользователя с id " + id + " не существует.");
         }
 
-        return Map.of("message", "Синхронизация данных прошла успешно.");
+        List<FriendEntity> friends = friendsRepository.findAllByAddedUserId(id);
+
+        for (FriendEntity friend: friends) {
+            friend.setFriendName(responseEntity.getBody());
+            friendsRepository.save(friend);
+        }
     }
 
     @Override
@@ -135,7 +175,7 @@ public class FriendService implements FriendServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
-        Optional<FriendEntity> friend = friendRepository.findByTargetUserIdAndAddedUserId(
+        Optional<FriendEntity> friend = friendsRepository.findByTargetUserIdAndAddedUserId(
                 targetUserId,
                 addedUserId
         );
@@ -146,7 +186,7 @@ public class FriendService implements FriendServiceInterface {
         }
 
         if (friend.get().getDeletedDate() == null) {
-            Optional<FriendEntity> addedFriend = friendRepository.findByTargetUserIdAndAddedUserId(
+            Optional<FriendEntity> addedFriend = friendsRepository.findByTargetUserIdAndAddedUserId(
                     addedUserId,
                     targetUserId
             );
@@ -159,8 +199,8 @@ public class FriendService implements FriendServiceInterface {
             friend.get().setDeletedDate(LocalDateTime.now());
             addedFriend.get().setDeletedDate(friend.get().getDeletedDate());
 
-            friendRepository.save(friend.get());
-            friendRepository.save(addedFriend.get());
+            friendsRepository.save(friend.get());
+            friendsRepository.save(addedFriend.get());
         }
         else {
             throw new ConflictException("Пользователь с ID " + addedUserId
@@ -191,7 +231,7 @@ public class FriendService implements FriendServiceInterface {
                 .targetUserId(targetUserId)
                 .build());
 
-        Page<FriendEntity> friends = friendRepository.findAll(example, pageable);
+        Page<FriendEntity> friends = friendsRepository.findAll(example, pageable);
         List<FriendEntity> friendEntities = friends.getContent();
         List<FriendInfoDto> friendInfoDtos = new ArrayList<>();
 
