@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.user.dto.UserIdAndFullNameDto;
 import ru.hits.messengerapi.user.service.implementation.IntegrationUserService;
 
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -19,10 +20,10 @@ public class IntegrationUserController {
 
     @PostMapping("/check-existence")
     public ResponseEntity<String> checkUserByIdAndFullName(
-            @RequestBody UserIdAndFullNameDto userIdAndFullNameDto) {
+            @RequestBody Map<String, String> userIdAndFullName) {
         return new ResponseEntity<>(integrationUserService.checkUserByIdAndFullName(
-                userIdAndFullNameDto.getId(),
-                userIdAndFullNameDto.getFullName()),
+                UUID.fromString(userIdAndFullName.get("id")),
+                userIdAndFullName.get("fullName")),
                 HttpStatus.OK
         );
     }

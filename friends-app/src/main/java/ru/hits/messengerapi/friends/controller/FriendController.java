@@ -39,8 +39,6 @@ public class FriendController {
 
     @PostMapping("/add")
     public ResponseEntity<FriendDto> addToFriends(@RequestBody @Valid AddToFriendsDto addToFriendsDto) {
-        String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
-                .getHeader("Authorization").substring(7);
         RestTemplate restTemplate = new RestTemplate();
         String url =
                 "http://localhost:8191/integration/users/check-existence";
@@ -48,7 +46,6 @@ public class FriendController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
-        headers.set(HEADER_JWT, "Bearer " + token);
         HttpEntity<AddToFriendsDto> requestEntity = new HttpEntity<>(addToFriendsDto, headers);
 
         ResponseEntity<String> responseEntity = restTemplate
@@ -65,8 +62,6 @@ public class FriendController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
-        String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
-                .getHeader("Authorization").substring(7);
         RestTemplate restTemplate = new RestTemplate();
         String url =
                 "http://localhost:8191/integration/users/get-full-name";
@@ -74,7 +69,6 @@ public class FriendController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
-        headers.set(HEADER_JWT, "Bearer " + token);
         HttpEntity<UUID> requestEntity = new HttpEntity<>(id, headers);
 
         ResponseEntity<String> responseEntity = restTemplate
