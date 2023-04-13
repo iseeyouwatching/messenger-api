@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.dto;
+package ru.hits.messengerapi.friends.dto.friends;
 
 import lombok.*;
 import ru.hits.messengerapi.common.dto.PageInfoDto;
@@ -10,12 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SearchedFriendsDto {
+public class FriendsPageListDto {
 
     private List<FriendInfoDto> friends;
 
     private PageInfoDto pageInfo;
 
-    private FriendFiltersDto filters;
+    private String fullNameFilter;
 
 }

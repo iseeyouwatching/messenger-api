@@ -7,10 +7,10 @@ import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.*;
+import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendsService;
 
 import javax.validation.Valid;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.dto;
+package ru.hits.messengerapi.friends.dto.blacklist;
 
 import lombok.*;
 import ru.hits.messengerapi.common.dto.PageInfoDto;
@@ -10,9 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class FriendsPageListDto {
+public class BlockedUsersPageListDto {
 
-    private List<FriendInfoDto> friends;
+    private List<BlockedUserInfoDto> blockedUsers;
 
     private PageInfoDto pageInfo;
 

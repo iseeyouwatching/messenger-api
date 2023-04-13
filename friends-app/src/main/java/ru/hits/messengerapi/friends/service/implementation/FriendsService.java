@@ -16,6 +16,7 @@ import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginatio
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.*;
+import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
@@ -56,7 +57,6 @@ public class FriendsService implements FriendsServiceInterface {
         }
 
         List<FriendInfoDto> friendInfoDtos = new ArrayList<>();
-
         for (FriendEntity friend : friends) {
             friendInfoDtos.add(new FriendInfoDto(friend));
         }

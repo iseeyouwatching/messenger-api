@@ -1,8 +1,8 @@
 package ru.hits.messengerapi.friends.service;
 
 import ru.hits.messengerapi.friends.dto.*;
+import ru.hits.messengerapi.friends.dto.friends.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 public interface FriendsServiceInterface {

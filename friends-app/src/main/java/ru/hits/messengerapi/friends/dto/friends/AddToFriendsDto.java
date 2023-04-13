@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.dto;
+package ru.hits.messengerapi.friends.dto.friends;
 
 import lombok.*;
 
