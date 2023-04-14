@@ -3,7 +3,8 @@ package ru.hits.messengerapi.friends.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import ru.hits.messengerapi.friends.dto.*;
+import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendsService;
 

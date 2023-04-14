@@ -1,6 +1,8 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -10,12 +12,11 @@ import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
-import ru.hits.messengerapi.friends.dto.AddPersonDto;
-import ru.hits.messengerapi.friends.dto.PaginationDto;
-import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserDto;
-import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserInfoDto;
-import ru.hits.messengerapi.friends.dto.blacklist.BlockedUsersPageListDto;
-import ru.hits.messengerapi.friends.dto.friends.FriendDto;
+import ru.hits.messengerapi.friends.dto.blacklist.*;
+import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationDto;
+import ru.hits.messengerapi.friends.dto.friends.FriendInfoDto;
+import ru.hits.messengerapi.friends.dto.friends.SearchedFriendsDto;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
@@ -175,5 +176,41 @@ public class BlacklistService implements BlacklistServiceInterface {
         }
 
         return new BlockedUserDto(blockedUser.get());
+    }
+
+    @Override
+    public SearchedBlockedUsersDto searchBlockedUsers(PaginationWithBlockedUserFiltersDto paginationAndFilters) {
+        int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
+        int pageSize = paginationAndFilters.getPageInfo().getPageSize();
+        checkPaginationInfoService.checkPagination(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID targetUserId = userData.getId();
+
+        Example<BlacklistEntity> example = Example.of(BlacklistEntity
+                .builder()
+                .addedDate(paginationAndFilters.getFilters().getAddedDate())
+                .blockedUserId(paginationAndFilters.getFilters().getBlockedUserId())
+                .deletedDate(paginationAndFilters.getFilters().getDeletedDate())
+                .blockedUserName(paginationAndFilters.getFilters().getBlockedUserName())
+                .targetUserId(targetUserId)
+                .build());
+
+        Page<BlacklistEntity> pageBlockedUsers = blacklistRepository.findAll(example, pageable);
+        List<BlacklistEntity> blockedUsers = pageBlockedUsers.getContent();
+        List<BlockedUserInfoDto> blockedUserInfoDtos = new ArrayList<>();
+
+        for (BlacklistEntity blockedUser: blockedUsers) {
+            blockedUserInfoDtos.add(new BlockedUserInfoDto(blockedUser));
+        }
+
+        SearchedBlockedUsersDto searchedBlockedUsersDto = new SearchedBlockedUsersDto();
+        searchedBlockedUsersDto.setBlockedUsers(blockedUserInfoDtos);
+        searchedBlockedUsersDto.setFilters(paginationAndFilters.getFilters());
+        searchedBlockedUsersDto.setPageInfo(paginationAndFilters.getPageInfo());
+
+        return searchedBlockedUsersDto;
     }
 }

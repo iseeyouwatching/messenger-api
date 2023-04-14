@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.service;
 
-import ru.hits.messengerapi.friends.dto.*;
+import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
 
 import java.util.UUID;
@@ -17,6 +18,6 @@ public interface FriendsServiceInterface {
 
     FriendDto deleteFriend(UUID addedUserId);
 
-    SearchedFriendsDto searchFriends(PaginationWithFriendFiltersDto filters);
+    SearchedFriendsDto searchFriends(PaginationWithFriendFiltersDto paginationAndfilters);
 
 }

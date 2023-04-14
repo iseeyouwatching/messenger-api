@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
-import ru.hits.messengerapi.friends.dto.AddPersonDto;
+import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.service.IntegrationRequestsServiceInterface;
 
 import java.util.Objects;

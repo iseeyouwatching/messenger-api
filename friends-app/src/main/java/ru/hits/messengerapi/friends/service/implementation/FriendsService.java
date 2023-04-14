@@ -12,7 +12,8 @@ import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
-import ru.hits.messengerapi.friends.dto.*;
+import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
@@ -238,11 +239,11 @@ public class FriendsService implements FriendsServiceInterface {
                 .targetUserId(targetUserId)
                 .build());
 
-        Page<FriendEntity> friends = friendsRepository.findAll(example, pageable);
-        List<FriendEntity> friendEntities = friends.getContent();
+        Page<FriendEntity> pageFriends = friendsRepository.findAll(example, pageable);
+        List<FriendEntity> friends = pageFriends.getContent();
         List<FriendInfoDto> friendInfoDtos = new ArrayList<>();
 
-        for (FriendEntity friend: friendEntities) {
+        for (FriendEntity friend: friends) {
             friendInfoDtos.add(new FriendInfoDto(friend));
         }
 

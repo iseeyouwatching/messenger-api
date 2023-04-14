@@ -6,9 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUsersPageListDto;
-import ru.hits.messengerapi.friends.dto.PaginationDto;
-import ru.hits.messengerapi.friends.dto.AddPersonDto;
-import ru.hits.messengerapi.friends.dto.friends.FriendDto;
+import ru.hits.messengerapi.friends.dto.blacklist.PaginationWithBlockedUserFiltersDto;
+import ru.hits.messengerapi.friends.dto.blacklist.SearchedBlockedUsersDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationDto;
+import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
+import ru.hits.messengerapi.friends.dto.friends.PaginationWithFriendFiltersDto;
+import ru.hits.messengerapi.friends.dto.friends.SearchedFriendsDto;
 import ru.hits.messengerapi.friends.service.implementation.BlacklistService;
 
 import javax.validation.Valid;
@@ -45,6 +48,13 @@ public class BlacklistController {
     public ResponseEntity<BlockedUserDto> deleteFromBlacklist(@PathVariable("id") UUID id) {
         return new ResponseEntity<>(blacklistService.deleteFromBlacklist(id), HttpStatus.OK);
     }
+
+    @PostMapping("/search")
+    public ResponseEntity<SearchedBlockedUsersDto> searchBlockedUsers(
+            @RequestBody @Valid PaginationWithBlockedUserFiltersDto paginationAndFilters) {
+        return new ResponseEntity<>(blacklistService.searchBlockedUsers(paginationAndFilters), HttpStatus.OK);
+    }
+
 
 
 }

@@ -1,6 +1,6 @@
 package ru.hits.messengerapi.friends.service;
 
-import ru.hits.messengerapi.friends.dto.AddPersonDto;
+import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 
 import java.util.UUID;
 
