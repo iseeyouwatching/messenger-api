@@ -1,6 +1,6 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +14,6 @@ import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginatio
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.*;
 import ru.hits.messengerapi.friends.dto.friends.*;
-import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
@@ -24,14 +23,25 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class FriendsService implements FriendsServiceInterface {
 
     private final FriendsRepository friendsRepository;
     private final CheckPaginationInfoService checkPaginationInfoService;
     private final IntegrationRequestsService integrationRequestsService;
+
     private final BlacklistService blacklistService;
     private final BlacklistRepository blacklistRepository;
+
+    public FriendsService(FriendsRepository friendsRepository,
+                          CheckPaginationInfoService checkPaginationInfoService,
+                          IntegrationRequestsService integrationRequestsService,
+                          @Lazy BlacklistService blacklistService, BlacklistRepository blacklistRepository) {
+        this.friendsRepository = friendsRepository;
+        this.checkPaginationInfoService = checkPaginationInfoService;
+        this.integrationRequestsService = integrationRequestsService;
+        this.blacklistService = blacklistService;
+        this.blacklistRepository = blacklistRepository;
+    }
 
     @Override
     public FriendsPageListDto getFriends(PaginationDto paginationDto) {
@@ -111,8 +121,9 @@ public class FriendsService implements FriendsServiceInterface {
 
 //        if (blockedUser.isPresent() && (blockedUser.get().getDeletedDate() == null)) {
 //            blacklistService.deleteFriend(addPersonDto.getId());
-//        }
 //        blacklistService.syncFriendData(addPersonDto.getId());
+//        }
+//
 
 
         if (friend.isPresent()) {
@@ -126,7 +137,7 @@ public class FriendsService implements FriendsServiceInterface {
 
             if (mutualFriendship.isPresent()) {
                 mutualFriendship.get().setDeletedDate(null);
-                mutualFriendship.get().setAddedDate(LocalDateTime.now());
+                mutualFriendship.get().setAddedDate(friend.get().getAddedDate());
                 syncFriendData(targetUserId);
                 friendsRepository.save(mutualFriendship.get());
 

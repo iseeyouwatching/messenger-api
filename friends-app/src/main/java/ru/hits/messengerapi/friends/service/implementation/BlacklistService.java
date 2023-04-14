@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.ConflictException;
+import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
@@ -15,6 +16,7 @@ import ru.hits.messengerapi.friends.dto.PaginationDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserInfoDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUsersPageListDto;
+import ru.hits.messengerapi.friends.dto.friends.FriendDto;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
@@ -69,6 +71,25 @@ public class BlacklistService implements BlacklistServiceInterface {
     }
 
     @Override
+    public BlockedUserDto getBlockedUser(UUID blockedUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID targetUserId = userData.getId();
+
+        Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
+                targetUserId,
+                blockedUserId
+        );
+
+        if (blockedUser.isEmpty() || blockedUser.get().getDeletedDate() != null) {
+            throw new NotFoundException("Пользователя с ID " + blockedUserId
+                    + " нет в черном списке у пользователя с ID " + targetUserId + ".");
+        }
+
+        return new BlockedUserDto(blockedUser.get());
+    }
+
+    @Override
     public BlockedUserDto addToBlacklist(AddPersonDto addPersonDto) {
         integrationRequestsService.checkUserExistence(addPersonDto);
 
@@ -94,8 +115,8 @@ public class BlacklistService implements BlacklistServiceInterface {
 
         if (friend.isPresent() && (friend.get().getDeletedDate() == null)) {
             friendsService.deleteFriend(addPersonDto.getId());
+            friendsService.syncFriendData(addPersonDto.getId());
         }
-        friendsService.syncFriendData(addPersonDto.getId());
 
         if (blockedUser.isPresent()) {
             blockedUser.get().setDeletedDate(null);
