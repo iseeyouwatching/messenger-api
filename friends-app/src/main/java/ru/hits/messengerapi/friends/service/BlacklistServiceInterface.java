@@ -26,4 +26,6 @@ public interface BlacklistServiceInterface {
 
     boolean checkIfTheUserBlacklisted(UUID id);
 
+    boolean checkIfTheTargetUserBlacklisted(UUID targetUserId, UUID blockedUserId);
+
 }

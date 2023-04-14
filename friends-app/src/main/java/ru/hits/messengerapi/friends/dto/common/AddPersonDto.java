@@ -16,7 +16,6 @@ public class AddPersonDto {
     @NotNull(message = "ID добавляемого пользователя является обязательным к заполнению.")
     private UUID id;
 
-    @NotNull(message = "ФИО пользователя является обязательным к заполнению.")
     @NotBlank(message = "ФИО пользователя не может быть пустым.")
     private String fullName;
 

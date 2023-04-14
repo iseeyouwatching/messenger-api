@@ -121,7 +121,6 @@ public class BlacklistService implements BlacklistServiceInterface {
             blockedUser.get().setAddedDate(LocalDateTime.now());
             syncBlockedUserData(addPersonDto.getId());
             blacklistRepository.save(blockedUser.get());
-
             return new BlockedUserDto(blockedUser.get());
         }
 
@@ -130,7 +129,6 @@ public class BlacklistService implements BlacklistServiceInterface {
         newBlockedUser.setTargetUserId(targetUserId);
         newBlockedUser.setBlockedUserId(addPersonDto.getId());
         newBlockedUser.setBlockedUserName(addPersonDto.getFullName());
-
         newBlockedUser = blacklistRepository.save(newBlockedUser);
 
         return new BlockedUserDto(newBlockedUser);
@@ -189,16 +187,23 @@ public class BlacklistService implements BlacklistServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
-        Example<BlacklistEntity> example = Example.of(BlacklistEntity
-                .builder()
-                .addedDate(paginationAndFilters.getFilters().getAddedDate())
-                .blockedUserId(paginationAndFilters.getFilters().getBlockedUserId())
-                .deletedDate(paginationAndFilters.getFilters().getDeletedDate())
-                .blockedUserName(paginationAndFilters.getFilters().getBlockedUserName())
-                .targetUserId(targetUserId)
-                .build());
+        Page<BlacklistEntity> pageBlockedUsers;
+        if (paginationAndFilters.getFilters() != null) {
+            Example<BlacklistEntity> example = Example.of(BlacklistEntity
+                    .builder()
+                    .addedDate(paginationAndFilters.getFilters().getAddedDate())
+                    .blockedUserId(paginationAndFilters.getFilters().getBlockedUserId())
+                    .deletedDate(paginationAndFilters.getFilters().getDeletedDate())
+                    .blockedUserName(paginationAndFilters.getFilters().getBlockedUserName())
+                    .targetUserId(targetUserId)
+                    .build());
 
-        Page<BlacklistEntity> pageBlockedUsers = blacklistRepository.findAll(example, pageable);
+            pageBlockedUsers = blacklistRepository.findAll(example, pageable);
+        }
+        else {
+            pageBlockedUsers = blacklistRepository.findAll(pageable);
+        }
+
         List<BlacklistEntity> blockedUsers = pageBlockedUsers.getContent();
         List<BlockedUserInfoDto> blockedUserInfoDtos = new ArrayList<>();
 
@@ -220,6 +225,16 @@ public class BlacklistService implements BlacklistServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
+        Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
+                targetUserId,
+                blockedUserId
+        );
+
+        return blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null;
+    }
+
+    @Override
+    public boolean checkIfTheTargetUserBlacklisted(UUID targetUserId, UUID blockedUserId) {
         Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
                 targetUserId,
                 blockedUserId

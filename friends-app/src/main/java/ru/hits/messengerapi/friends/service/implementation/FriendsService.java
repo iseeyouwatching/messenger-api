@@ -15,6 +15,7 @@ import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
+import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
@@ -103,6 +104,7 @@ public class FriendsService implements FriendsServiceInterface {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
+        String targetUserFullName = userData.getFullName();
 
         if (addPersonDto.getId().equals(targetUserId)) {
             throw new ConflictException("Пользователь не может добавить самого себя в друзья.");
@@ -116,16 +118,17 @@ public class FriendsService implements FriendsServiceInterface {
                     + addPersonDto.getFullName() + " уже добавлен в список друзей.");
         }
 
-//        Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
-//                targetUserId,
-//                addPersonDto.getId());
+        if (blacklistService.checkIfTheUserBlacklisted(addPersonDto.getId())) {
+            throw new ConflictException("Пользователь с ID " + addPersonDto.getId() + " и ФИО "
+                    + addPersonDto.getFullName() + " находится у пользователя с ID "
+                    + targetUserId + " в черном списке.");
+        }
 
-//        if (blockedUser.isPresent() && (blockedUser.get().getDeletedDate() == null)) {
-//            blacklistService.deleteFriend(addPersonDto.getId());
-//        blacklistService.syncFriendData(addPersonDto.getId());
-//        }
-//
-
+        if (blacklistService.checkIfTheTargetUserBlacklisted(addPersonDto.getId(), targetUserId)) {
+            throw new ConflictException("Пользователь с ID " + targetUserId + " и ФИО "
+                    + targetUserFullName + " не может добавить пользователя с ID "
+                    + addPersonDto.getId() + " в друзья, так как находится у него в черном списке.");
+        }
 
         if (friend.isPresent()) {
             friend.get().setDeletedDate(null);
@@ -151,7 +154,6 @@ public class FriendsService implements FriendsServiceInterface {
         newFriend.setTargetUserId(targetUserId);
         newFriend.setAddedUserId(addPersonDto.getId());
         newFriend.setFriendName(addPersonDto.getFullName());
-
         newFriend = friendsRepository.save(newFriend);
 
         FriendEntity mutualFriendship = new FriendEntity();
@@ -159,7 +161,6 @@ public class FriendsService implements FriendsServiceInterface {
         mutualFriendship.setTargetUserId(addPersonDto.getId());
         mutualFriendship.setAddedUserId(targetUserId);
         mutualFriendship.setFriendName(userData.getFullName());
-
         friendsRepository.save(mutualFriendship);
 
         return new FriendDto(newFriend);
@@ -225,23 +226,29 @@ public class FriendsService implements FriendsServiceInterface {
         int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
         int pageSize = paginationAndFilters.getPageInfo().getPageSize();
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<FriendEntity> pageFriends;
+        if (paginationAndFilters.getFilters() != null) {
+            Example<FriendEntity> example = Example.of(FriendEntity
+                    .builder()
+                    .addedDate(paginationAndFilters.getFilters().getAddedDate())
+                    .addedUserId(paginationAndFilters.getFilters().getAddedUserId())
+                    .deletedDate(paginationAndFilters.getFilters().getDeletedDate())
+                    .friendName(paginationAndFilters.getFilters().getFriendName())
+                    .targetUserId(targetUserId)
+                    .build());
 
-        Example<FriendEntity> example = Example.of(FriendEntity
-                .builder()
-                .addedDate(paginationAndFilters.getFilters().getAddedDate())
-                .addedUserId(paginationAndFilters.getFilters().getAddedUserId())
-                .deletedDate(paginationAndFilters.getFilters().getDeletedDate())
-                .friendName(paginationAndFilters.getFilters().getFriendName())
-                .targetUserId(targetUserId)
-                .build());
+            pageFriends = friendsRepository.findAll(example, pageable);
+        }
+        else {
+            pageFriends = friendsRepository.findAll(pageable);
+        }
 
-        Page<FriendEntity> pageFriends = friendsRepository.findAll(example, pageable);
         List<FriendEntity> friends = pageFriends.getContent();
         List<FriendInfoDto> friendInfoDtos = new ArrayList<>();
 

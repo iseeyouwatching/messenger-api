@@ -67,21 +67,4 @@ public class UserDto {
      */
     private LocalDateTime registrationDate;
 
-    /**
-     * Конструктор для создания экземпляра DTO из объекта класса {@link UserEntity}.
-     * @param userEntity объект сущности пользователя.
-     */
-    public UserDto(UserEntity userEntity) {
-        this.id = userEntity.getId();
-        this.login = userEntity.getLogin();
-        this.email = userEntity.getEmail();
-        this.password = userEntity.getPassword();
-        this.fullName = userEntity.getFullName();
-        this.birthDate = userEntity.getBirthDate();
-        this.phoneNumber = userEntity.getPhoneNumber();
-        this.city = userEntity.getCity();
-        this.avatar = userEntity.getAvatar();
-        this.registrationDate = userEntity.getRegistrationDate();
-    }
-
 }
