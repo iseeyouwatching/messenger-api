@@ -6,6 +6,9 @@ import ru.hits.messengerapi.friends.entity.FriendEntity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Класс, представляющий DTO с неполной информацией о друге.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,16 +16,37 @@ import java.util.UUID;
 @Setter
 public class FriendInfoDto {
 
+    /**
+     * UUID сущности из друзей.
+     */
     private UUID id;
 
+    /**
+     * Дата добавления в друзья.
+     */
     private LocalDateTime addedDate;
 
+    /**
+     * Дата удаления из друзей.
+     */
     private LocalDateTime deletedDate;
 
+    /**
+     * Идентификатор пользователя, которого добавили в друзья.
+     */
     private UUID addedUserId;
 
+    /**
+     * ФИО друга.
+     */
     private String friendName;
 
+    /**
+     * Конструктор, который создает DTO объект, представляющий неполную информацию о друге
+     * на основе сущности друга.
+     *
+     * @param friend объект класса {@link FriendEntity}, являющийся сущностью друга.
+     */
     public FriendInfoDto(FriendEntity friend) {
         this.id = friend.getId();
         this.addedDate = friend.getAddedDate();

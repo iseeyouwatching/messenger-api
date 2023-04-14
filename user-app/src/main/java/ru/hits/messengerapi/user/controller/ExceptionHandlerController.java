@@ -131,22 +131,22 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
-//    /**
-//     * Метод обрабатывает непредвиденные внутренние ошибки сервера,
-//     * которые не относятся к другим типам исключений.
-//     *
-//     * @param exception исключение типа {@link Exception}.
-//     * @param request объект запроса.
-//     * @return объект ответа с ошибкой в формате JSON.
-//     */
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ApiError> handleUnexpectedInternalException(Exception exception,
-//                                                                      WebRequest request
-//    ) {
-//        return new ResponseEntity<>(
-//                new ApiError("Непредвиденная внутренняя ошибка сервера"),
-//                HttpStatus.INTERNAL_SERVER_ERROR
-//        );
-//    }
+    /**
+     * Метод обрабатывает непредвиденные внутренние ошибки сервера,
+     * которые не относятся к другим типам исключений.
+     *
+     * @param exception исключение типа {@link Exception}.
+     * @param request объект запроса.
+     * @return объект ответа с ошибкой в формате JSON.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpectedInternalException(Exception exception,
+                                                                      WebRequest request
+    ) {
+        return new ResponseEntity<>(
+                new ApiError("Непредвиденная внутренняя ошибка сервера"),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
 
 }

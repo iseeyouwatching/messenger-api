@@ -2,10 +2,12 @@ package ru.hits.messengerapi.friends.dto.blacklist;
 
 import lombok.*;
 import ru.hits.messengerapi.common.dto.PageInfoDto;
-import ru.hits.messengerapi.friends.dto.friends.FriendFiltersDto;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Класс, представляющий DTO с информацией о пагинации и фильтрах.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,10 +15,15 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class PaginationWithBlockedUserFiltersDto {
 
+    /**
+     * Информация о пагинации.
+     */
     @NotNull(message = "Информация о странице является обязательной к заполнению.")
     private PageInfoDto pageInfo;
 
+    /**
+     * Фильтры.
+     */
     private BlockedUserFiltersDto filters;
-
 
 }

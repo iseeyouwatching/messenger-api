@@ -6,15 +6,22 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Java-модель конфига по пути app.security в application.yml
+ * Класс, содержащий свойства безопасности приложения.
  */
 @ConfigurationProperties("app.security")
 @Getter
 @Setter
 @ToString
 public class SecurityProps {
+
+    /**
+     * Свойства JWT-токена системы безопасности.
+     */
     private SecurityJwtTokenProps jwtToken;
 
+    /**
+     * Свойства интеграционных запросов.
+     */
     private SecurityIntegrationsProps integrations;
 
 }

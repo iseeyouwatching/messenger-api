@@ -5,6 +5,9 @@ import ru.hits.messengerapi.common.dto.PageInfoDto;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Класс, представляющий DTO, содержащую информацию о пагинации и фильтре по ФИО.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +21,9 @@ public class PaginationDto {
     @NotNull(message = "Информация о странице является обязательной к заполнению.")
     private PageInfoDto pageInfo;
 
+    /**
+     * Фильтр по ФИО.
+     */
     private String fullNameFilter;
 
 }

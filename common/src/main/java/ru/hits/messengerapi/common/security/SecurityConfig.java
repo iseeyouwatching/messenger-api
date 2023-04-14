@@ -14,8 +14,7 @@ import ru.hits.messengerapi.common.security.props.SecurityProps;
 import java.util.Objects;
 
 /**
- * Конфигурация безопасности приложения
- * Данный класс определяет настройки авторизации и аутентификации, а также включает фильтр JWT.
+ * Класс, содержащий настройки авторизации и аутентификации для приложения, а также включающий фильтр JWT.
  */
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -45,7 +44,10 @@ public class SecurityConfig {
     }
 
     /**
-     * Настройка для интеграции между сервисами
+     * Метод, который настраивает правила безопасности для интеграции между сервисами.
+     *
+     * @param http объект класса {@link HttpSecurity} для настройки правил безопасности.
+     * @return объект класса {@link SecurityFilterChain} для конечной настройки.
      */
     @SneakyThrows
     @Bean
@@ -62,6 +64,13 @@ public class SecurityConfig {
         return finalize(http);
     }
 
+    /**
+     * Метод, который настраивает правила безопасности для запрета всех запросов,
+     * кроме тех, что имеют отдельную настройку.
+     *
+     * @param http объект класса {@link HttpSecurity} для настройки правил безопасности.
+     * @return объект класса {@link SecurityFilterChain} для конечной настройки.
+     */
     @SneakyThrows
     @Bean
     public SecurityFilterChain filterChainDenyAll(HttpSecurity http) {
@@ -74,6 +83,13 @@ public class SecurityConfig {
         return finalize(http);
     }
 
+    /**
+     * Метод, заверщающий настройку объекта класса {@link HttpSecurity} и
+     * возвращающий объект класса {@link SecurityFilterChain}.
+     *
+     * @param http объект класса {@link HttpSecurity} для завершения настройки.
+     * @return объект класса {@link SecurityFilterChain}.
+     */
     @SneakyThrows
     private SecurityFilterChain finalize(HttpSecurity http) {
         return http.csrf()

@@ -4,7 +4,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
-import ru.hits.messengerapi.friends.entity.FriendEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;

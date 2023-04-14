@@ -5,6 +5,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Класс, представляющий DTO, содержащую фильтры для поиска друщей.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,12 +15,24 @@ import java.util.UUID;
 @Setter
 public class FriendFiltersDto {
 
+    /**
+     * Дата добавления в друзья.
+     */
     private LocalDateTime addedDate;
 
+    /**
+     * Идентификатор пользователя, которого добавили в друзья.
+     */
     private UUID addedUserId;
 
+    /**
+     * Дата удаления из друзей.
+     */
     private LocalDateTime deletedDate;
 
+    /**
+     * ФИО друга.
+     */
     private String friendName;
 
 }

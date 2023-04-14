@@ -59,7 +59,7 @@ public class JWTUtil {
      * Метод для проверки JWT-токена, который возвращает ID пользователя, указанный в токене.
      *
      * @param token JWT-токен.
-     * @return ID пользователя.
+     * @return список утверждений JWT-токена.
      * @throws JWTVerificationException если токен не прошел верификацию.
      */
     public List<String> validateTokenAndRetrieveClaim(String token) throws JWTVerificationException {

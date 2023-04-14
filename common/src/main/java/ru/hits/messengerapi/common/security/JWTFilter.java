@@ -24,6 +24,9 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_JWT;
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
+    /**
+     * Сервис для работы с JWT-токеном.
+     */
     private final JWTUtil jwtUtil;
 
     /**

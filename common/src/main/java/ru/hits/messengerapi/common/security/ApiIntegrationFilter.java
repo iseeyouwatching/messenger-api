@@ -3,7 +3,6 @@ package ru.hits.messengerapi.common.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -14,16 +13,21 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
-import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_JWT;
 
 /**
- * Фильтр проверки ключа API KEY в интеграционных запросах
+ * Фильтр, который проверяет наличие API-ключа в интеграционных запросах и устанавливает аутентификацию.
  */
 @RequiredArgsConstructor
 class ApiIntegrationFilter extends OncePerRequestFilter {
 
+    /**
+     * API-ключ.
+     */
     private final String apiKey;
 
+    /**
+     * Метод, проверяющий наличие API-ключа и устанавливающий аутентификацию.
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest httpServletRequest,
@@ -39,4 +43,5 @@ class ApiIntegrationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
+
 }
