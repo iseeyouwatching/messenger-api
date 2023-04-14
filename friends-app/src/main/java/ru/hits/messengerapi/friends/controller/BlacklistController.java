@@ -36,4 +36,15 @@ public class BlacklistController {
         return new ResponseEntity<>(blacklistService.addToBlacklist(addPersonDto), HttpStatus.OK);
     }
 
+    @PatchMapping("/{id}")
+    public void syncBlockedUserData(@PathVariable("id") UUID id) {
+        blacklistService.syncBlockedUserData(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BlockedUserDto> deleteFromBlacklist(@PathVariable("id") UUID id) {
+        return new ResponseEntity<>(blacklistService.deleteFromBlacklist(id), HttpStatus.OK);
+    }
+
+
 }

@@ -10,7 +10,6 @@ import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
-import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.PaginationDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserDto;
@@ -121,7 +120,7 @@ public class BlacklistService implements BlacklistServiceInterface {
         if (blockedUser.isPresent()) {
             blockedUser.get().setDeletedDate(null);
             blockedUser.get().setAddedDate(LocalDateTime.now());
-            syncFriendData(addPersonDto.getId());
+            syncBlockedUserData(addPersonDto.getId());
             blacklistRepository.save(blockedUser.get());
 
             return new BlockedUserDto(blockedUser.get());
@@ -139,7 +138,7 @@ public class BlacklistService implements BlacklistServiceInterface {
     }
 
     @Override
-    public void syncFriendData(UUID id) {
+    public void syncBlockedUserData(UUID id) {
         String fullName = integrationRequestsService.getFullName(id);
 
         List<BlacklistEntity> blockedUsers = blacklistRepository.findAllByBlockedUserId(id);
@@ -148,5 +147,33 @@ public class BlacklistService implements BlacklistServiceInterface {
             blockedUser.setBlockedUserName(fullName);
             blacklistRepository.save(blockedUser);
         }
+    }
+
+    @Override
+    public BlockedUserDto deleteFromBlacklist(UUID blockedUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID targetUserId = userData.getId();
+
+        Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
+                targetUserId,
+                blockedUserId
+        );
+
+        if (blockedUser.isEmpty()) {
+            throw new NotFoundException("Пользователя с ID " + blockedUserId
+                    + " нет в черном списке у пользователя с ID " + targetUserId + ".");
+        }
+
+        if (blockedUser.get().getDeletedDate() == null) {
+            blockedUser.get().setDeletedDate(LocalDateTime.now());
+            blacklistRepository.save(blockedUser.get());
+        }
+        else {
+            throw new ConflictException("Пользователь с ID " + blockedUserId
+                    + " уже удален из черного списка у пользователя с ID " + targetUserId + ".");
+        }
+
+        return new BlockedUserDto(blockedUser.get());
     }
 }

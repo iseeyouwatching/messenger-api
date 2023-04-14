@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,11 +21,16 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
 
     private final SecurityProps securityProps;
 
+    @Value("${integration.request.check-existence}")
+    private String integrationUsersRequestCheckExistence;
+
+    @Value("${integration.request.get-full-name}")
+    private String integrationUsersRequestGetFullName;
+
     @Override
     public void checkUserExistence(AddPersonDto addPersonDto) {
         RestTemplate restTemplate = new RestTemplate();
-        String url =
-                "http://localhost:8191/integration/users/check-existence";
+        String url = integrationUsersRequestCheckExistence;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -43,8 +49,7 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
     @Override
     public String getFullName(UUID id) {
         RestTemplate restTemplate = new RestTemplate();
-        String url =
-                "http://localhost:8191/integration/users/get-full-name";
+        String url = integrationUsersRequestGetFullName;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

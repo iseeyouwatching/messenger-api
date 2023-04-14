@@ -29,5 +29,10 @@ spring:
     hibernate:
       ddl-auto: validate
 
+integration:
+  request:
+    check-existence: http://localhost:8191/integration/users/check-existence
+    get-full-name: http://localhost:8191/integration/users/get-full-name
+
 server:
   port: 8192
