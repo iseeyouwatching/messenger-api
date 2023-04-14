@@ -9,6 +9,7 @@ import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendsService;
 
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -34,8 +35,8 @@ public class FriendsController {
     }
 
     @PatchMapping("/{id}")
-    public void syncFriendData(@PathVariable("id") UUID id) {
-        friendsService.syncFriendData(id);
+    public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
+       return new ResponseEntity<>(friendsService.syncFriendData(id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

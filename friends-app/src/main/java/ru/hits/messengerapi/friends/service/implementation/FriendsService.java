@@ -166,7 +166,7 @@ public class FriendsService implements FriendsServiceInterface {
     }
 
     @Override
-    public void syncFriendData(UUID id) {
+    public Map<String, String> syncFriendData(UUID id) {
         String fullName = integrationRequestsService.getFullName(id);
 
         List<FriendEntity> friends = friendsRepository.findAllByAddedUserId(id);
@@ -175,6 +175,8 @@ public class FriendsService implements FriendsServiceInterface {
             friend.setFriendName(fullName);
             friendsRepository.save(friend);
         }
+
+        return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
     @Override

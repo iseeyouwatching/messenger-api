@@ -15,8 +15,6 @@ import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.blacklist.*;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationDto;
-import ru.hits.messengerapi.friends.dto.friends.FriendInfoDto;
-import ru.hits.messengerapi.friends.dto.friends.SearchedFriendsDto;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
@@ -139,7 +137,7 @@ public class BlacklistService implements BlacklistServiceInterface {
     }
 
     @Override
-    public void syncBlockedUserData(UUID id) {
+    public Map<String, String> syncBlockedUserData(UUID id) {
         String fullName = integrationRequestsService.getFullName(id);
 
         List<BlacklistEntity> blockedUsers = blacklistRepository.findAllByBlockedUserId(id);
@@ -148,6 +146,8 @@ public class BlacklistService implements BlacklistServiceInterface {
             blockedUser.setBlockedUserName(fullName);
             blacklistRepository.save(blockedUser);
         }
+
+        return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
     @Override
@@ -213,4 +213,20 @@ public class BlacklistService implements BlacklistServiceInterface {
 
         return searchedBlockedUsersDto;
     }
+
+    @Override
+    public boolean checkIfTheUserBlacklisted(UUID blockedUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID targetUserId = userData.getId();
+
+        Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
+                targetUserId,
+                blockedUserId
+        );
+
+        return blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null;
+    }
+
+
 }

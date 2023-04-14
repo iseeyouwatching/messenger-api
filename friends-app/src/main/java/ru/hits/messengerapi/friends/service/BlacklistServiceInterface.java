@@ -6,9 +6,8 @@ import ru.hits.messengerapi.friends.dto.common.PaginationDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUsersPageListDto;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
-import ru.hits.messengerapi.friends.dto.friends.PaginationWithFriendFiltersDto;
-import ru.hits.messengerapi.friends.dto.friends.SearchedFriendsDto;
 
+import java.util.Map;
 import java.util.UUID;
 
 public interface BlacklistServiceInterface {
@@ -19,10 +18,12 @@ public interface BlacklistServiceInterface {
 
     BlockedUserDto addToBlacklist(AddPersonDto addPersonDto);
 
-    void syncBlockedUserData(UUID id);
+    Map<String, String> syncBlockedUserData(UUID id);
 
     BlockedUserDto deleteFromBlacklist(UUID blockedUserId);
 
     SearchedBlockedUsersDto searchBlockedUsers(PaginationWithBlockedUserFiltersDto paginationAndfilters);
+
+    boolean checkIfTheUserBlacklisted(UUID id);
 
 }
