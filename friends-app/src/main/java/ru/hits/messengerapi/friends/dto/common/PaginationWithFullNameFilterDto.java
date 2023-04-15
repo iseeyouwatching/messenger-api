@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PaginationDto {
+public class PaginationWithFullNameFilterDto {
 
     /**
      * Информация о странице.

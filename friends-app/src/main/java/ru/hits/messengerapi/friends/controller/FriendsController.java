@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
-import ru.hits.messengerapi.friends.dto.common.PaginationDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendsService;
 
@@ -28,12 +28,12 @@ public class FriendsController {
     /**
      * Метод для получения списка друзей пользователя.
      *
-     * @param paginationDto объект класса {@link PaginationDto} с данными для пагинации.
+     * @param paginationWithFullNameFilterDto объект класса {@link PaginationWithFullNameFilterDto} с данными для пагинации.
      * @return список друзей с информацией о странице и фильтре.
      */
     @PostMapping
-    public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationDto paginationDto) {
-        return new ResponseEntity<>(friendsService.getFriends(paginationDto), HttpStatus.OK);
+    public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+        return new ResponseEntity<>(friendsService.getFriends(paginationWithFullNameFilterDto), HttpStatus.OK);
     }
 
     /**

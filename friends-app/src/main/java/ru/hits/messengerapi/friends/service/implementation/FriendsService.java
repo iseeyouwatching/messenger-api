@@ -13,42 +13,69 @@ import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
-import ru.hits.messengerapi.friends.dto.common.PaginationDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
-import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
-import ru.hits.messengerapi.friends.repository.BlacklistRepository;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ *  Сервис друзей.
+ */
 @Service
 public class FriendsService implements FriendsServiceInterface {
 
+    /**
+     * Репозиторий для работы с сущностью {@link FriendEntity}.
+     */
     private final FriendsRepository friendsRepository;
+
+    /**
+     * Вспомогательный сервис для проверки данных для пагинации.
+     */
     private final CheckPaginationInfoService checkPaginationInfoService;
+
+    /**
+     * Сервис, в котором хранится логика отправки интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
 
+    /**
+     *  Сервис черного списка.
+     */
     private final BlacklistService blacklistService;
-    private final BlacklistRepository blacklistRepository;
 
+    /**
+     * Конструктор класса {@link FriendsService}.
+     *
+     * @param friendsRepository репозиторий друзей.
+     * @param checkPaginationInfoService вспомогательный сервис для проверки данных для пагинации.
+     * @param integrationRequestsService сервис, в котором хранится логика отправки интеграционных запросов.
+     * @param blacklistService сервис черного списка.
+     */
     public FriendsService(FriendsRepository friendsRepository,
                           CheckPaginationInfoService checkPaginationInfoService,
                           IntegrationRequestsService integrationRequestsService,
-                          @Lazy BlacklistService blacklistService, BlacklistRepository blacklistRepository) {
+                          @Lazy BlacklistService blacklistService) {
         this.friendsRepository = friendsRepository;
         this.checkPaginationInfoService = checkPaginationInfoService;
         this.integrationRequestsService = integrationRequestsService;
         this.blacklistService = blacklistService;
-        this.blacklistRepository = blacklistRepository;
     }
 
+    /**
+     * Получить друзей целевого пользователя.
+     *
+     * @param paginationWithFullNameFilterDto информация о пагинации и фильтре по ФИО.
+     * @return список друзей, информация о странице и фильтре по ФИО.
+     */
     @Override
-    public FriendsPageListDto getFriends(PaginationDto paginationDto) {
-        int pageNumber = paginationDto.getPageInfo().getPageNumber();
-        int pageSize = paginationDto.getPageInfo().getPageSize();
+    public FriendsPageListDto getFriends(PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+        int pageNumber = paginationWithFullNameFilterDto.getPageInfo().getPageNumber();
+        int pageSize = paginationWithFullNameFilterDto.getPageInfo().getPageSize();
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
@@ -57,11 +84,11 @@ public class FriendsService implements FriendsServiceInterface {
         UUID targetUserId = userData.getId();
 
         List<FriendEntity> friends;
-        if (paginationDto.getFullNameFilter() == null || paginationDto.getFullNameFilter().isBlank()) {
+        if (paginationWithFullNameFilterDto.getFullNameFilter() == null || paginationWithFullNameFilterDto.getFullNameFilter().isBlank()) {
              friends = friendsRepository.findAllByTargetUserIdAndDeletedDate(targetUserId, null, pageable);
         }
         else {
-            String wildcardFullNameFilter = "%" + paginationDto.getFullNameFilter() + "%";
+            String wildcardFullNameFilter = "%" + paginationWithFullNameFilterDto.getFullNameFilter() + "%";
             friends = friendsRepository.findAllByTargetUserIdAndFriendNameLikeAndDeletedDate(
                     targetUserId, wildcardFullNameFilter, null, pageable);
         }
@@ -73,11 +100,17 @@ public class FriendsService implements FriendsServiceInterface {
 
         return new FriendsPageListDto(
                 friendInfoDtos,
-                paginationDto.getPageInfo(),
-                paginationDto.getFullNameFilter()
+                paginationWithFullNameFilterDto.getPageInfo(),
+                paginationWithFullNameFilterDto.getFullNameFilter()
         );
     }
 
+    /**
+     * Получить информацию о друге.
+     *
+     * @param addedUserId id друга.
+     * @return полная информация о друге.
+     */
     @Override
     public FriendDto getFriend(UUID addedUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -97,6 +130,12 @@ public class FriendsService implements FriendsServiceInterface {
         return new FriendDto(friend.get());
     }
 
+    /**
+     * Добавить пользователя в друзья.
+     *
+     * @param addPersonDto информация необходимая для добавления в друзья.
+     * @return полная информация о друге.
+     */
     @Override
     public FriendDto addToFriends(AddPersonDto addPersonDto) {
         integrationRequestsService.checkUserExistence(addPersonDto);
@@ -166,6 +205,12 @@ public class FriendsService implements FriendsServiceInterface {
         return new FriendDto(newFriend);
     }
 
+    /**
+     * Синхронизация данных друга.
+     *
+     * @param id идентификатор пользователя.
+     * @return сообщение об успешной синхронизации.
+     */
     @Override
     public Map<String, String> syncFriendData(UUID id) {
         String fullName = integrationRequestsService.getFullName(id);
@@ -180,6 +225,12 @@ public class FriendsService implements FriendsServiceInterface {
         return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
+    /**
+     * Удалить пользователя из друзей.
+     *
+     * @param addedUserId id друга.
+     * @return полная информация об удаленном друге.
+     */
     @Override
     public FriendDto deleteFriend(UUID addedUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -221,6 +272,12 @@ public class FriendsService implements FriendsServiceInterface {
         return new FriendDto(friend.get());
     }
 
+    /**
+     * Поиск среди друзей.
+     *
+     * @param paginationAndFilters информация о пагинации и фильтрах.
+     * @return найденные друзья с информацией о странице и фильтрах.
+     */
     @Override
     public SearchedFriendsDto searchFriends(PaginationWithFriendFiltersDto paginationAndFilters) {
         int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
@@ -263,4 +320,5 @@ public class FriendsService implements FriendsServiceInterface {
 
         return searchedFriendsDto;
     }
+
 }

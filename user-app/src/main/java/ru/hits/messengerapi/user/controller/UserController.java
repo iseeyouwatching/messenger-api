@@ -11,17 +11,20 @@ import ru.hits.messengerapi.user.service.implementation.UserService;
 import javax.validation.Valid;
 
 /**
- * Контроллер с эндпоинтами пользователя.
+ * Контроллер для работы с пользователем.
  */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
+    /**
+     * Сервис пользователя.
+     */
     private final UserService userService;
 
     /**
-     * Эндпоинт для регистрации пользователя.
+     * Метод для регистрации пользователя.
      *
      * @param userSignUpDto DTO для регистрации пользователя.
      * @return {@link ResponseEntity} с {@link UserProfileDto} и заголовком авторизации.
@@ -40,7 +43,7 @@ public class UserController {
     }
 
     /**
-     * Эндпоинт для аутентификации пользователя.
+     * Метод для аутентификации пользователя.
      *
      * @param userSignInDto DTO для аутентификации пользователя.
      * @return {@link ResponseEntity} с {@link UserProfileDto} и заголовком авторизации.
@@ -59,7 +62,7 @@ public class UserController {
     }
 
     /**
-     * Эндпоинт для получения списка пользователей.
+     * Метод для получения списка пользователей.
      *
      * @param paginationDto DTO для пагинации списка пользователей.
      * @return @link ResponseEntity} с {@link UsersPageListDto}.
@@ -70,7 +73,7 @@ public class UserController {
     }
 
     /**
-     * Эндпоинт для получения профиля пользователя по логину.
+     * Метод для получения профиля пользователя по логину.
      *
      * @param login логин пользователя.
      * @return {@link ResponseEntity} с {@link UserProfileDto}.
@@ -81,7 +84,7 @@ public class UserController {
     }
 
     /**
-     * Эндпоинт для получения информации о профиле текущего пользователя.
+     * Метод для получения информации о профиле текущего пользователя.
      *
      * @return {@link ResponseEntity} с {@link UserProfileDto}.
      */
@@ -91,7 +94,7 @@ public class UserController {
     }
 
     /**
-     * Эндпоинт для обновления информации о профиле текущего пользователя.
+     * Метод для обновления информации о профиле текущего пользователя.
      *
      * @param updateUserInfoDto объект с обновленной информацией о пользователе.
      * @return {@link ResponseEntity} с {@link UserProfileDto}.

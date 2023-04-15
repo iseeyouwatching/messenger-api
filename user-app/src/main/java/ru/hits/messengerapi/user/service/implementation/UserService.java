@@ -28,16 +28,35 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- *  Сервис, предназначенный для бизнес-логики эндпоинтов пользователя.
+ *  Сервис пользователя.
  */
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserServiceInterface {
 
+    /**
+     * Репозиторий пользователя.
+     */
     private final UserRepository userRepository;
+
+    /**
+     * Шифровальщик паролей.
+     */
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    /**
+     * Вспомогательный сервис для работы с JWT-токенами.
+     */
     private final JWTUtil jwtUtil;
+
+    /**
+     * Маппер.
+     */
     private final ModelMapper modelMapper;
+
+    /**
+     * Вспомогательный сервис для проверки данных для пагинации.
+     */
     private final CheckPaginationInfoService checkPaginationInfoService;
 
     /**
@@ -122,8 +141,8 @@ public class UserService implements UserServiceInterface {
             List<SortingDto> sortings = paginationDto.getSortings();
             List<Order> orders = new ArrayList<>();
             for (SortingDto sorting : sortings) {
-                orders.add(new Order(Sort.Direction.fromString(sorting.getDirection().toString()),
-                        sorting.getField().toString()));
+                orders.add(new Order(Sort.Direction.fromString(sorting.getDirection()),
+                        sorting.getField()));
             }
             pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orders));
         }

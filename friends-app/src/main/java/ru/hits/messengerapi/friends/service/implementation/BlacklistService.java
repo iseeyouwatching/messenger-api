@@ -14,7 +14,7 @@ import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginatio
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.blacklist.*;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
-import ru.hits.messengerapi.friends.dto.common.PaginationDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
@@ -24,20 +24,48 @@ import ru.hits.messengerapi.friends.service.BlacklistServiceInterface;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ *  Сервис черного списка.
+ */
 @Service
 @RequiredArgsConstructor
 public class BlacklistService implements BlacklistServiceInterface {
 
+    /**
+     * Репозиторий для работы с сущностью {@link BlacklistEntity}.
+     */
     private final BlacklistRepository blacklistRepository;
+
+    /**
+     * Вспомогательный сервис для проверки данных для пагинации.
+     */
     private final CheckPaginationInfoService checkPaginationInfoService;
+
+    /**
+     * Сервис, в котором хранится логика отправки интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
+
+    /**
+     * Сервис друзей.
+     */
     private final FriendsService friendsService;
+
+    /**
+     * Репозиторий для работы с сущностью {@link FriendEntity}.
+     */
     private final FriendsRepository friendsRepository;
 
+    /**
+     * Получить заблокированных пользователей с информацией о странице и фильтре по ФИО для целевого пользователя.
+     *
+     * @param paginationWithFullNameFilterDto объект {@link PaginationWithFullNameFilterDto}, содержащий информацию о странице и фильтре по ФИО.
+     * @return список заблокированных пользователей, информация о странице и фильтре по ФИО.
+     */
     @Override
-    public BlockedUsersPageListDto getBlockedUsers(PaginationDto paginationDto) {
-        int pageNumber = paginationDto.getPageInfo().getPageNumber();
-        int pageSize = paginationDto.getPageInfo().getPageSize();
+    public BlockedUsersPageListDto getBlockedUsers(PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+        int pageNumber = paginationWithFullNameFilterDto.getPageInfo().getPageNumber();
+        int pageSize = paginationWithFullNameFilterDto.getPageInfo().getPageSize();
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
@@ -46,12 +74,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         UUID targetUserId = userData.getId();
 
         List<BlacklistEntity> blockedUsers;
-        if (paginationDto.getFullNameFilter() == null || paginationDto.getFullNameFilter().isBlank()) {
+        if (paginationWithFullNameFilterDto.getFullNameFilter() == null || paginationWithFullNameFilterDto.getFullNameFilter().isBlank()) {
             blockedUsers = blacklistRepository
                     .findAllByTargetUserIdAndDeletedDate(targetUserId, null, pageable);
         }
         else {
-            String wildcardFullNameFilter = "%" + paginationDto.getFullNameFilter() + "%";
+            String wildcardFullNameFilter = "%" + paginationWithFullNameFilterDto.getFullNameFilter() + "%";
             blockedUsers = blacklistRepository.findAllByTargetUserIdAndBlockedUserNameLikeAndDeletedDate(
                     targetUserId, wildcardFullNameFilter, null, pageable);
         }
@@ -63,11 +91,17 @@ public class BlacklistService implements BlacklistServiceInterface {
 
         return new BlockedUsersPageListDto(
                 blockedUserInfoDtos,
-                paginationDto.getPageInfo(),
-                paginationDto.getFullNameFilter()
+                paginationWithFullNameFilterDto.getPageInfo(),
+                paginationWithFullNameFilterDto.getFullNameFilter()
         );
     }
 
+    /**
+     * Получить информацию о заблокированном пользователе.
+     *
+     * @param blockedUserId id заблокированного пользователя.
+     * @return полная информация о заблокированном пользователе.
+     */
     @Override
     public BlockedUserDto getBlockedUser(UUID blockedUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -87,6 +121,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         return new BlockedUserDto(blockedUser.get());
     }
 
+    /**
+     * Добавить пользователя в черный список.
+     *
+     * @param addPersonDto DTO, содержащая информацию о добавляемом в черный список пользователе
+     * @return полная информация о заблокированном пользователе
+     */
     @Override
     public BlockedUserDto addToBlacklist(AddPersonDto addPersonDto) {
         integrationRequestsService.checkUserExistence(addPersonDto);
@@ -134,6 +174,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         return new BlockedUserDto(newBlockedUser);
     }
 
+    /**
+     * Синхронизация данных заблокированного пользователя.
+     *
+     * @param id идентификатор пользователя.
+     * @return сообщение об успешной синхронизации.
+     */
     @Override
     public Map<String, String> syncBlockedUserData(UUID id) {
         String fullName = integrationRequestsService.getFullName(id);
@@ -148,6 +194,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
+    /**
+     * Удалить пользователя из черного списка.
+     *
+     * @param blockedUserId id заблокированного пользователя.
+     * @return полная информация о заблокированном пользователе.
+     */
     @Override
     public BlockedUserDto deleteFromBlacklist(UUID blockedUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -176,6 +228,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         return new BlockedUserDto(blockedUser.get());
     }
 
+    /**
+     * Поиск среди заблокированных пользователей.
+     *
+     * @param paginationAndFilters информация о пагинации и фильтрах.
+     * @return найденные заблокированные пользователи с информацией о странице и фильтрах.
+     */
     @Override
     public SearchedBlockedUsersDto searchBlockedUsers(PaginationWithBlockedUserFiltersDto paginationAndFilters) {
         int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
@@ -219,6 +277,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         return searchedBlockedUsersDto;
     }
 
+    /**
+     * Проверка нахождения пользователя в черном списке.
+     *
+     * @param blockedUserId id заблокированного пользователя
+     * @return булевая переменная, которая показывает находится пользователь в черном списке или нет.
+     */
     @Override
     public boolean checkIfTheUserBlacklisted(UUID blockedUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -233,6 +297,13 @@ public class BlacklistService implements BlacklistServiceInterface {
         return blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null;
     }
 
+    /**
+     * Проверка нахождения целевого пользователя в черном списке у добавляемого в друзья пользователе.
+     *
+     * @param targetUserId id целевого пользователя.
+     * @param blockedUserId id заблокированного пользователя.
+     * @return булевая переменная, которая показывает находится пользователь в черном списке или нет.
+     */
     @Override
     public boolean checkIfTheTargetUserBlacklisted(UUID targetUserId, UUID blockedUserId) {
         Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(

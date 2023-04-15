@@ -1,7 +1,6 @@
 package ru.hits.messengerapi.user.dto;
 
 import lombok.*;
-import ru.hits.messengerapi.user.entity.UserEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

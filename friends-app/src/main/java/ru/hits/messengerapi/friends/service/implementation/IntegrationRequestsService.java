@@ -15,18 +15,35 @@ import java.util.UUID;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 
+/**
+ * Сервис для интеграционных запросов.
+ */
 @Service
 @RequiredArgsConstructor
 public class IntegrationRequestsService implements IntegrationRequestsServiceInterface {
 
+    /**
+     * Свойства безопасности приложения.
+     */
     private final SecurityProps securityProps;
 
+    /**
+     * URL, куда отправляет интеграционный запрос на проверку существования пользователя.
+     */
     @Value("${integration.request.check-existence}")
     private String integrationUsersRequestCheckExistence;
 
+    /**
+     * URL, куда отправляет интеграционный запрос для получения ФИО пользователя.
+     */
     @Value("${integration.request.get-full-name}")
     private String integrationUsersRequestGetFullName;
 
+    /**
+     * Метод для проверки существования пользователя по ФИО и ID.
+     *
+     * @param addPersonDto информация проверяемого пользователя.
+     */
     @Override
     public void checkUserExistence(AddPersonDto addPersonDto) {
         RestTemplate restTemplate = new RestTemplate();
@@ -46,6 +63,12 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
         }
     }
 
+    /**
+     * Метод для получения ФИО пользователя по его ID.
+     *
+     * @param id идентификатор пользователя.
+     * @return ФИО пользователя.
+     */
     @Override
     public String getFullName(UUID id) {
         RestTemplate restTemplate = new RestTemplate();

@@ -8,7 +8,7 @@ import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUsersPageListDto;
 import ru.hits.messengerapi.friends.dto.blacklist.PaginationWithBlockedUserFiltersDto;
 import ru.hits.messengerapi.friends.dto.blacklist.SearchedBlockedUsersDto;
-import ru.hits.messengerapi.friends.dto.common.PaginationDto;
+import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.service.implementation.BlacklistService;
 
@@ -33,12 +33,12 @@ public class BlacklistController {
     /**
      * Метод для получения списка пользователей в черном списке.
      *
-     * @param paginationDto объект класса {@link PaginationDto}, содержащий информацию о постраничном выводе данных.
+     * @param paginationWithFullNameFilterDto объект класса {@link PaginationWithFullNameFilterDto}, содержащий информацию о постраничном выводе данных.
      * @return список пользователей в черном списке с информацией о пагинации и фильтре.
      */
     @PostMapping
-    public ResponseEntity<BlockedUsersPageListDto> getBlockedUsers(@RequestBody @Valid PaginationDto paginationDto) {
-        return new ResponseEntity<>(blacklistService.getBlockedUsers(paginationDto), HttpStatus.OK);
+    public ResponseEntity<BlockedUsersPageListDto> getBlockedUsers(@RequestBody @Valid PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+        return new ResponseEntity<>(blacklistService.getBlockedUsers(paginationWithFullNameFilterDto), HttpStatus.OK);
     }
 
     /**
