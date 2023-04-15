@@ -29,14 +29,8 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
      * @return exist - если пользователь существует, dont exist - если пользователя не существует.
      */
     @Override
-    public String checkUserByIdAndFullName(UUID id, String fullName) {
-        Optional<UserEntity> user = userRepository.findByIdAndFullName(id, fullName);
-
-        if (user.isEmpty()) {
-            return "dont exist";
-        }
-
-        return "exist";
+    public Boolean checkUserByIdAndFullName(UUID id, String fullName) {
+        return userRepository.findByIdAndFullName(id, fullName).isPresent();
     }
 
     /**

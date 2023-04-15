@@ -101,6 +101,7 @@ public class BlacklistService implements BlacklistServiceInterface {
      *
      * @param blockedUserId id заблокированного пользователя.
      * @return полная информация о заблокированном пользователе.
+     * @throws NotFoundException если пользователя нет в ЧС.
      */
     @Override
     public BlockedUserDto getBlockedUser(UUID blockedUserId) {
@@ -126,6 +127,9 @@ public class BlacklistService implements BlacklistServiceInterface {
      *
      * @param addPersonDto DTO, содержащая информацию о добавляемом в черный список пользователе
      * @return полная информация о заблокированном пользователе
+     * @throws ConflictException если 1) пользователь хочет добавить самого себя в ЧС;
+     *                                2) целевой пользователь хочет добавить в ЧС пользователя,
+     *                                который уже добавлен в ЧС
      */
     @Override
     public BlockedUserDto addToBlacklist(AddPersonDto addPersonDto) {
@@ -199,6 +203,8 @@ public class BlacklistService implements BlacklistServiceInterface {
      *
      * @param blockedUserId id заблокированного пользователя.
      * @return полная информация о заблокированном пользователе.
+     * @throws NotFoundException если пользователя нет в ЧС.
+     * @throws ConflictException если пользователь уже удален из ЧС.
      */
     @Override
     public BlockedUserDto deleteFromBlacklist(UUID blockedUserId) {
@@ -281,7 +287,7 @@ public class BlacklistService implements BlacklistServiceInterface {
      * Проверка нахождения пользователя в черном списке.
      *
      * @param blockedUserId id заблокированного пользователя
-     * @return булевая переменная, которая показывает находится пользователь в черном списке или нет.
+     * @return true - если пользователь находится в ЧС, false - если нет.
      */
     @Override
     public boolean checkIfTheUserBlacklisted(UUID blockedUserId) {
@@ -302,7 +308,7 @@ public class BlacklistService implements BlacklistServiceInterface {
      *
      * @param targetUserId id целевого пользователя.
      * @param blockedUserId id заблокированного пользователя.
-     * @return булевая переменная, которая показывает находится пользователь в черном списке или нет.
+     * @return true - если пользователь находится в ЧС, false - если нет.
      */
     @Override
     public boolean checkIfTheTargetUserBlacklisted(UUID targetUserId, UUID blockedUserId) {

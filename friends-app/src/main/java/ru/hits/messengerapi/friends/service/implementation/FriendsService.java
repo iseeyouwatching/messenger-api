@@ -110,6 +110,7 @@ public class FriendsService implements FriendsServiceInterface {
      *
      * @param addedUserId id друга.
      * @return полная информация о друге.
+     * @throws NotFoundException если пользователя нет в списке друзей.
      */
     @Override
     public FriendDto getFriend(UUID addedUserId) {
@@ -135,6 +136,13 @@ public class FriendsService implements FriendsServiceInterface {
      *
      * @param addPersonDto информация необходимая для добавления в друзья.
      * @return полная информация о друге.
+     * @throws ConflictException если 1) пользователь хочет добавить самого себя в друзья;
+     *                                2) пользователь хочет добавить в друзья пользователя,
+     *                                который уже добавлен к нему в друзья;
+     *                                3) пользователь хочет добавить в друзья пользователя,
+     *                                который находится у него в ЧС;
+     *                                4) пользователь хочет добавить в друзья пользователя,
+     *                                у которого находится в ЧС
      */
     @Override
     public FriendDto addToFriends(AddPersonDto addPersonDto) {
@@ -230,6 +238,9 @@ public class FriendsService implements FriendsServiceInterface {
      *
      * @param addedUserId id друга.
      * @return полная информация об удаленном друге.
+     * @throws NotFoundException если пользователя нет в списке друзей.
+     * @throws ConflictException если пользователь, которого хочет добавить в друзья целевой пользователь,
+     *                           уже удален из друзей
      */
     @Override
     public FriendDto deleteFriend(UUID addedUserId) {

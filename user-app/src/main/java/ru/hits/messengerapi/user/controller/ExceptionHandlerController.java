@@ -47,6 +47,8 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
             HttpStatus status,
             WebRequest request
     ) {
+        logError(request, exception);
+
         Map<String, List<String>> errors = new HashMap<>();
 
         exception
@@ -83,6 +85,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleNotFoundException(NotFoundException exception,
                                                             WebRequest request
     ) {
+        logError(request, exception);
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.NOT_FOUND);
     }
 
@@ -98,6 +101,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleBadRequestException(BadRequestException exception,
                                                               WebRequest request
     ) {
+        logError(request, exception);
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
@@ -113,6 +117,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleConflictException(ConflictException exception,
                                                             WebRequest request
     ) {
+        logError(request, exception);
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.CONFLICT);
     }
 
@@ -128,6 +133,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleUnauthorizedException(UnauthorizedException exception,
                                                             WebRequest request
     ) {
+        logError(request, exception);
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
@@ -143,10 +149,22 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleUnexpectedInternalException(Exception exception,
                                                                       WebRequest request
     ) {
+        logError(request, exception);
         return new ResponseEntity<>(
                 new ApiError("Непредвиденная внутренняя ошибка сервера"),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
+    }
+
+    /**
+     * Метод для логирования всех исключений, которые доходят до контроллера.
+     *
+     * @param request   запрос, в ходе выполнения которого возникло исключение.
+     * @param exception исключение.
+     */
+    private void logError(WebRequest request, Exception exception) {
+        log.error("Возникла ошибка при запросе на URL: {}", request.getDescription(true));
+        log.error(exception.getMessage(), exception);
     }
 
 }

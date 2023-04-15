@@ -29,5 +29,9 @@ spring:
     hibernate:
       ddl-auto: validate
 
+integration:
+  request:
+    check-existence-in-blacklist: http://localhost:8192/integration/blacklist/check-existence-in-blacklist
+
 server:
   port: 8191

@@ -59,6 +59,8 @@ public class UserService implements UserServiceInterface {
      */
     private final CheckPaginationInfoService checkPaginationInfoService;
 
+    private final IntegrationRequestsService integrationRequestsService;
+
     /**
      * Метод для регистрации пользователя.
      *
@@ -200,6 +202,16 @@ public class UserService implements UserServiceInterface {
 
         if (user.isEmpty()) {
             throw new NotFoundException("Пользователь с логином " + login + " не найден.");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        UUID id = userData.getId();
+
+        if (Boolean.TRUE.equals(integrationRequestsService.checkExistenceInBlacklist(user.get().getId(), id))) {
+            throw new ConflictException("Пользователь с ID " + id
+                    + " не может посмотреть профиль пользователя с ID " + user.get().getId()
+                    + ", так как находится у него в черном списке.");
         }
 
         return new UserProfileDto(user.get());

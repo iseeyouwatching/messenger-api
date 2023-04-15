@@ -54,10 +54,10 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
         headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
         HttpEntity<AddPersonDto> requestEntity = new HttpEntity<>(addPersonDto, headers);
 
-        ResponseEntity<String> responseEntity = restTemplate
-                .exchange(url, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<Boolean> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
 
-        if (Objects.equals(responseEntity.getBody(), "dont exist")) {
+        if (Boolean.FALSE.equals(responseEntity.getBody())) {
             throw new NotFoundException("Пользователя с id " + addPersonDto.getId()
                     + " и ФИО " + addPersonDto.getFullName() + " не существует.");
         }

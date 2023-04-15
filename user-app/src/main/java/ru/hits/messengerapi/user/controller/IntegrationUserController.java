@@ -29,7 +29,7 @@ public class IntegrationUserController {
      * @return exist - если пользователь существует, dont exist - если пользователя не существует.
      */
     @PostMapping("/check-existence")
-    public ResponseEntity<String> checkUserByIdAndFullName(
+    public ResponseEntity<Boolean> checkUserByIdAndFullName(
             @RequestBody Map<String, String> userIdAndFullName) {
         return new ResponseEntity<>(integrationUserService.checkUserByIdAndFullName(
                 UUID.fromString(userIdAndFullName.get("id")),

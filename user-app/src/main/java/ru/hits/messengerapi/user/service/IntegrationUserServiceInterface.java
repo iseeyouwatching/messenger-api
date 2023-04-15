@@ -12,9 +12,9 @@ public interface IntegrationUserServiceInterface {
      *
      * @param id идентификатор пользователя.
      * @param fullName ФИО пользователя.
-     * @return exist - если пользователь существует, dont exist - если пользователя не существует.
+     * @return true - если пользователь существует, false - если пользователя не существует.
      */
-    String checkUserByIdAndFullName(UUID id, String fullName);
+    Boolean checkUserByIdAndFullName(UUID id, String fullName);
 
     /**
      * Метод для получения ФИО пользователя по его ID.
