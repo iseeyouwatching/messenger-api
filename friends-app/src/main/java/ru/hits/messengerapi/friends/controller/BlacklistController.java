@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/blacklist")
 @RequiredArgsConstructor
+@Slf4j
 public class BlacklistController {
 
     /**
@@ -37,7 +39,10 @@ public class BlacklistController {
      * @return список пользователей в черном списке с информацией о пагинации и фильтре.
      */
     @PostMapping
-    public ResponseEntity<BlockedUsersPageListDto> getBlockedUsers(@RequestBody @Valid PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+    public ResponseEntity<BlockedUsersPageListDto> getBlockedUsers(
+            @RequestBody @Valid PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+        log.info("Запрос на получение списка пользователей в черном списке с параметрами: {}",
+                paginationWithFullNameFilterDto);
         return new ResponseEntity<>(blacklistService.getBlockedUsers(paginationWithFullNameFilterDto), HttpStatus.OK);
     }
 
@@ -49,6 +54,7 @@ public class BlacklistController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<BlockedUserDto> getBlockedUser(@PathVariable("id") UUID id) {
+        log.info("Запрос на получение информации о пользователе из черного списка с id: {}", id);
         return new ResponseEntity<>(blacklistService.getBlockedUser(id), HttpStatus.OK);
     }
 
@@ -60,7 +66,8 @@ public class BlacklistController {
      * @return информация о добавленном в черный список пользователе.
      */
     @PostMapping("/add")
-    public ResponseEntity<BlockedUserDto> addToFriends(@RequestBody @Valid AddPersonDto addPersonDto) {
+    public ResponseEntity<BlockedUserDto> addToBlacklist(@RequestBody @Valid AddPersonDto addPersonDto) {
+        log.info("Запрос на добавление пользователя в черный список с параметрами: {}", addPersonDto);
         return new ResponseEntity<>(blacklistService.addToBlacklist(addPersonDto), HttpStatus.OK);
     }
 
@@ -72,6 +79,7 @@ public class BlacklistController {
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Map<String, String>> syncBlockedUserData(@PathVariable("id") UUID id) {
+        log.info("Синхронизация данных заблокированного пользователя с ID: {}", id);
         return new ResponseEntity<>(blacklistService.syncBlockedUserData(id), HttpStatus.OK);
     }
 
@@ -83,6 +91,7 @@ public class BlacklistController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<BlockedUserDto> deleteFromBlacklist(@PathVariable("id") UUID id) {
+        log.info("Запрос на удаление пользователя с идентификатором {} из черного списка", id);
         return new ResponseEntity<>(blacklistService.deleteFromBlacklist(id), HttpStatus.OK);
     }
 
@@ -96,7 +105,11 @@ public class BlacklistController {
     @PostMapping("/search")
     public ResponseEntity<SearchedBlockedUsersDto> searchBlockedUsers(
             @RequestBody @Valid PaginationWithBlockedUserFiltersDto paginationAndFilters) {
-        return new ResponseEntity<>(blacklistService.searchBlockedUsers(paginationAndFilters), HttpStatus.OK);
+        log.info("Поиск заблокированных пользователей с параметрами пагинации и фильтрации: {}",
+                paginationAndFilters);
+        SearchedBlockedUsersDto searchedBlockedUsers = blacklistService.searchBlockedUsers(paginationAndFilters);
+        log.info("Найдено {} заблокированных пользователей", searchedBlockedUsers.getBlockedUsers().size());
+        return new ResponseEntity<>(searchedBlockedUsers, HttpStatus.OK);
     }
 
     /**
@@ -109,14 +122,15 @@ public class BlacklistController {
     public ResponseEntity<Map<String, String>> checkIfTheUserBlacklisted(@PathVariable("id") UUID id) {
         boolean check = blacklistService.checkIfTheUserBlacklisted(id);
         if (check) {
+            log.info("Пользователь с идентификатором {} находится в черном списке.", id);
             return new ResponseEntity<>(
                     Map.of("message", "Пользователь находится в черном списке."), HttpStatus.OK);
         }
         else {
+            log.info("Пользователь с идентификатором {} не находится в черном списке.", id);
             return new ResponseEntity<>(
                     Map.of("message", "Пользователь не находится в черном списке."), HttpStatus.OK);
         }
-
     }
 
 

@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
@@ -14,6 +15,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IntegrationUserService implements IntegrationUserServiceInterface {
 
     /**
@@ -30,7 +32,14 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
      */
     @Override
     public Boolean checkUserByIdAndFullName(UUID id, String fullName) {
-        return userRepository.findByIdAndFullName(id, fullName).isPresent();
+        log.debug("Проверка пользователя с id {} и полным именем {}", id, fullName);
+        boolean isUserPresent = userRepository.findByIdAndFullName(id, fullName).isPresent();
+        if (isUserPresent) {
+            log.debug("Пользователь с id {} и полным именем {} найден", id, fullName);
+        } else {
+            log.debug("Пользователь с id {} и полным именем {} не найден", id, fullName);
+        }
+        return isUserPresent;
     }
 
     /**
@@ -41,12 +50,17 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
      */
     @Override
     public String getFullName(UUID id) {
+        log.info("Запрос на получение полного имени пользователя с ID {}", id);
+
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
+            log.warn("Пользователь с ID {} не найден", id);
             return "dont exist";
         }
 
-        return user.get().getFullName();
+        String fullName = user.get().getFullName();
+        log.info("Полное имя пользователя с ID {} успешно получено: {}", id, fullName);
+        return fullName;
     }
 }

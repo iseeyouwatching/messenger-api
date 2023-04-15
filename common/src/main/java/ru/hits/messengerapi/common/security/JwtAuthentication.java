@@ -1,10 +1,12 @@
 package ru.hits.messengerapi.common.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 /**
  * Класс, представляющий аутентификацию по JWT-токену.
  */
+@Slf4j
 public class JwtAuthentication extends AbstractAuthenticationToken {
 
     /**
@@ -17,6 +19,7 @@ public class JwtAuthentication extends AbstractAuthenticationToken {
         super(null);
         this.setDetails(jwtUserData);
         setAuthenticated(true);
+        log.info("Аутентификация пользователя с ID {} прошла успешно.", jwtUserData.getId());
     }
 
     /**

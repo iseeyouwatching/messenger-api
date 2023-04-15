@@ -1,10 +1,12 @@
 package ru.hits.messengerapi.common.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 /**
  * Класс, представляющий аутентификацию при интеграционных запросах.
  */
+@Slf4j
 public class IntegrationAuthentication extends AbstractAuthenticationToken {
 
     /**
@@ -14,6 +16,7 @@ public class IntegrationAuthentication extends AbstractAuthenticationToken {
     public IntegrationAuthentication() {
         super(null);
         setAuthenticated(true);
+        log.info("Успешная аутентификация для интеграционного запроса.");
     }
 
     /**

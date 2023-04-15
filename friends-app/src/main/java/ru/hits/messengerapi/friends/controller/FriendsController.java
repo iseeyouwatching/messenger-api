@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/friends")
 @RequiredArgsConstructor
+@Slf4j
 public class FriendsController {
 
     /**
@@ -33,6 +35,8 @@ public class FriendsController {
      */
     @PostMapping
     public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+        log.info("Запрос на получение списка друзей пользователя с параметрами: {}",
+                paginationWithFullNameFilterDto);
         return new ResponseEntity<>(friendsService.getFriends(paginationWithFullNameFilterDto), HttpStatus.OK);
     }
 
@@ -44,6 +48,7 @@ public class FriendsController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<FriendDto> getFriend(@PathVariable("id") UUID id) {
+        log.info("Запрос на получение информации о друге с id = {}", id);
         return new ResponseEntity<>(friendsService.getFriend(id), HttpStatus.OK);
     }
 
@@ -56,6 +61,7 @@ public class FriendsController {
      */
     @PostMapping("/add")
     public ResponseEntity<FriendDto> addToFriends(@RequestBody @Valid AddPersonDto addPersonDto) {
+        log.info("Запрос на добавление друга: {}", addPersonDto);
         return new ResponseEntity<>(friendsService.addToFriends(addPersonDto), HttpStatus.OK);
     }
 
@@ -67,7 +73,9 @@ public class FriendsController {
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
-       return new ResponseEntity<>(friendsService.syncFriendData(id), HttpStatus.OK);
+        Map<String, String> response = friendsService.syncFriendData(id);
+        log.info("Данные друга с идентификатором {} синхронизированы", id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -78,6 +86,7 @@ public class FriendsController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<FriendDto> deleteFriend(@PathVariable("id") UUID id) {
+        log.info("Запрос на удаление друга с идентификатором {} из списка друзей", id);
         return new ResponseEntity<>(friendsService.deleteFriend(id), HttpStatus.OK);
     }
 
@@ -91,6 +100,7 @@ public class FriendsController {
     @PostMapping("/search")
     public ResponseEntity<SearchedFriendsDto> searchFriends(
             @RequestBody @Valid PaginationWithFriendFiltersDto paginationAndFilters) {
+        log.info("Поиск друзей пользователя с параметрами: {}", paginationAndFilters);
         return new ResponseEntity<>(friendsService.searchFriends(paginationAndFilters), HttpStatus.OK);
     }
 

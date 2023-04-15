@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
  * Утилитарный класс для генерации и проверки JWT-токенов.
  */
 @Component
+@Slf4j
 public class JWTUtil {
 
     /**
@@ -44,7 +46,7 @@ public class JWTUtil {
     public String generateToken(UUID id, String login, String fullName) {
         Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());
 
-        return JWT.create()
+        String token = JWT.create()
                 .withSubject(subject)
                 .withClaim("id", id.toString())
                 .withClaim("login", login)
@@ -53,6 +55,10 @@ public class JWTUtil {
                 .withIssuer(issuer)
                 .withExpiresAt(expirationDate)
                 .sign(Algorithm.HMAC256(secret));
+
+        log.info("Сгенерирован JWT-токен для пользователя с ID {}, логином {} и полным именем {}", id, login, fullName);
+
+        return token;
     }
 
     /**
@@ -78,6 +84,9 @@ public class JWTUtil {
         claims.add(id);
         claims.add(login);
         claims.add(fullName);
+
+        log.info("JWT-токен для пользователя с ID {} и логином {} прошел верификацию", id, login);
+
         return claims;
     }
 

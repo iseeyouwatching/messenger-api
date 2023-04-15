@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Order;
@@ -32,6 +33,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserServiceInterface {
 
     /**
@@ -72,16 +74,19 @@ public class UserService implements UserServiceInterface {
      */
     @Override
     public UserProfileAndTokenDto userSignUp(UserSignUpDto userSignUpDto) {
-
         if (userRepository.findByLogin(userSignUpDto.getLogin()).isPresent()) {
+            log.warn("Пользователь с логином {} уже существует.",
+                    userSignUpDto.getLogin());
             throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
         }
 
         if (userRepository.findByEmail(userSignUpDto.getEmail()).isPresent()) {
+            log.warn("Пользователь с почтой {} уже существует.", userSignUpDto.getEmail());
             throw new ConflictException("Пользователь с почтой " + userSignUpDto.getEmail() + " уже существует.");
         }
 
         if (userSignUpDto.getBirthDate() != null && userSignUpDto.getBirthDate().isAfter(LocalDate.now())) {
+            log.warn("Дата рождения не может быть позже текущей.");
             throw new BadRequestException("Дата рождения не может быть позже текущей.");
         }
 
@@ -111,6 +116,7 @@ public class UserService implements UserServiceInterface {
 
         if (user.isEmpty() ||
                 !bCryptPasswordEncoder.matches(userSignInDto.getPassword(), user.get().getPassword())) {
+            log.error("Некорректные данные для входа пользователя с логином {}.", userSignInDto.getLogin());
             throw new UnauthorizedException("Некорректные данные.");
         }
 
@@ -119,8 +125,10 @@ public class UserService implements UserServiceInterface {
         userProfileAndTokenDto.setToken(jwtUtil.generateToken(
                 user.get().getId(),
                 user.get().getLogin(),
-                user.get().getFullName()))
-        ;
+                user.get().getFullName())
+        );
+
+        log.info("Пользователь с логином {} авторизовался в системе.", user.get().getLogin());
 
         return userProfileAndTokenDto;
     }
@@ -137,6 +145,8 @@ public class UserService implements UserServiceInterface {
         int pageNumber = paginationDto.getPageInfo().getPageNumber();
         int pageSize = paginationDto.getPageInfo().getPageSize();
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
+        log.info("Запрос списка пользователей. Страница: {}, размер страницы: {}",
+                paginationDto.getPageInfo().getPageNumber(), paginationDto.getPageInfo().getPageSize());
 
         Pageable pageable;
         if (paginationDto.getSortings() != null) {
@@ -186,6 +196,8 @@ public class UserService implements UserServiceInterface {
         usersPageListDto.setFilters(paginationDto.getFilters());
         usersPageListDto.setSortings(paginationDto.getSortings());
 
+        log.info("Список пользователей успешно получен.");
+
         return usersPageListDto;
     }
 
@@ -201,6 +213,8 @@ public class UserService implements UserServiceInterface {
         Optional<UserEntity> user = userRepository.findByLogin(login);
 
         if (user.isEmpty()) {
+            log.warn("Пользователь с логином {} не найден.",
+                    login);
             throw new NotFoundException("Пользователь с логином " + login + " не найден.");
         }
 
@@ -209,10 +223,14 @@ public class UserService implements UserServiceInterface {
         UUID id = userData.getId();
 
         if (Boolean.TRUE.equals(integrationRequestsService.checkExistenceInBlacklist(user.get().getId(), id))) {
+            log.warn("Пользователь с ID {} не может посмотреть профиль пользователя с ID {}, " +
+                    "так как находится у него в черном списке.", id, user.get().getId());
             throw new ConflictException("Пользователь с ID " + id
                     + " не может посмотреть профиль пользователя с ID " + user.get().getId()
                     + ", так как находится у него в черном списке.");
         }
+
+        log.info("Информация о пользователе получена.");
 
         return new UserProfileDto(user.get());
     }
@@ -231,6 +249,7 @@ public class UserService implements UserServiceInterface {
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
+            log.error("Пользователь с ID {} не найден.", id);
             throw new NotFoundException("Пользователь с ID " + id + " не найден.");
         }
 
@@ -251,14 +270,18 @@ public class UserService implements UserServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID id = userData.getId();
         Optional<UserEntity> user = userRepository.findById(id);
+        log.info("Пользователь с ID {} пытается обновить свой профиль.", id);
 
         if (user.isEmpty()) {
+            log.error("Пользователь с ID {} не найден.", id);
             throw new NotFoundException("Пользователь с ID " + id + " не найден.");
         }
 
         if (updateUserInfoDto.getBirthDate() != null &&
                 updateUserInfoDto.getBirthDate().isAfter(LocalDate.now())) {
-            throw new BadRequestException("Дата рождения не может быть позже текущей.");
+            String errorMessage = "Дата рождения не может быть позже текущей.";
+            log.error(errorMessage);
+            throw new BadRequestException(errorMessage);
         }
 
         if (updateUserInfoDto.getFullName() != null) {
@@ -282,6 +305,7 @@ public class UserService implements UserServiceInterface {
         }
 
         user = Optional.of(userRepository.save(user.get()));
+        log.info("Профиль пользователя с ID {} успешно обновлен.", id);
 
         return new UserProfileDto(user.get());
     }

@@ -2,6 +2,7 @@ package ru.hits.messengerapi.common.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +20,7 @@ import java.util.Objects;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
     private final JWTFilter jwtFilter;
@@ -32,6 +34,7 @@ public class SecurityConfig {
     @SneakyThrows
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) {
+        log.info("Настройка правил безопасности и включение фильтра JWT.");
         http = http.requestMatcher(request -> Objects.nonNull(request.getServletPath())
                         && request.getServletPath().startsWith(securityProps.getJwtToken().getRootPath()))
                 .authorizeRequests()
@@ -52,6 +55,7 @@ public class SecurityConfig {
     @SneakyThrows
     @Bean
     public SecurityFilterChain filterChainIntegration(HttpSecurity http) {
+        log.info("Настройка правил безопасности для интеграции между сервисами.");
         http = http.requestMatcher(request -> Objects.nonNull(request.getServletPath())
                         && request.getServletPath().startsWith(securityProps.getIntegrations().getRootPath()))
                 .authorizeRequests()
@@ -74,6 +78,7 @@ public class SecurityConfig {
     @SneakyThrows
     @Bean
     public SecurityFilterChain filterChainDenyAll(HttpSecurity http) {
+        log.info("Настройка правил безопасности для запрета всех запросов, кроме тех, что имеют отдельную настройку.");
         http = http.requestMatcher(request -> Objects.nonNull(request.getServletPath())
                         && !request.getServletPath().startsWith(securityProps.getJwtToken().getRootPath())
                         && !request.getServletPath().startsWith(securityProps.getIntegrations().getRootPath()))
@@ -92,6 +97,7 @@ public class SecurityConfig {
      */
     @SneakyThrows
     private SecurityFilterChain finalize(HttpSecurity http) {
+        log.info("Завершение настройки правил безопасности и возвращение объекта класса SecurityFilterChain.");
         return http.csrf()
                 .disable()
                 .sessionManagement()

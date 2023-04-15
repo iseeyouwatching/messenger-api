@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.common.helpingservices.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoInterface;
@@ -10,6 +11,7 @@ import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoInterface;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CheckPaginationInfoService implements CheckPaginationInfoInterface {
 
     /**
@@ -21,6 +23,7 @@ public class CheckPaginationInfoService implements CheckPaginationInfoInterface 
     @Override
     public void checkPageNumber(int pageNumber) {
         if (pageNumber <= 0) {
+            log.error("Номер страницы должен быть больше 0.");
             throw new BadRequestException("Номер страницы должен быть больше 0.");
         }
     }
@@ -34,6 +37,7 @@ public class CheckPaginationInfoService implements CheckPaginationInfoInterface 
     @Override
     public void checkPageSize(int pageSize) {
         if (pageSize <= 0) {
+            log.error("Размер страницы должен быть больше 0.");
             throw new BadRequestException("Размер страницы должен быть больше 0.");
         }
     }

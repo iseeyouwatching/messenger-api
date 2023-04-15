@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,7 @@ import java.util.*;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BlacklistService implements BlacklistServiceInterface {
 
     /**
@@ -89,6 +91,10 @@ public class BlacklistService implements BlacklistServiceInterface {
             blockedUserInfoDtos.add(new BlockedUserInfoDto(blockedUser));
         }
 
+        log.info("Метод на получение заблокированных пользователей успешно выполнен с параметрами " +
+                "pageNumber={}, pageSize={}, targetUserId={}, fullNameFilter={}",
+                pageNumber, pageSize, targetUserId, paginationWithFullNameFilterDto.getFullNameFilter());
+
         return new BlockedUsersPageListDto(
                 blockedUserInfoDtos,
                 paginationWithFullNameFilterDto.getPageInfo(),
@@ -115,9 +121,14 @@ public class BlacklistService implements BlacklistServiceInterface {
         );
 
         if (blockedUser.isEmpty() || blockedUser.get().getDeletedDate() != null) {
+            String errorMsg = "Пользователя с ID {} нет в черном списке у пользователя с ID {}.";
+            log.error(errorMsg, blockedUserId, targetUserId);
             throw new NotFoundException("Пользователя с ID " + blockedUserId
                     + " нет в черном списке у пользователя с ID " + targetUserId + ".");
         }
+
+        String successMsg = "Пользователь с ID {} успешно найден в черном списке у пользователя с ID {}.";
+        log.info(successMsg, blockedUserId, targetUserId);
 
         return new BlockedUserDto(blockedUser.get());
     }
@@ -139,7 +150,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
 
+        log.info("Пользователь с ID {} и ФИО {} хочет добавить пользователя с ID {} и ФИО {} в черный список.",
+                targetUserId, userData.getFullName(), addPersonDto.getId(), addPersonDto.getFullName());
+
         if (addPersonDto.getId().equals(targetUserId)) {
+            log.warn("Пользователь с ID {} и ФИО {} пытается добавить самого себя в черный список.",
+                    targetUserId, userData.getFullName());
             throw new ConflictException("Пользователь не может добавить самого себя в черный список.");
         }
 
@@ -147,6 +163,8 @@ public class BlacklistService implements BlacklistServiceInterface {
                 targetUserId, addPersonDto.getId());
 
         if (blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null) {
+            log.warn("Пользователь с ID {} и ФИО {} уже добавлен в черный список пользователя с ID {} и ФИО {}.",
+                    addPersonDto.getId(), addPersonDto.getFullName(), targetUserId, userData.getFullName());
             throw new ConflictException("Пользователь с ID " + addPersonDto.getId() + " и ФИО "
                     + addPersonDto.getFullName() + " уже добавлен в черный список.");
         }
@@ -156,6 +174,9 @@ public class BlacklistService implements BlacklistServiceInterface {
                 addPersonDto.getId());
 
         if (friend.isPresent() && (friend.get().getDeletedDate() == null)) {
+            log.info("Удаляем пользователя с ID {} и ФИО {} из друзей пользователя с ID {} и ФИО {}, " +
+                            "так как он добавлен в черный список.",
+                    addPersonDto.getId(), addPersonDto.getFullName(), targetUserId, userData.getFullName());
             friendsService.deleteFriend(addPersonDto.getId());
             friendsService.syncFriendData(addPersonDto.getId());
         }
@@ -165,6 +186,9 @@ public class BlacklistService implements BlacklistServiceInterface {
             blockedUser.get().setAddedDate(LocalDateTime.now());
             syncBlockedUserData(addPersonDto.getId());
             blacklistRepository.save(blockedUser.get());
+            log.info("Пользователь с ID {} и ФИО {} уже существует в черном списке пользователя " +
+                            "с ID {} и ФИО {}, поэтому мы его только обновляем.",
+                    addPersonDto.getId(), addPersonDto.getFullName(), targetUserId, userData.getFullName());
             return new BlockedUserDto(blockedUser.get());
         }
 
@@ -174,6 +198,8 @@ public class BlacklistService implements BlacklistServiceInterface {
         newBlockedUser.setBlockedUserId(addPersonDto.getId());
         newBlockedUser.setBlockedUserName(addPersonDto.getFullName());
         newBlockedUser = blacklistRepository.save(newBlockedUser);
+        log.info("Пользователь с ID {} и ФИО {} добавлен в черный список пользователя с ID {} и ФИО {}.",
+                addPersonDto.getId(), addPersonDto.getFullName(), targetUserId, userData.getFullName());
 
         return new BlockedUserDto(newBlockedUser);
     }
@@ -194,6 +220,9 @@ public class BlacklistService implements BlacklistServiceInterface {
             blockedUser.setBlockedUserName(fullName);
             blacklistRepository.save(blockedUser);
         }
+
+        log.info("Данные заблокированного пользователя с ID {} были успешно синхронизированы с ФИО: {}",
+                id, fullName);
 
         return Map.of("message", "Синхронизация данных прошла успешно.");
     }
@@ -218,6 +247,8 @@ public class BlacklistService implements BlacklistServiceInterface {
         );
 
         if (blockedUser.isEmpty()) {
+            log.warn("Пользователя с ID {} нет в черном списке у пользователя с ID {}.",
+                    blockedUserId, targetUserId);
             throw new NotFoundException("Пользователя с ID " + blockedUserId
                     + " нет в черном списке у пользователя с ID " + targetUserId + ".");
         }
@@ -225,8 +256,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         if (blockedUser.get().getDeletedDate() == null) {
             blockedUser.get().setDeletedDate(LocalDateTime.now());
             blacklistRepository.save(blockedUser.get());
+            log.info("Пользователь с ID {} успешно удален из черного списка у пользователя с ID {}.",
+                    blockedUserId, targetUserId);
         }
         else {
+            log.warn("Пользователь с ID {} уже удален из черного списка у пользователя с ID {}.",
+                    blockedUserId, targetUserId);
             throw new ConflictException("Пользователь с ID " + blockedUserId
                     + " уже удален из черного списка у пользователя с ID " + targetUserId + ".");
         }
@@ -280,6 +315,9 @@ public class BlacklistService implements BlacklistServiceInterface {
         searchedBlockedUsersDto.setFilters(paginationAndFilters.getFilters());
         searchedBlockedUsersDto.setPageInfo(paginationAndFilters.getPageInfo());
 
+        log.info("Выполнен поиск заблокированных пользователей у пользователя с ID {}.",
+                targetUserId);
+
         return searchedBlockedUsersDto;
     }
 
@@ -300,7 +338,17 @@ public class BlacklistService implements BlacklistServiceInterface {
                 blockedUserId
         );
 
-        return blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null;
+        boolean isBlocked = blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null;
+
+        if (isBlocked) {
+            log.info("Пользователь с ID {} находится в черном списке у пользователя с ID {}",
+                    blockedUserId, targetUserId);
+        } else {
+            log.info("Пользователь с ID {} не находится в черном списке у пользователя с ID {}",
+                    blockedUserId, targetUserId);
+        }
+
+        return isBlocked;
     }
 
     /**
@@ -317,7 +365,14 @@ public class BlacklistService implements BlacklistServiceInterface {
                 blockedUserId
         );
 
-        return blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null;
+        boolean isBlocked = blockedUser.isPresent() && blockedUser.get().getDeletedDate() == null;
+        if (isBlocked) {
+            log.info("Пользователь с ID {} заблокирован пользователем с ID {}", blockedUserId, targetUserId);
+        } else {
+            log.info("Пользователь с ID {} не заблокирован пользователем с ID {}", blockedUserId, targetUserId);
+        }
+
+        return isBlocked;
     }
 
 

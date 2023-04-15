@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.common.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,6 +19,7 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
  * Фильтр, который проверяет наличие API-ключа в интеграционных запросах и устанавливает аутентификацию.
  */
 @RequiredArgsConstructor
+@Slf4j
 class ApiIntegrationFilter extends OncePerRequestFilter {
 
     /**
@@ -36,9 +38,11 @@ class ApiIntegrationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         if (Objects.equals(httpServletRequest.getHeader(HEADER_API_KEY), apiKey)) {
             SecurityContextHolder.getContext().setAuthentication(new IntegrationAuthentication());
+            log.info("API-ключ {} успешно аутентифицирован.", apiKey);
         }
         else {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+            log.error("Неавторизованный запрос с API-ключом {}.", apiKey);
             return;
         }
         filterChain.doFilter(httpServletRequest, httpServletResponse);

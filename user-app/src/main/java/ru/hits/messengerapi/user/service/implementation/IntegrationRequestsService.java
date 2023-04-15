@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.user.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IntegrationRequestsService implements IntegrationRequestsServiceInterface {
 
     /**
@@ -56,6 +58,13 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
         ResponseEntity<Boolean> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
 
-        return responseEntity.getBody();
+        Boolean isBlocked = responseEntity.getBody();
+        if (Boolean.TRUE.equals(isBlocked)) {
+            log.info("Пользователь с id {} заблокирован пользователем с id {}.", targetUserId, blockedUserId);
+        } else {
+            log.info("Пользователь с id {} не заблокирован пользователем с id {}.", targetUserId, blockedUserId);
+        }
+
+        return isBlocked;
     }
 }

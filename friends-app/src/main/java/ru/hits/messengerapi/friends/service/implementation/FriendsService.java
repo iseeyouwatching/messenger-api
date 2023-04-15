@@ -1,5 +1,6 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import java.util.*;
  *  Сервис друзей.
  */
 @Service
+@Slf4j
 public class FriendsService implements FriendsServiceInterface {
 
     /**
@@ -84,8 +86,10 @@ public class FriendsService implements FriendsServiceInterface {
         UUID targetUserId = userData.getId();
 
         List<FriendEntity> friends;
-        if (paginationWithFullNameFilterDto.getFullNameFilter() == null || paginationWithFullNameFilterDto.getFullNameFilter().isBlank()) {
-             friends = friendsRepository.findAllByTargetUserIdAndDeletedDate(targetUserId, null, pageable);
+        if (paginationWithFullNameFilterDto.getFullNameFilter() == null ||
+                paginationWithFullNameFilterDto.getFullNameFilter().isBlank()) {
+             friends = friendsRepository.findAllByTargetUserIdAndDeletedDate(targetUserId, null,
+                     pageable);
         }
         else {
             String wildcardFullNameFilter = "%" + paginationWithFullNameFilterDto.getFullNameFilter() + "%";
@@ -98,6 +102,7 @@ public class FriendsService implements FriendsServiceInterface {
             friendInfoDtos.add(new FriendInfoDto(friend));
         }
 
+        log.info("Получение списка друзей для пользователя с ID {}.", targetUserId);
         return new FriendsPageListDto(
                 friendInfoDtos,
                 paginationWithFullNameFilterDto.getPageInfo(),
@@ -124,6 +129,8 @@ public class FriendsService implements FriendsServiceInterface {
         );
 
         if (friend.isEmpty() || friend.get().getDeletedDate() != null) {
+            log.error("Пользователя с ID {} нет в списке друзей у пользователя с ID {}.",
+                    addedUserId, targetUserId);
             throw new NotFoundException("Пользователя с ID " + addedUserId
                     + " нет в списке друзей у пользователя с ID " + targetUserId + ".");
         }
@@ -152,6 +159,8 @@ public class FriendsService implements FriendsServiceInterface {
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
         String targetUserFullName = userData.getFullName();
+        log.info("Пользователь {} ({}) пытается добавить пользователя {} ({}) в список друзей.",
+                targetUserId, targetUserFullName, addPersonDto.getId(), addPersonDto.getFullName());
 
         if (addPersonDto.getId().equals(targetUserId)) {
             throw new ConflictException("Пользователь не может добавить самого себя в друзья.");
@@ -161,20 +170,25 @@ public class FriendsService implements FriendsServiceInterface {
                 targetUserId, addPersonDto.getId());
 
         if (friend.isPresent() && friend.get().getDeletedDate() == null) {
-            throw new ConflictException("Пользователь с ID " + addPersonDto.getId() + " и ФИО "
-                    + addPersonDto.getFullName() + " уже добавлен в список друзей.");
+            String message = "Пользователь с ID " + addPersonDto.getId() + " и ФИО " +
+                    addPersonDto.getFullName() + " уже добавлен в список друзей.";
+            log.error(message);
+            throw new ConflictException(message);
         }
 
         if (blacklistService.checkIfTheUserBlacklisted(addPersonDto.getId())) {
-            throw new ConflictException("Пользователь с ID " + addPersonDto.getId() + " и ФИО "
-                    + addPersonDto.getFullName() + " находится у пользователя с ID "
-                    + targetUserId + " в черном списке.");
+            String message = "Пользователь с ID " + addPersonDto.getId() + " и ФИО " + addPersonDto.getFullName() +
+                    " находится у пользователя с ID " + targetUserId + " в черном списке.";
+            log.error(message);
+            throw new ConflictException(message);
         }
 
         if (blacklistService.checkIfTheTargetUserBlacklisted(addPersonDto.getId(), targetUserId)) {
-            throw new ConflictException("Пользователь с ID " + targetUserId + " и ФИО "
-                    + targetUserFullName + " не может добавить пользователя с ID "
-                    + addPersonDto.getId() + " в друзья, так как находится у него в черном списке.");
+            String message = "Пользователь с ID " + targetUserId + " и ФИО " + targetUserFullName +
+                    " не может добавить пользователя с ID " + addPersonDto.getId() +
+                    " в друзья, так как находится у него в черном списке.";
+            log.error(message);
+            throw new ConflictException(message);
         }
 
         if (friend.isPresent()) {
@@ -192,6 +206,7 @@ public class FriendsService implements FriendsServiceInterface {
                 syncFriendData(targetUserId);
                 friendsRepository.save(mutualFriendship.get());
 
+                log.info("Пользователи {} и {} стали друзьями.", targetUserId, addPersonDto.getId());
                 return new FriendDto(friend.get());
             }
         }
@@ -210,6 +225,8 @@ public class FriendsService implements FriendsServiceInterface {
         mutualFriendship.setFriendName(userData.getFullName());
         friendsRepository.save(mutualFriendship);
 
+        log.info("Пользователи {} и {} стали друзьями.", targetUserId, addPersonDto.getId());
+
         return new FriendDto(newFriend);
     }
 
@@ -222,15 +239,20 @@ public class FriendsService implements FriendsServiceInterface {
     @Override
     public Map<String, String> syncFriendData(UUID id) {
         String fullName = integrationRequestsService.getFullName(id);
+        log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);
 
         List<FriendEntity> friends = friendsRepository.findAllByAddedUserId(id);
+        log.debug("Найдено {} друзей для пользователя с ID {}", friends.size(), id);
 
         for (FriendEntity friend: friends) {
             friend.setFriendName(fullName);
             friendsRepository.save(friend);
+            log.debug("Данные друга с ID {} обновлены", friend.getId());
         }
 
-        return Map.of("message", "Синхронизация данных прошла успешно.");
+        Map<String, String> result = Map.of("message", "Синхронизация данных прошла успешно.");
+        log.info("Синхронизация данных для пользователя с ID {} завершена", id);
+        return result;
     }
 
     /**
@@ -254,6 +276,8 @@ public class FriendsService implements FriendsServiceInterface {
         );
 
         if (friend.isEmpty()) {
+            log.error("Пользователя с ID {} нет в списке друзей у пользователя с ID {}.",
+                    addedUserId, targetUserId);
             throw new NotFoundException("Пользователя с ID " + addedUserId
                     + " нет в списке друзей у пользователя с ID " + targetUserId + ".");
         }
@@ -265,6 +289,8 @@ public class FriendsService implements FriendsServiceInterface {
             );
 
             if (addedFriend.isEmpty()) {
+                log.error("Пользователя с ID {} нет в списке друзей у пользователя с ID {}.",
+                        targetUserId, addedUserId);
                 throw new NotFoundException("Пользователя с ID " + targetUserId
                         + " нет в списке друзей у пользователя с ID " + addedUserId + ".");
             }
@@ -274,8 +300,13 @@ public class FriendsService implements FriendsServiceInterface {
 
             friendsRepository.save(friend.get());
             friendsRepository.save(addedFriend.get());
+
+            log.info("Пользователь с ID {} удален из списка друзей пользователя с ID {}.",
+                    addedUserId, targetUserId);
         }
         else {
+            log.error("Пользователь с ID {} уже удален из списка друзей пользователя с ID {}.",
+                    addedUserId, targetUserId);
             throw new ConflictException("Пользователь с ID " + addedUserId
                     + " уже удален из списка друзей пользователя с ID " + targetUserId + ".");
         }
@@ -294,14 +325,17 @@ public class FriendsService implements FriendsServiceInterface {
         int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
         int pageSize = paginationAndFilters.getPageInfo().getPageSize();
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
+        log.info("Начинается поиск друзей. Страница {} размер {}", pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         UUID targetUserId = userData.getId();
+        log.debug("Идентификатор текущего пользователя: {}", targetUserId);
 
         Page<FriendEntity> pageFriends;
         if (paginationAndFilters.getFilters() != null) {
+            log.debug("Поиск друзей по фильтрам");
             Example<FriendEntity> example = Example.of(FriendEntity
                     .builder()
                     .addedDate(paginationAndFilters.getFilters().getAddedDate())
@@ -314,6 +348,7 @@ public class FriendsService implements FriendsServiceInterface {
             pageFriends = friendsRepository.findAll(example, pageable);
         }
         else {
+            log.debug("Поиск всех друзей без фильтров");
             pageFriends = friendsRepository.findAll(pageable);
         }
 
@@ -328,6 +363,7 @@ public class FriendsService implements FriendsServiceInterface {
         searchedFriendsDto.setFriends(friendInfoDtos);
         searchedFriendsDto.setFilters(paginationAndFilters.getFilters());
         searchedFriendsDto.setPageInfo(paginationAndFilters.getPageInfo());
+        log.info("Поиск друзей завершен. Найдено {} друзей", friendInfoDtos.size());
 
         return searchedFriendsDto;
     }

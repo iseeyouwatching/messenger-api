@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/integration/users")
 @RequiredArgsConstructor
+@Slf4j
 public class IntegrationUserController {
 
     /**
@@ -31,11 +33,16 @@ public class IntegrationUserController {
     @PostMapping("/check-existence")
     public ResponseEntity<Boolean> checkUserByIdAndFullName(
             @RequestBody Map<String, String> userIdAndFullName) {
-        return new ResponseEntity<>(integrationUserService.checkUserByIdAndFullName(
-                UUID.fromString(userIdAndFullName.get("id")),
-                userIdAndFullName.get("fullName")),
-                HttpStatus.OK
-        );
+        UUID userId = UUID.fromString(userIdAndFullName.get("id"));
+        String fullName = userIdAndFullName.get("fullName");
+        log.info("Получен запрос на проверку пользователя по id = {} и полному имени '{}'",
+                userId, fullName);
+
+        boolean result = integrationUserService.checkUserByIdAndFullName(userId, fullName);
+        log.info("Результат проверки пользователя по id = {} и полному имени '{}' равен {}",
+                userId, fullName, result);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**
@@ -46,7 +53,11 @@ public class IntegrationUserController {
      */
     @PostMapping ("/get-full-name")
     public ResponseEntity<String> getFullName(@RequestBody UUID id) {
-        return new ResponseEntity<>(integrationUserService.getFullName(id), HttpStatus.OK);
+        log.info("Получен запрос на получение полного имени пользователя с id = {}", id);
+        String fullName = integrationUserService.getFullName(id);
+        log.info("Получено полное имя '{}' для пользователя с id = {}", fullName, id);
+
+        return new ResponseEntity<>(fullName, HttpStatus.OK);
     }
 
 }

@@ -2,6 +2,7 @@ package ru.hits.messengerapi.common.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_JWT;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     /**
@@ -51,6 +53,7 @@ public class JWTFilter extends OncePerRequestFilter {
             String jwt = authHeader.substring(7);
             if (jwt.isBlank()) {
                 httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+                log.info("Невалидный токен. JWT-токен пустой.");
             } else {
                 try {
                     UUID id = UUID.fromString(jwtUtil.validateTokenAndRetrieveClaim(jwt).get(0));
@@ -61,9 +64,11 @@ public class JWTFilter extends OncePerRequestFilter {
 
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
+                        log.info("Аутентификация пользователя с ID {} прошла успешно.", id);
                     }
                 } catch (JWTVerificationException exception) {
                     httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    log.info("Невалидный токен. JWT-токен не прошел проверку.");
                 }
             }
         }

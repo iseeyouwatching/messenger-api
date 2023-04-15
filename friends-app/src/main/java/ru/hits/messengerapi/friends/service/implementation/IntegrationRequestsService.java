@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IntegrationRequestsService implements IntegrationRequestsServiceInterface {
 
     /**
@@ -58,9 +60,11 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
 
         if (Boolean.FALSE.equals(responseEntity.getBody())) {
+            log.warn("Пользователь с id {} и ФИО {} не найден.", addPersonDto.getId(), addPersonDto.getFullName());
             throw new NotFoundException("Пользователя с id " + addPersonDto.getId()
                     + " и ФИО " + addPersonDto.getFullName() + " не существует.");
         }
+        log.info("Пользователь с id {} и ФИО {} существует.", addPersonDto.getId(), addPersonDto.getFullName());
     }
 
     /**
@@ -83,10 +87,13 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
                 .exchange(url, HttpMethod.POST, requestEntity, String.class);
 
         if (Objects.equals(responseEntity.getBody(), "dont exist")) {
+            log.warn("Пользователь с id {} не найден.", id);
             throw new NotFoundException("Пользователя с id " + id + " не существует.");
         }
 
-        return responseEntity.getBody();
+        String fullName = responseEntity.getBody();
+        log.info("Получено полное имя '{}' для пользователя с id = {}", fullName, id);
+        return fullName;
     }
 
 }

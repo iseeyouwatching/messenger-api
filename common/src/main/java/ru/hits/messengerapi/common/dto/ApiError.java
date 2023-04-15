@@ -1,29 +1,31 @@
-package ru.hits.messengerapi.common.dto;
+    package ru.hits.messengerapi.common.dto;
 
-import lombok.Data;
+    import lombok.Data;
+    import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Класс, представляющий ошибку в ответе API.
- */
-@Data
-public class ApiError {
+    import java.util.ArrayList;
+    import java.util.List;
 
     /**
-     * Список сообщений об ошибке.
+     * Класс, представляющий ошибку в ответе API.
      */
-    private List<String> messages;
+    @Data
+    @Slf4j
+    public class ApiError {
 
-    /**
-     * Конструктор класса.
-     *
-     * @param message сообщение об ошибке.
-     */
-    public ApiError(String message) {
-        this.messages = new ArrayList<>();
-        this.messages.add(message);
+        /**
+         * Список сообщений об ошибке.
+         */
+        private List<String> messages;
+
+        /**
+         * Конструктор класса.
+         *
+         * @param message сообщение об ошибке.
+         */
+        public ApiError(String message) {
+            this.messages = new ArrayList<>();
+            this.messages.add(message);
+        }
+
     }
-
-}
