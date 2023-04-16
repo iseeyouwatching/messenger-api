@@ -37,14 +37,6 @@ public interface FriendsServiceInterface {
     FriendDto addToFriends(AddPersonDto addPersonDto);
 
     /**
-     * Синхронизация данных друга.
-     *
-     * @param id идентификатор пользователя.
-     * @return сообщение об успешной синхронизации.
-     */
-    Map<String, String> syncFriendData(UUID id);
-
-    /**
      * Удалить пользователя из друзей.
      *
      * @param addedUserId id друга.

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  *  Сервис пользователя.
@@ -75,8 +76,7 @@ public class UserService implements UserServiceInterface {
     @Override
     public UserProfileAndTokenDto userSignUp(UserSignUpDto userSignUpDto) {
         if (userRepository.findByLogin(userSignUpDto.getLogin()).isPresent()) {
-            log.warn("Пользователь с логином {} уже существует.",
-                    userSignUpDto.getLogin());
+            log.warn("Пользователь с логином {} уже существует.", userSignUpDto.getLogin());
             throw new ConflictException("Пользователь с логином " + userSignUpDto.getLogin() + " уже существует.");
         }
 
@@ -85,14 +85,15 @@ public class UserService implements UserServiceInterface {
             throw new ConflictException("Пользователь с почтой " + userSignUpDto.getEmail() + " уже существует.");
         }
 
-        if (userSignUpDto.getBirthDate() != null && userSignUpDto.getBirthDate().isAfter(LocalDate.now())) {
-            log.warn("Дата рождения не может быть позже текущей.");
-            throw new BadRequestException("Дата рождения не может быть позже текущей.");
+        LocalDate birthDate = userSignUpDto.getBirthDate();
+        if (birthDate != null && birthDate.isAfter(LocalDate.now())) {
+            String message = "Дата рождения не может быть позже текущей.";
+            log.warn(message);
+            throw new BadRequestException(message);
         }
 
         UserEntity user = modelMapper.map(userSignUpDto, UserEntity.class);
         user.setPassword(bCryptPasswordEncoder.encode(userSignUpDto.getPassword()));
-
         user = userRepository.save(user);
 
         UserProfileAndTokenDto userProfileAndTokenDto = new UserProfileAndTokenDto();
@@ -116,8 +117,9 @@ public class UserService implements UserServiceInterface {
 
         if (user.isEmpty() ||
                 !bCryptPasswordEncoder.matches(userSignInDto.getPassword(), user.get().getPassword())) {
-            log.error("Некорректные данные для входа пользователя с логином {}.", userSignInDto.getLogin());
-            throw new UnauthorizedException("Некорректные данные.");
+            String message = "Некорректные данные.";
+            log.error(message);
+            throw new UnauthorizedException(message);
         }
 
         UserProfileAndTokenDto userProfileAndTokenDto = new UserProfileAndTokenDto();
@@ -148,49 +150,40 @@ public class UserService implements UserServiceInterface {
         log.info("Запрос списка пользователей. Страница: {}, размер страницы: {}",
                 paginationDto.getPageInfo().getPageNumber(), paginationDto.getPageInfo().getPageSize());
 
-        Pageable pageable;
+        Pageable pageable = null;
         if (paginationDto.getSortings() != null) {
             List<SortingDto> sortings = paginationDto.getSortings();
-            List<Order> orders = new ArrayList<>();
-            for (SortingDto sorting : sortings) {
-                orders.add(new Order(Sort.Direction.fromString(sorting.getDirection()),
-                        sorting.getField()));
-            }
+            List<Order> orders = sortings.stream()
+                    .map(s -> new Order(Sort.Direction.fromString(s.getDirection()), s.getField()))
+                    .collect(Collectors.toList());
             pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orders));
         }
         else {
             pageable = PageRequest.of(pageNumber - 1, pageSize);
         }
 
-        Page<UserEntity> users;
+        Example<UserEntity> example = null;
         if (paginationDto.getFilters() != null) {
             FiltersDto filtersDto = paginationDto.getFilters();
-
-            Example<UserEntity> example = Example.of(UserEntity
-                    .builder()
+            UserEntity userEntity = UserEntity.builder()
                     .login(filtersDto.getLogin())
                     .email(filtersDto.getEmail())
                     .fullName(filtersDto.getFullName())
                     .birthDate(filtersDto.getBirthDate())
                     .phoneNumber(filtersDto.getPhoneNumber())
                     .city(filtersDto.getCity())
-                    .build());
-
-            users = userRepository.findAll(example, pageable);
-        }
-        else {
-            users = userRepository.findAll(pageable);
+                    .build();
+            example = Example.of(userEntity);
         }
 
-        List<UserEntity> userEntities = users.getContent();
-        List<UserProfileDto> userProfileDtos = new ArrayList<>();
+        Page<UserEntity> page = example == null ? userRepository.findAll(pageable) :
+                userRepository.findAll(example, pageable);
 
-        for (UserEntity userEntity: userEntities) {
-            userProfileDtos.add(new UserProfileDto(userEntity));
-        }
+        List<UserProfileDto> userProfileDtos = page.getContent().stream()
+                .map(UserProfileDto::new)
+                .collect(Collectors.toList());
 
         UsersPageListDto usersPageListDto = new UsersPageListDto();
-
         usersPageListDto.setUsers(userProfileDtos);
         usersPageListDto.setPageInfo(paginationDto.getPageInfo());
         usersPageListDto.setFilters(paginationDto.getFilters());
@@ -211,18 +204,13 @@ public class UserService implements UserServiceInterface {
     @Override
     public UserProfileDto getUserInfo(String login) {
         Optional<UserEntity> user = userRepository.findByLogin(login);
-
         if (user.isEmpty()) {
-            log.warn("Пользователь с логином {} не найден.",
-                    login);
+            log.warn("Пользователь с логином {} не найден.", login);
             throw new NotFoundException("Пользователь с логином " + login + " не найден.");
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
-        UUID id = userData.getId();
-
-        if (Boolean.TRUE.equals(integrationRequestsService.checkExistenceInBlacklist(user.get().getId(), id))) {
+        UUID id = getAuthenticatedUserId();
+        if (integrationRequestsService.checkExistenceInBlacklist(user.get().getId(), id)) {
             log.warn("Пользователь с ID {} не может посмотреть профиль пользователя с ID {}, " +
                     "так как находится у него в черном списке.", id, user.get().getId());
             throw new ConflictException("Пользователь с ID " + id
@@ -243,9 +231,7 @@ public class UserService implements UserServiceInterface {
      */
     @Override
     public UserProfileDto viewYourProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
-        UUID id = userData.getId();
+        UUID id = getAuthenticatedUserId();
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
@@ -266,48 +252,87 @@ public class UserService implements UserServiceInterface {
      */
     @Override
     public UserProfileDto updateUserInfo(UpdateUserInfoDto updateUserInfoDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
-        UUID id = userData.getId();
+        UserEntity user = getUserById();
+        validateFields(updateUserInfoDto);
+        updateUserEntity(user, updateUserInfoDto);
+
+        UserEntity savedUser = userRepository.save(user);
+
+        log.info("Профиль пользователя с ID {} успешно обновлен.", user.getId());
+
+        return new UserProfileDto(savedUser);
+    }
+
+    /**
+     * Метод для получения сущности аутентифицированного пользователя по его ID.
+     *
+     * @return сущность аутентифицированного пользователя.
+     * @throws NotFoundException если пользователь не найден.
+     */
+    private UserEntity getUserById() {
+        UUID id = getAuthenticatedUserId();
         Optional<UserEntity> user = userRepository.findById(id);
-        log.info("Пользователь с ID {} пытается обновить свой профиль.", id);
 
         if (user.isEmpty()) {
             log.error("Пользователь с ID {} не найден.", id);
             throw new NotFoundException("Пользователь с ID " + id + " не найден.");
         }
 
+        return user.get();
+    }
+
+    /**
+     * Метод для валидирования полей DTO на обновление данных пользователя.
+     *
+     * @param updateUserInfoDto DTO на обновление данных пользователя.
+     * @throws BadRequestException если дата рождения позже текущей.
+     */
+    private void validateFields(UpdateUserInfoDto updateUserInfoDto) {
         if (updateUserInfoDto.getBirthDate() != null &&
                 updateUserInfoDto.getBirthDate().isAfter(LocalDate.now())) {
-            String errorMessage = "Дата рождения не может быть позже текущей.";
-            log.error(errorMessage);
-            throw new BadRequestException(errorMessage);
+            String message = "Дата рождения не может быть позже текущей.";
+            log.error(message);
+            throw new BadRequestException(message);
         }
+    }
 
+    /**
+     * Метод необходимый для обновления данных в сущности пользователя.
+     *
+     * @param user сущность пользователя.
+     * @param updateUserInfoDto DTO, содержащая данные для обновления данных пользователя.
+     */
+    private void updateUserEntity(UserEntity user, UpdateUserInfoDto updateUserInfoDto) {
         if (updateUserInfoDto.getFullName() != null) {
-            user.get().setFullName(updateUserInfoDto.getFullName());
+            user.setFullName(updateUserInfoDto.getFullName());
         }
 
         if (updateUserInfoDto.getBirthDate() != null) {
-            user.get().setBirthDate(updateUserInfoDto.getBirthDate());
+            user.setBirthDate(updateUserInfoDto.getBirthDate());
         }
 
         if (updateUserInfoDto.getPhoneNumber() != null) {
-            user.get().setPhoneNumber(updateUserInfoDto.getPhoneNumber());
+            user.setPhoneNumber(updateUserInfoDto.getPhoneNumber());
         }
 
         if (updateUserInfoDto.getCity() != null) {
-            user.get().setCity(updateUserInfoDto.getCity());
+            user.setCity(updateUserInfoDto.getCity());
         }
 
         if (updateUserInfoDto.getAvatar() != null) {
-            user.get().setAvatar(updateUserInfoDto.getAvatar());
+            user.setAvatar(updateUserInfoDto.getAvatar());
         }
+    }
 
-        user = Optional.of(userRepository.save(user.get()));
-        log.info("Профиль пользователя с ID {} успешно обновлен.", id);
-
-        return new UserProfileDto(user.get());
+    /**
+     * Метод для получения ID аутентифицированного пользователя.
+     *
+     * @return ID аутентифицированного пользователя.
+     */
+    private UUID getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        return userData.getId();
     }
 
 }

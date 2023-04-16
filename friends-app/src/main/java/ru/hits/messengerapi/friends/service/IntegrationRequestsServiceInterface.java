@@ -1,7 +1,11 @@
 package ru.hits.messengerapi.friends.service;
 
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
+import ru.hits.messengerapi.friends.entity.BlacklistEntity;
+import ru.hits.messengerapi.friends.entity.FriendEntity;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -23,5 +27,21 @@ public interface IntegrationRequestsServiceInterface {
      * @return ФИО пользователя.
      */
     String getFullName(UUID id);
+
+    /**
+     * Синхронизация данных заблокированного пользователя.
+     *
+     * @param id идентификатор пользователя.
+     * @return сообщение об успешной синхронизации.
+     */
+    Map<String, String> syncBlockedUserData(UUID id);
+
+    /**
+     * Синхронизация данных друга.
+     *
+     * @param id идентификатор пользователя.
+     * @return сообщение об успешной синхронизации.
+     */
+    Map<String, String> syncFriendData(UUID id);
 
 }

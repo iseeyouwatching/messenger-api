@@ -43,27 +43,25 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
      */
     @Override
     public Boolean checkExistenceInBlacklist(UUID targetUserId, UUID blockedUserId) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = integrationUsersRequestCheckExistenceInBlacklist;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
 
         Map<String, UUID> idMap = new HashMap<>();
         idMap.put("targetUserId", targetUserId);
         idMap.put("blockedUserId", blockedUserId);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
         HttpEntity<Map<String, UUID>> requestEntity = new HttpEntity<>(idMap, headers);
 
+        RestTemplate restTemplate = new RestTemplate();
+        String url = integrationUsersRequestCheckExistenceInBlacklist;
         ResponseEntity<Boolean> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
 
         Boolean isBlocked = responseEntity.getBody();
-        if (Boolean.TRUE.equals(isBlocked)) {
-            log.info("Пользователь с id {} заблокирован пользователем с id {}.", targetUserId, blockedUserId);
-        } else {
-            log.info("Пользователь с id {} не заблокирован пользователем с id {}.", targetUserId, blockedUserId);
-        }
+
+        String logMessage = isBlocked ? "заблокирован" : "не заблокирован";
+        log.info("Пользователь с id {} {} пользователем с id {}.", targetUserId, logMessage, blockedUserId);
 
         return isBlocked;
     }

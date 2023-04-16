@@ -66,19 +66,6 @@ public class FriendsController {
     }
 
     /**
-     * Метод для синхронизации информации о пользователе, находящегося в друзьях.
-     *
-     * @param id идентификатор пользователя, находящегося в друзьях.
-     * @return сообщение об успешной синхронизации данных.
-     */
-    @PatchMapping("/{id}")
-    public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
-        Map<String, String> response = friendsService.syncFriendData(id);
-        log.info("Данные друга с идентификатором {} синхронизированы", id);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    /**
      * Метод для удаления друга из списка друзей по его идентификатору.
      *
      * @param id идентификатор друга.

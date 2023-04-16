@@ -26,11 +26,6 @@ public class FriendFiltersDto {
     private UUID addedUserId;
 
     /**
-     * Дата удаления из друзей.
-     */
-    private LocalDateTime deletedDate;
-
-    /**
      * ФИО друга.
      */
     private String friendName;

@@ -26,11 +26,6 @@ public class BlockedUserFiltersDto {
     private UUID blockedUserId;
 
     /**
-     * Дата удаления из черного списка.
-     */
-    private LocalDateTime deletedDate;
-
-    /**
      * ФИО заблокированного пользователя.
      */
     private String blockedUserName;

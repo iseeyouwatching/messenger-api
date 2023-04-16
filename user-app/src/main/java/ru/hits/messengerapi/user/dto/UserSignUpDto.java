@@ -20,6 +20,7 @@ public class UserSignUpDto {
      * Логин пользователя.
      */
     @NotBlank(message = "Логин не может быть пустым.")
+    @Size(min = 5, max = 32, message = "Длина логина должна быть от 5 до 32 символов.")
     private String login;
 
     /**

@@ -41,14 +41,6 @@ public interface BlacklistServiceInterface {
     BlockedUserDto addToBlacklist(AddPersonDto addPersonDto);
 
     /**
-     * Синхронизация данных заблокированного пользователя.
-     *
-     * @param id идентификатор заблокированного пользователя.
-     * @return сообщение об успешной синхронизации.
-     */
-    Map<String, String> syncBlockedUserData(UUID id);
-
-    /**
      * Удалить пользователя из черного списка.
      *
      * @param blockedUserId id заблокированного пользователя.

@@ -72,18 +72,6 @@ public class BlacklistController {
     }
 
     /**
-     * Метод для синхронизации информации о пользователе из черного списка.
-     *
-     * @param id идентификатор пользователя в черном списке.
-     * @return сообщение об успешной синхронизации данных.
-     */
-    @PatchMapping("/{id}")
-    public ResponseEntity<Map<String, String>> syncBlockedUserData(@PathVariable("id") UUID id) {
-        log.info("Синхронизация данных заблокированного пользователя с ID: {}", id);
-        return new ResponseEntity<>(blacklistService.syncBlockedUserData(id), HttpStatus.OK);
-    }
-
-    /**
      * Метод для удаления пользователя из черного списка.
      *
      * @param id идентификатор пользователя в черном списке.

@@ -22,6 +22,7 @@ import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *  Сервис друзей.
@@ -49,6 +50,7 @@ public class FriendsService implements FriendsServiceInterface {
      *  Сервис черного списка.
      */
     private final BlacklistService blacklistService;
+
 
     /**
      * Конструктор класса {@link FriendsService}.
@@ -81,9 +83,7 @@ public class FriendsService implements FriendsServiceInterface {
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
-        UUID targetUserId = userData.getId();
+        UUID targetUserId = getAuthenticatedUserId();
 
         List<FriendEntity> friends;
         if (paginationWithFullNameFilterDto.getFullNameFilter() == null ||
@@ -97,10 +97,9 @@ public class FriendsService implements FriendsServiceInterface {
                     targetUserId, wildcardFullNameFilter, null, pageable);
         }
 
-        List<FriendInfoDto> friendInfoDtos = new ArrayList<>();
-        for (FriendEntity friend : friends) {
-            friendInfoDtos.add(new FriendInfoDto(friend));
-        }
+        List<FriendInfoDto> friendInfoDtos = friends.stream()
+                .map(FriendInfoDto::new)
+                .collect(Collectors.toList());
 
         log.info("Получение списка друзей для пользователя с ID {}.", targetUserId);
         return new FriendsPageListDto(
@@ -119,9 +118,7 @@ public class FriendsService implements FriendsServiceInterface {
      */
     @Override
     public FriendDto getFriend(UUID addedUserId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
-        UUID targetUserId = userData.getId();
+        UUID targetUserId = getAuthenticatedUserId();
 
         Optional<FriendEntity> friend = friendsRepository.findByTargetUserIdAndAddedUserId(
                 targetUserId,
@@ -194,7 +191,7 @@ public class FriendsService implements FriendsServiceInterface {
         if (friend.isPresent()) {
             friend.get().setDeletedDate(null);
             friend.get().setAddedDate(LocalDateTime.now());
-            syncFriendData(addPersonDto.getId());
+            integrationRequestsService.syncFriendData(addPersonDto.getId());
             friendsRepository.save(friend.get());
 
             Optional<FriendEntity> mutualFriendship = friendsRepository.findByTargetUserIdAndAddedUserId(
@@ -203,7 +200,7 @@ public class FriendsService implements FriendsServiceInterface {
             if (mutualFriendship.isPresent()) {
                 mutualFriendship.get().setDeletedDate(null);
                 mutualFriendship.get().setAddedDate(friend.get().getAddedDate());
-                syncFriendData(targetUserId);
+                integrationRequestsService.syncFriendData(targetUserId);
                 friendsRepository.save(mutualFriendship.get());
 
                 log.info("Пользователи {} и {} стали друзьями.", targetUserId, addPersonDto.getId());
@@ -231,31 +228,6 @@ public class FriendsService implements FriendsServiceInterface {
     }
 
     /**
-     * Синхронизация данных друга.
-     *
-     * @param id идентификатор пользователя.
-     * @return сообщение об успешной синхронизации.
-     */
-    @Override
-    public Map<String, String> syncFriendData(UUID id) {
-        String fullName = integrationRequestsService.getFullName(id);
-        log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);
-
-        List<FriendEntity> friends = friendsRepository.findAllByAddedUserId(id);
-        log.debug("Найдено {} друзей для пользователя с ID {}", friends.size(), id);
-
-        for (FriendEntity friend: friends) {
-            friend.setFriendName(fullName);
-            friendsRepository.save(friend);
-            log.debug("Данные друга с ID {} обновлены", friend.getId());
-        }
-
-        Map<String, String> result = Map.of("message", "Синхронизация данных прошла успешно.");
-        log.info("Синхронизация данных для пользователя с ID {} завершена", id);
-        return result;
-    }
-
-    /**
      * Удалить пользователя из друзей.
      *
      * @param addedUserId id друга.
@@ -266,9 +238,7 @@ public class FriendsService implements FriendsServiceInterface {
      */
     @Override
     public FriendDto deleteFriend(UUID addedUserId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
-        UUID targetUserId = userData.getId();
+        UUID targetUserId = getAuthenticatedUserId();
 
         Optional<FriendEntity> friend = friendsRepository.findByTargetUserIdAndAddedUserId(
                 targetUserId,
@@ -328,35 +298,37 @@ public class FriendsService implements FriendsServiceInterface {
         log.info("Начинается поиск друзей. Страница {} размер {}", pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
-        UUID targetUserId = userData.getId();
+        UUID targetUserId = getAuthenticatedUserId();
         log.debug("Идентификатор текущего пользователя: {}", targetUserId);
 
         Page<FriendEntity> pageFriends;
+        Example<FriendEntity> example;
         if (paginationAndFilters.getFilters() != null) {
-            log.debug("Поиск друзей по фильтрам");
-            Example<FriendEntity> example = Example.of(FriendEntity
+            example = Example.of(FriendEntity
                     .builder()
                     .addedDate(paginationAndFilters.getFilters().getAddedDate())
                     .addedUserId(paginationAndFilters.getFilters().getAddedUserId())
-                    .deletedDate(paginationAndFilters.getFilters().getDeletedDate())
                     .friendName(paginationAndFilters.getFilters().getFriendName())
                     .targetUserId(targetUserId)
-                    .build());
-
-            pageFriends = friendsRepository.findAll(example, pageable);
+                    .build()
+            );
         }
         else {
-            log.debug("Поиск всех друзей без фильтров");
-            pageFriends = friendsRepository.findAll(pageable);
+            example = Example.of(FriendEntity
+                    .builder()
+                    .targetUserId(targetUserId)
+                    .build()
+            );
         }
+        pageFriends = friendsRepository.findAll(example, pageable);
 
         List<FriendEntity> friends = pageFriends.getContent();
         List<FriendInfoDto> friendInfoDtos = new ArrayList<>();
 
         for (FriendEntity friend: friends) {
-            friendInfoDtos.add(new FriendInfoDto(friend));
+            if (friend.getDeletedDate() == null) {
+                friendInfoDtos.add(new FriendInfoDto(friend));
+            }
         }
 
         SearchedFriendsDto searchedFriendsDto = new SearchedFriendsDto();
@@ -366,6 +338,17 @@ public class FriendsService implements FriendsServiceInterface {
         log.info("Поиск друзей завершен. Найдено {} друзей", friendInfoDtos.size());
 
         return searchedFriendsDto;
+    }
+
+    /**
+     * Метод для получения ID аутентифицированного пользователя.
+     *
+     * @return ID аутентифицированного пользователя.
+     */
+    private UUID getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserData userData = (JwtUserData) authentication.getPrincipal();
+        return userData.getId();
     }
 
 }

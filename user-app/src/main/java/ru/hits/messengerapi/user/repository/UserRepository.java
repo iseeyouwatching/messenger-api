@@ -14,13 +14,20 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
     /**
-     * Метод, который находит пользователя по его логину.
+     * Находит пользователя по его логину.
      *
      * @param login логин пользователя.
      * @return найденный пользователь.
      */
     Optional<UserEntity> findByLogin(String login);
 
+    /**
+     * Находит пользователя по его ID и ФИО.
+     *
+     * @param id идентификатор пользователя.
+     * @param fullName ФИО пользователя.
+     * @return найденный пользователь.
+     */
     Optional<UserEntity> findByIdAndFullName(UUID id, String fullName);
 
     /**
