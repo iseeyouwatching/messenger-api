@@ -4,7 +4,6 @@ import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**

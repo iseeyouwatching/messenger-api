@@ -23,6 +23,9 @@ import java.util.UUID;
 @Slf4j
 public class IntegrationFriendsController {
 
+    /**
+     * Сервис для интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
 
     /**

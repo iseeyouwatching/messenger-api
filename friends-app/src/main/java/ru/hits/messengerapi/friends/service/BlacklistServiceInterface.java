@@ -7,7 +7,6 @@ import ru.hits.messengerapi.friends.dto.blacklist.BlockedUserDto;
 import ru.hits.messengerapi.friends.dto.blacklist.BlockedUsersPageListDto;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**
