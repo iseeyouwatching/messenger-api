@@ -167,25 +167,27 @@ public class FriendsService implements FriendsServiceInterface {
                 targetUserId, addPersonDto.getId());
 
         if (friend.isPresent() && friend.get().getDeletedDate() == null) {
-            String message = "Пользователь с ID " + addPersonDto.getId() + " и ФИО " +
-                    addPersonDto.getFullName() + " уже добавлен в список друзей.";
-            log.error(message);
-            throw new ConflictException(message);
+            log.error("Пользователь с ID {} и ФИО {} уже добавлен в список друзей.", addPersonDto.getId(),
+                    addPersonDto.getFullName());
+            throw new ConflictException("Пользователь с ID " + addPersonDto.getId() + " и ФИО " +
+                    addPersonDto.getFullName() + " уже добавлен в список друзей.");
         }
 
         if (blacklistService.checkIfTheUserBlacklisted(addPersonDto.getId())) {
-            String message = "Пользователь с ID " + addPersonDto.getId() + " и ФИО " + addPersonDto.getFullName() +
-                    " находится у пользователя с ID " + targetUserId + " в черном списке.";
-            log.error(message);
-            throw new ConflictException(message);
+            log.error("Пользователь с ID {} и ФИО {} находится у пользователя с ID {} в черном списке.",
+                    addPersonDto.getId(), addPersonDto.getFullName(), targetUserId);
+            throw new ConflictException("Пользователь с ID " + addPersonDto.getId() + " и ФИО "
+                    + addPersonDto.getFullName() + " находится у пользователя с ID " +
+                    targetUserId + " в черном списке.");
         }
 
         if (blacklistService.checkIfTheTargetUserBlacklisted(addPersonDto.getId(), targetUserId)) {
-            String message = "Пользователь с ID " + targetUserId + " и ФИО " + targetUserFullName +
+            log.error("Пользователь с ID {} и ФИО {} не может добавить пользователя с ID {} " +
+                            "в друзья, так как находится у него в черном списке.",
+                    targetUserId, targetUserFullName, addPersonDto.getId());
+            throw new ConflictException("Пользователь с ID " + targetUserId + " и ФИО " + targetUserFullName +
                     " не может добавить пользователя с ID " + addPersonDto.getId() +
-                    " в друзья, так как находится у него в черном списке.";
-            log.error(message);
-            throw new ConflictException(message);
+                    " в друзья, так как находится у него в черном списке.");
         }
 
         if (friend.isPresent()) {
