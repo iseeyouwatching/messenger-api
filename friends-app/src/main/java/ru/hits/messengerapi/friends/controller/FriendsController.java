@@ -8,6 +8,7 @@ import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.service.implementation.FriendsService;
+import ru.hits.messengerapi.friends.service.implementation.IntegrationRequestsService;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -26,6 +27,11 @@ public class FriendsController {
      * Сервис для работы с друзьями пользователя.
      */
     private final FriendsService friendsService;
+
+    /**
+     * Сервис для логики интеграционных запросов.
+     */
+    private final IntegrationRequestsService integrationRequestsService;
 
     /**
      * Метод для получения списка друзей пользователя.
@@ -63,6 +69,19 @@ public class FriendsController {
     public ResponseEntity<FriendDto> addToFriends(@RequestBody @Valid AddPersonDto addPersonDto) {
         log.info("Запрос на добавление друга: {}", addPersonDto);
         return new ResponseEntity<>(friendsService.addToFriends(addPersonDto), HttpStatus.OK);
+    }
+
+    /**
+     * Метод для синхронизации информации о пользователе, находящегося в друзьях.
+     *
+     * @param id идентификатор пользователя, находящегося в друзьях.
+     * @return сообщение об успешной синхронизации данных.
+     */
+    @PatchMapping("/sync/{id}")
+    public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
+        Map<String, String> response = integrationRequestsService.syncFriendData(id);
+        log.info("Данные друга с идентификатором {} синхронизированы", id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**

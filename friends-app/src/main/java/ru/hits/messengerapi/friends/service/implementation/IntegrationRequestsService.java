@@ -128,8 +128,7 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
         blockedUsers.forEach(user -> user.setBlockedUserName(fullName));
         blacklistRepository.saveAll(blockedUsers);
 
-        log.info("Данные заблокированного пользователя с ID {} были успешно синхронизированы.",
-                id);
+        log.info("Данные заблокированного пользователя с ID {} были успешно синхронизированы.", id);
 
         return Map.of("message", "Синхронизация данных прошла успешно.");
     }

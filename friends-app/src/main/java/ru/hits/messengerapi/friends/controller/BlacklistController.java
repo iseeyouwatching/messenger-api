@@ -12,6 +12,7 @@ import ru.hits.messengerapi.friends.dto.blacklist.SearchedBlockedUsersDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.service.implementation.BlacklistService;
+import ru.hits.messengerapi.friends.service.implementation.IntegrationRequestsService;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -31,11 +32,16 @@ public class BlacklistController {
      */
     private final BlacklistService blacklistService;
 
+    /**
+     * Сервис для логики интеграционных запросов.
+     */
+    private final IntegrationRequestsService integrationRequestsService;
 
     /**
      * Метод для получения списка пользователей в черном списке.
      *
-     * @param paginationWithFullNameFilterDto объект класса {@link PaginationWithFullNameFilterDto}, содержащий информацию о постраничном выводе данных.
+     * @param paginationWithFullNameFilterDto объект класса {@link PaginationWithFullNameFilterDto},
+     *                                        содержащий информацию о постраничном выводе данных.
      * @return список пользователей в черном списке с информацией о пагинации и фильтре.
      */
     @PostMapping
@@ -43,7 +49,8 @@ public class BlacklistController {
             @RequestBody @Valid PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
         log.info("Запрос на получение списка пользователей в черном списке с параметрами: {}",
                 paginationWithFullNameFilterDto);
-        return new ResponseEntity<>(blacklistService.getBlockedUsers(paginationWithFullNameFilterDto), HttpStatus.OK);
+        return new ResponseEntity<>(blacklistService.getBlockedUsers(paginationWithFullNameFilterDto),
+                HttpStatus.OK);
     }
 
     /**
@@ -72,6 +79,18 @@ public class BlacklistController {
     }
 
     /**
+     * Метод для синхронизации информации о пользователе из черного списка.
+     *
+     * @param id идентификатор пользователя в черном списке.
+     * @return сообщение об успешной синхронизации данных.
+     */
+    @PatchMapping("/sync/{id}")
+    public ResponseEntity<Map<String, String>> syncBlockedUserData(@PathVariable("id") UUID id) {
+        log.info("Синхронизация данных заблокированного пользователя с ID: {}", id);
+        return new ResponseEntity<>(integrationRequestsService.syncBlockedUserData(id), HttpStatus.OK);
+    }
+
+    /**
      * Метод для удаления пользователя из черного списка.
      *
      * @param id идентификатор пользователя в черном списке.
@@ -95,7 +114,8 @@ public class BlacklistController {
             @RequestBody @Valid PaginationWithBlockedUserFiltersDto paginationAndFilters) {
         log.info("Поиск заблокированных пользователей с параметрами пагинации и фильтрации: {}",
                 paginationAndFilters);
-        SearchedBlockedUsersDto searchedBlockedUsers = blacklistService.searchBlockedUsers(paginationAndFilters);
+        SearchedBlockedUsersDto searchedBlockedUsers =
+                blacklistService.searchBlockedUsers(paginationAndFilters);
         log.info("Найдено {} заблокированных пользователей", searchedBlockedUsers.getBlockedUsers().size());
         return new ResponseEntity<>(searchedBlockedUsers, HttpStatus.OK);
     }
@@ -106,7 +126,7 @@ public class BlacklistController {
      * @param id идентификатор пользователя, которого нужно проверить.
      * @return сообщение о нахождении пользователя в черном списке или его отсутствии.
      */
-    @GetMapping("/{id}/check")
+    @GetMapping("/check-existing-in-blacklist/{id}")
     public ResponseEntity<Map<String, String>> checkIfTheUserBlacklisted(@PathVariable("id") UUID id) {
         boolean check = blacklistService.checkIfTheUserBlacklisted(id);
         if (check) {
@@ -120,6 +140,5 @@ public class BlacklistController {
                     Map.of("message", "Пользователь не находится в черном списке."), HttpStatus.OK);
         }
     }
-
 
 }
