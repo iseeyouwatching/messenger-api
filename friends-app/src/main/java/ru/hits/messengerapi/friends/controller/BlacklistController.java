@@ -126,7 +126,7 @@ public class BlacklistController {
      * @param id идентификатор пользователя, которого нужно проверить.
      * @return сообщение о нахождении пользователя в черном списке или его отсутствии.
      */
-    @GetMapping("/check-existing-in-blacklist/{id}")
+    @GetMapping("/check-existing/{id}")
     public ResponseEntity<Map<String, String>> checkIfTheUserBlacklisted(@PathVariable("id") UUID id) {
         boolean check = blacklistService.checkIfTheUserBlacklisted(id);
         if (check) {
