@@ -3,7 +3,7 @@ package ru.hits.messengerapi.friends.dto.blacklist;
 import lombok.*;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -24,12 +24,12 @@ public class BlockedUserInfoDto {
     /**
      * Дата добавления в черный список.
      */
-    private LocalDateTime addedDate;
+    private LocalDate addedDate;
 
     /**
      * Дата удаления из черного списка.
      */
-    private LocalDateTime deletedDate;
+    private LocalDate deletedDate;
 
     /**
      * Идентификатор заблокированного пользователя.

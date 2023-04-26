@@ -20,7 +20,7 @@ import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -192,7 +192,8 @@ public class FriendsService implements FriendsServiceInterface {
 
         if (friend.isPresent()) {
             friend.get().setDeletedDate(null);
-            friend.get().setAddedDate(LocalDateTime.now());
+            friend.get().setIsDeleted(false);
+            friend.get().setAddedDate(LocalDate.now());
             integrationRequestsService.syncFriendData(addPersonDto.getId());
             friendsRepository.save(friend.get());
 
@@ -201,6 +202,7 @@ public class FriendsService implements FriendsServiceInterface {
 
             if (mutualFriendship.isPresent()) {
                 mutualFriendship.get().setDeletedDate(null);
+                mutualFriendship.get().setIsDeleted(false);
                 mutualFriendship.get().setAddedDate(friend.get().getAddedDate());
                 integrationRequestsService.syncFriendData(targetUserId);
                 friendsRepository.save(mutualFriendship.get());
@@ -211,7 +213,8 @@ public class FriendsService implements FriendsServiceInterface {
         }
 
         FriendEntity newFriend = new FriendEntity();
-        newFriend.setAddedDate(LocalDateTime.now());
+        newFriend.setAddedDate(LocalDate.now());
+        newFriend.setIsDeleted(false);
         newFriend.setTargetUserId(targetUserId);
         newFriend.setAddedUserId(addPersonDto.getId());
         newFriend.setFriendName(addPersonDto.getFullName());
@@ -219,6 +222,7 @@ public class FriendsService implements FriendsServiceInterface {
 
         FriendEntity mutualFriendship = new FriendEntity();
         mutualFriendship.setAddedDate(newFriend.getAddedDate());
+        mutualFriendship.setIsDeleted(false);
         mutualFriendship.setTargetUserId(addPersonDto.getId());
         mutualFriendship.setAddedUserId(targetUserId);
         mutualFriendship.setFriendName(userData.getFullName());
@@ -267,8 +271,10 @@ public class FriendsService implements FriendsServiceInterface {
                         + " нет в списке друзей у пользователя с ID " + addedUserId + ".");
             }
 
-            friend.get().setDeletedDate(LocalDateTime.now());
+            friend.get().setDeletedDate(LocalDate.now());
+            friend.get().setIsDeleted(true);
             addedFriend.get().setDeletedDate(friend.get().getDeletedDate());
+            addedFriend.get().setIsDeleted(true);
 
             friendsRepository.save(friend.get());
             friendsRepository.save(addedFriend.get());
@@ -312,6 +318,7 @@ public class FriendsService implements FriendsServiceInterface {
                     .addedUserId(paginationAndFilters.getFilters().getAddedUserId())
                     .friendName(paginationAndFilters.getFilters().getFriendName())
                     .targetUserId(targetUserId)
+                    .isDeleted(false)
                     .build()
             );
         }
@@ -319,6 +326,7 @@ public class FriendsService implements FriendsServiceInterface {
             example = Example.of(FriendEntity
                     .builder()
                     .targetUserId(targetUserId)
+                    .isDeleted(false)
                     .build()
             );
         }

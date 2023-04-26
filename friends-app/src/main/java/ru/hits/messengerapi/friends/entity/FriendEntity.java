@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -34,13 +34,13 @@ public class FriendEntity {
      * Дата добавления в друзья.
      */
     @Column(name = "added_date", nullable = false)
-    private LocalDateTime addedDate;
+    private LocalDate addedDate;
 
     /**
      * Дата удаления из друзей.
      */
     @Column(name = "deleted_date")
-    private LocalDateTime deletedDate;
+    private LocalDate deletedDate;
 
     /**
      * Идентификатор пользователя, который добавил в друзья.
@@ -59,5 +59,11 @@ public class FriendEntity {
      */
     @Column(name = "friend_name", nullable = false)
     private String friendName;
+
+    /**
+     * Проверка на то, удален ли пользователь из друзей или нет.
+     */
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
 }

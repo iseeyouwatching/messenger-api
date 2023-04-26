@@ -22,7 +22,7 @@ import ru.hits.messengerapi.friends.repository.BlacklistRepository;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.BlacklistServiceInterface;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -180,7 +180,8 @@ public class BlacklistService implements BlacklistServiceInterface {
 
         if (blockedUser.isPresent()) {
             blockedUser.get().setDeletedDate(null);
-            blockedUser.get().setAddedDate(LocalDateTime.now());
+            blockedUser.get().setIsDeleted(false);
+            blockedUser.get().setAddedDate(LocalDate.now());
             integrationRequestsService.syncBlockedUserData(addPersonDto.getId());
             blacklistRepository.save(blockedUser.get());
             log.info("Пользователь с ID {} и ФИО {} уже существует в черном списке пользователя " +
@@ -190,7 +191,8 @@ public class BlacklistService implements BlacklistServiceInterface {
         }
 
         BlacklistEntity newBlockedUser = new BlacklistEntity();
-        newBlockedUser.setAddedDate(LocalDateTime.now());
+        newBlockedUser.setAddedDate(LocalDate.now());
+        newBlockedUser.setIsDeleted(false);
         newBlockedUser.setTargetUserId(targetUserId);
         newBlockedUser.setBlockedUserId(addPersonDto.getId());
         newBlockedUser.setBlockedUserName(addPersonDto.getFullName());
@@ -226,7 +228,8 @@ public class BlacklistService implements BlacklistServiceInterface {
         }
 
         if (blockedUser.get().getDeletedDate() == null) {
-            blockedUser.get().setDeletedDate(LocalDateTime.now());
+            blockedUser.get().setDeletedDate(LocalDate.now());
+            blockedUser.get().setIsDeleted(true);
             blacklistRepository.save(blockedUser.get());
             log.info("Пользователь с ID {} успешно удален из черного списка у пользователя с ID {}.",
                     blockedUserId, targetUserId);
@@ -265,11 +268,13 @@ public class BlacklistService implements BlacklistServiceInterface {
                     .blockedUserId(paginationAndFilters.getFilters().getBlockedUserId())
                     .blockedUserName(paginationAndFilters.getFilters().getBlockedUserName())
                     .targetUserId(targetUserId)
+                    .isDeleted(false)
                     .build());
         } else {
             example = Example.of(BlacklistEntity
                     .builder()
                     .targetUserId(targetUserId)
+                    .isDeleted(false)
                     .build());
         }
         pageBlockedUsers = blacklistRepository.findAll(example, pageable);
@@ -278,9 +283,7 @@ public class BlacklistService implements BlacklistServiceInterface {
         List<BlockedUserInfoDto> blockedUserInfoDtos = new ArrayList<>();
 
         for (BlacklistEntity blockedUser: blockedUsers) {
-            if (blockedUser.getDeletedDate() == null) {
-                blockedUserInfoDtos.add(new BlockedUserInfoDto(blockedUser));
-            }
+            blockedUserInfoDtos.add(new BlockedUserInfoDto(blockedUser));
         }
 
         SearchedBlockedUsersDto searchedBlockedUsersDto = new SearchedBlockedUsersDto();

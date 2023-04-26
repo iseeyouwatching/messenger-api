@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -34,13 +34,13 @@ public class BlacklistEntity {
      * Дата добавления в черный список.
      */
     @Column(name = "added_date", nullable = false)
-    private LocalDateTime addedDate;
+    private LocalDate addedDate;
 
     /**
      * Дата удаления из черного списка.
      */
     @Column(name = "deleted_date")
-    private LocalDateTime deletedDate;
+    private LocalDate deletedDate;
 
     /**
      * Идентификатор пользователя, который добавил в черный список.
@@ -59,5 +59,11 @@ public class BlacklistEntity {
      */
     @Column(name = "blocked_user_name", nullable = false)
     private String blockedUserName;
+
+    /**
+     * Проверка на то, удален ли пользователь из черного списка или нет.
+     */
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
 }

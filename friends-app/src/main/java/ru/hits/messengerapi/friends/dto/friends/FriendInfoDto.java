@@ -3,7 +3,7 @@ package ru.hits.messengerapi.friends.dto.friends;
 import lombok.*;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -24,12 +24,12 @@ public class FriendInfoDto {
     /**
      * Дата добавления в друзья.
      */
-    private LocalDateTime addedDate;
+    private LocalDate addedDate;
 
     /**
      * Дата удаления из друзей.
      */
-    private LocalDateTime deletedDate;
+    private LocalDate deletedDate;
 
     /**
      * Идентификатор пользователя, которого добавили в друзья.
