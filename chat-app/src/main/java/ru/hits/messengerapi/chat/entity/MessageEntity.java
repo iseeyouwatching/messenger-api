@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -32,7 +33,7 @@ public class MessageEntity {
     private ChatEntity chat;
 
     @Column(name = "send_date")
-    private LocalDate sendDate;
+    private LocalDateTime sendDate;
 
     @Column(name = "message_text", length = 500)
     private String messageText;

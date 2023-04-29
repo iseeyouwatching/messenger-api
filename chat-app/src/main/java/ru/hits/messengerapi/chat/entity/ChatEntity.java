@@ -42,4 +42,10 @@ public class ChatEntity {
     @Column(name = "avatar_id")
     private UUID avatarId;
 
+    @Column(name = "sender_id")
+    private UUID senderId;
+
+    @Column(name = "receiver_id")
+    private UUID receiverId;
+
 }

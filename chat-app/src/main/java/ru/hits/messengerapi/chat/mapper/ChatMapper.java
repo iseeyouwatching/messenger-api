@@ -24,4 +24,14 @@ public class ChatMapper {
                 .build();
     }
 
+    public ChatEntity senderIdAndreceiverIdToChat(UUID senderId, UUID receiverId) {
+        return ChatEntity
+                .builder()
+                .chatType(ChatType.DIALOGUE)
+                .creationDate(LocalDate.now())
+                .senderId(senderId)
+                .receiverId(receiverId)
+                .build();
+    }
+
 }

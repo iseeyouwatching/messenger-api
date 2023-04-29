@@ -46,6 +46,23 @@ public class ChatService {
     }
 
     @Transactional
+    public ChatEntity createDialogue(UUID receiverId) {
+        UUID authenticatedUserId = getAuthenticatedUserId();
+        ChatEntity chat = chatMapper.senderIdAndreceiverIdToChat(authenticatedUserId, receiverId);
+        chat = chatRepository.save(chat);
+
+        List<UUID> listOfIDs = new ArrayList<>();
+        listOfIDs.add(receiverId);
+        listOfIDs.add(authenticatedUserId);
+
+        List<ChatUserEntity> chatUserEntityList =
+                chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.getId(), listOfIDs);
+        chatUserRepository.saveAll(chatUserEntityList);
+
+        return chat;
+    }
+
+    @Transactional
     public void updateChat(UpdateChatDto updateChatDto) {
         UUID authenticatedUserId = getAuthenticatedUserId();
         Optional<ChatEntity> chat = chatRepository.findById(updateChatDto.getId());
@@ -63,10 +80,8 @@ public class ChatService {
         }
 
         if (updateChatDto.getUsers() != null) {
-            if (!updateChatDto.getUsers().contains(authenticatedUserId)) {
-                throw new ConflictException("Админа с ID " + authenticatedUserId + " нет в чате, который создан им.");
-            }
             List<UUID> listOfIDs = updateChatDto.getUsers();
+            listOfIDs.add(authenticatedUserId);
             List<ChatUserEntity> chatUserEntityList =
                     chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.get().getId(), listOfIDs);
             chatUserRepository.deleteAllByChatId(chat.get().getId());
