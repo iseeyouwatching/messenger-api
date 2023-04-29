@@ -19,6 +19,7 @@
 		<module>user-app</module>
 		<module>friends-app</module>
 		<module>gateway</module>
+		<module>chat-app</module>
 	</modules>
 	<properties>
 		<java.version>11</java.version>
