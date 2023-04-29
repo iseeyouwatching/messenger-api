@@ -13,3 +13,7 @@ spring:
           uri: http://localhost:8192/
           predicates:
             - Path=/api/friends/**, /api/blacklist/**
+        - id: chats_route
+          uri: http://localhost:8193/
+          predicates:
+            - Path=/api/chat/**
