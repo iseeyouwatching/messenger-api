@@ -20,6 +20,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/chats_db
     user: hits
     password: hits
+    enabled: false
   datasource:
     url: jdbc:postgresql://localhost:5432/chats_db
     username: hits
