@@ -8,4 +8,7 @@ import java.util.UUID;
 
 @Repository
 public interface ChatUserRepository extends JpaRepository<ChatUserEntity, UUID> {
+
+    void deleteAllByChatId(UUID chatId);
+
 }

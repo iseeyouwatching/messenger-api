@@ -2,11 +2,9 @@ package ru.hits.messengerapi.chat.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.chat.dto.CreateChatDto;
+import ru.hits.messengerapi.chat.dto.UpdateChatDto;
 import ru.hits.messengerapi.chat.service.ChatService;
 
 import javax.validation.Valid;
@@ -22,6 +20,11 @@ public class ChatController {
     @PostMapping
     public void createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         chatService.createChat(createChatDto);
+    }
+
+    @PutMapping
+    public void updateChat(@RequestBody @Valid UpdateChatDto updateChatDto) {
+        chatService.updateChat(updateChatDto);
     }
 
 }
