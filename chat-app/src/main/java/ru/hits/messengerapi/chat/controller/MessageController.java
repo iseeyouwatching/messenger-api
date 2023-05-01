@@ -13,19 +13,19 @@ import ru.hits.messengerapi.chat.service.MessageService;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/api/chat/message")
 @RequiredArgsConstructor
 @Slf4j
 public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping("/send-message-to-dialogue")
+    @PostMapping("/dialogue")
     public void sendMessageToDialogue(@RequestBody @Valid DialogueMessageDto dialogueMessageDto) {
         messageService.sendMessageToDialogue(dialogueMessageDto);
     }
 
-    @PostMapping("/send-message-to-chat")
+    @PostMapping("/chat")
     public void sendMessageToChat(@RequestBody @Valid ChatMessageDto chatMessageDto) {
         messageService.sendMessageToChat(chatMessageDto);
     }

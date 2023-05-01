@@ -157,10 +157,17 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleMultiConflictException(MultiConflictException exception,
                                                                  WebRequest request
     ) {
-        ApiError apiError = new ApiError(exception.getMessages());
-        System.out.println(apiError);
         return new ResponseEntity<>(new ApiError(exception.getMessages()), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> handleForbiddenException(ForbiddenException exception,
+                                                                WebRequest request
+    ) {
+        logError(request, exception);
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
 
     /**
      * Метод для логирования всех исключений, которые доходят до контроллера.

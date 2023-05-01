@@ -2,12 +2,14 @@ package ru.hits.messengerapi.chat.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.chat.dto.CreateChatDto;
 import ru.hits.messengerapi.chat.dto.UpdateChatDto;
 import ru.hits.messengerapi.chat.service.ChatService;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/chat")
