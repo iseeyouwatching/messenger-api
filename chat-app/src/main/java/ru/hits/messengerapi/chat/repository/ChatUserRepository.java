@@ -4,14 +4,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ChatUserRepository extends JpaRepository<ChatUserEntity, UUID> {
 
-    void deleteAllByChatId(UUID chatId);
+    void deleteAllByChatIdAndUserIdNotIn(UUID chatId, List<UUID> users);
 
     Optional<ChatUserEntity> findByUserId(UUID userId);
+
+    Optional<ChatUserEntity> findByChatIdAndUserId(UUID chatId, UUID userId);
 
 }

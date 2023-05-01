@@ -66,6 +66,8 @@ public class ChatService {
     @Transactional
     public void updateChat(UpdateChatDto updateChatDto) {
         UUID authenticatedUserId = getAuthenticatedUserId();
+        integrationRequestsService.checkExistenceMultiUsersInFriends(authenticatedUserId, updateChatDto.getUsers());
+
         Optional<ChatEntity> chat = chatRepository.findById(updateChatDto.getId());
 
         if (chat.isEmpty()) {
@@ -85,8 +87,12 @@ public class ChatService {
             listOfIDs.add(authenticatedUserId);
             List<ChatUserEntity> chatUserEntityList =
                     chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.get().getId(), listOfIDs);
-            chatUserRepository.deleteAllByChatId(chat.get().getId());
-            chatUserRepository.saveAll(chatUserEntityList);
+            chatUserRepository.deleteAllByChatIdAndUserIdNotIn(chat.get().getId(), updateChatDto.getUsers());
+            for (ChatUserEntity chatUser : chatUserEntityList) {
+                if (chatUserRepository.findByChatIdAndUserId(chat.get().getId(), chatUser.getUserId()).isEmpty()) {
+                    chatUserRepository.save(chatUser);
+                }
+            }
         }
 
         chatRepository.save(chat.get());
