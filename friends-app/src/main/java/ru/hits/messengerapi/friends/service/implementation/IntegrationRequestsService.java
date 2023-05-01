@@ -1,11 +1,13 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
@@ -65,6 +67,7 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
     @Override
     public void checkUserExistence(AddPersonDto addPersonDto) {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
         String url = integrationUsersRequestCheckExistence;
 
         HttpHeaders headers = new HttpHeaders();
@@ -75,11 +78,6 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
         ResponseEntity<Boolean> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
 
-        if (Boolean.FALSE.equals(responseEntity.getBody())) {
-            log.warn("Пользователь с id {} и ФИО {} не найден.", addPersonDto.getId(), addPersonDto.getFullName());
-            throw new NotFoundException("Пользователя с id " + addPersonDto.getId()
-                    + " и ФИО " + addPersonDto.getFullName() + " не существует.");
-        }
         log.info("Пользователь с id {} и ФИО {} существует.", addPersonDto.getId(), addPersonDto.getFullName());
     }
 

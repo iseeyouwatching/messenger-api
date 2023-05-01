@@ -3,7 +3,7 @@ package ru.hits.messengerapi.common.exception;
 /**
  * Исключение, которое возникает при попытке получить несуществующий ресурс.
  */
-public class NotFoundException extends RuntimeException{
+public class NotFoundException extends RuntimeException {
 
     /**
      * Создает новый экземпляр исключения с указанным сообщением об ошибке.

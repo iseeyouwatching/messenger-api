@@ -3,6 +3,7 @@ package ru.hits.messengerapi.user.service.implementation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.service.IntegrationUserServiceInterface;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class IntegrationUserService implements IntegrationUserServiceInterface {
+public class IntegrationUserService {
 
     /**
      * Репозиторий пользователя.
@@ -30,7 +31,6 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
      * @param fullName ФИО пользователя.
      * @return exist - если пользователь существует, dont exist - если пользователя не существует.
      */
-    @Override
     public Boolean checkUserByIdAndFullName(UUID id, String fullName) {
         log.debug("Проверка пользователя с id {} и полным именем {}", id, fullName);
         boolean isUserPresent = userRepository.findByIdAndFullName(id, fullName).isPresent();
@@ -38,8 +38,20 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
             log.debug("Пользователь с id {} и полным именем {} найден", id, fullName);
         } else {
             log.debug("Пользователь с id {} и полным именем {} не найден", id, fullName);
+            throw new NotFoundException("Пользователь с ID " + id + " и ФИО " + fullName + " не найден.");
         }
-        return isUserPresent;
+        return true;
+    }
+
+    public Boolean checkUserById(UUID id) {
+        boolean isUserPresent = userRepository.findById(id).isPresent();
+        if (isUserPresent) {
+            log.debug("Пользователь с id {} найден", id);
+        } else {
+            log.debug("Пользователь с id {} не найден", id);
+            throw new NotFoundException("Пользователь с ID " + id + " не найден.");
+        }
+        return true;
     }
 
     /**
@@ -48,7 +60,6 @@ public class IntegrationUserService implements IntegrationUserServiceInterface {
      * @param id идентификатор пользователя.
      * @return ФИО пользователя.
      */
-    @Override
     public String getFullName(UUID id) {
         log.info("Запрос на получение полного имени пользователя с ID {}", id);
 

@@ -20,7 +20,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping("send-message-to-dialogue")
-    private void sendMessageToDialogue(@RequestBody @Valid DialogueMessageDto dialogueMessageDto) {
+    public void sendMessageToDialogue(@RequestBody @Valid DialogueMessageDto dialogueMessageDto) {
         messageService.sendMessageToDialogue(dialogueMessageDto);
     }
 

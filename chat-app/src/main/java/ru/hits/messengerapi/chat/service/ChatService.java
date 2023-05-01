@@ -13,7 +13,6 @@ import ru.hits.messengerapi.chat.mapper.ChatMapper;
 import ru.hits.messengerapi.chat.mapper.ChatUserMapper;
 import ru.hits.messengerapi.chat.repository.ChatRepository;
 import ru.hits.messengerapi.chat.repository.ChatUserRepository;
-import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.JwtUserData;
 

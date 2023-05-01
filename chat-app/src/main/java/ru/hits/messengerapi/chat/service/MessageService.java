@@ -9,15 +9,12 @@ import ru.hits.messengerapi.chat.dto.AttachmentDto;
 import ru.hits.messengerapi.chat.dto.DialogueMessageDto;
 import ru.hits.messengerapi.chat.entity.AttachmentEntity;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
-import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
 import ru.hits.messengerapi.chat.repository.AttachmentRepository;
 import ru.hits.messengerapi.chat.repository.ChatRepository;
-import ru.hits.messengerapi.chat.repository.ChatUserRepository;
 import ru.hits.messengerapi.chat.repository.MessageRepository;
 import ru.hits.messengerapi.common.security.JwtUserData;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +30,10 @@ public class MessageService {
     private final AttachmentRepository attachmentRepository;
     private final ChatRepository chatRepository;
     private final ChatService chatService;
+    private final IntegrationRequestsService integrationRequestsService;
 
     public void sendMessageToDialogue(DialogueMessageDto dialogueMessageDto) {
+        integrationRequestsService.checkUserExistence(dialogueMessageDto.getReceiverId());
         UUID senderId = getAuthenticatedUserId();
         UUID receiverId = dialogueMessageDto.getReceiverId();
 

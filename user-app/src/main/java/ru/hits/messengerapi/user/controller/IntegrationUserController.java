@@ -45,6 +45,14 @@ public class IntegrationUserController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PostMapping("/check-existence-by-id")
+    public ResponseEntity<Boolean> checkUserById(@RequestBody UUID id) {
+        boolean result = integrationUserService.checkUserById(id);
+        log.info("Результат проверки пользователя по id = {} равен {}",
+                id, result);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     /**
      * Метод получения ФИО пользователя по его ID.
      *
