@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public interface FriendsRepository extends JpaRepository<FriendEntity, UUID> {
      * @return список сущностей друзей, удовлетворяющих условиям поиска.
      */
     List<FriendEntity> findAllByTargetUserIdAndDeletedDate(UUID targetUserId,
-                                                           LocalDateTime deletedDate,
+                                                           LocalDate deletedDate,
                                                            Pageable pageable);
 
     /**
@@ -47,9 +48,9 @@ public interface FriendsRepository extends JpaRepository<FriendEntity, UUID> {
      * @param pageable объект класса {@link Pageable}, содержащий информацию о странице.
      * @return список сущностей друзей, удовлетворяющих условиям поиска.
      */
-    List<FriendEntity> findAllByTargetUserIdAndFriendNameLikeAndDeletedDate(UUID targetUserId,
+    List<FriendEntity> findAllByTargetUserIdAndFriendNameLikeIgnoreCaseAndDeletedDate(UUID targetUserId,
                                                                             String wildcardFullNameFilter,
-                                                                            LocalDateTime deletedDate,
+                                                                            LocalDate deletedDate,
                                                                             Pageable pageable);
 
     /**

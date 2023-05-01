@@ -81,7 +81,7 @@ public class BlacklistService implements BlacklistServiceInterface {
         }
         else {
             String wildcardFullNameFilter = "%" + paginationWithFullNameFilterDto.getFullNameFilter() + "%";
-            blockedUsers = blacklistRepository.findAllByTargetUserIdAndBlockedUserNameLikeAndDeletedDate(
+            blockedUsers = blacklistRepository.findAllByTargetUserIdAndBlockedUserNameLikeIgnoreCaseAndDeletedDate(
                     targetUserId, wildcardFullNameFilter, null, pageable);
         }
 

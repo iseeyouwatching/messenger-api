@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public interface BlacklistRepository extends JpaRepository<BlacklistEntity, UUID
      * @return список сущностей заблокированных пользователей, удовлетворяющих условиям поиска.
      */
     List<BlacklistEntity> findAllByTargetUserIdAndDeletedDate(UUID targetUserId,
-                                                           LocalDateTime deletedDate,
+                                                           LocalDate deletedDate,
                                                            Pageable pageable);
 
     /**
@@ -47,10 +48,10 @@ public interface BlacklistRepository extends JpaRepository<BlacklistEntity, UUID
      * @param pageable объект класса {@link Pageable}, содержащий информацию о странице.
      * @return сущности из черного списка, удовлетворяющих условиям поиска.
      */
-    List<BlacklistEntity> findAllByTargetUserIdAndBlockedUserNameLikeAndDeletedDate(UUID targetUserId,
-                                                                            String wildcardFullNameFilter,
-                                                                            LocalDateTime deletedDate,
-                                                                            Pageable pageable);
+    List<BlacklistEntity> findAllByTargetUserIdAndBlockedUserNameLikeIgnoreCaseAndDeletedDate(UUID targetUserId,
+                                                                                              String wildcardFullNameFilter,
+                                                                                              LocalDate deletedDate,
+                                                                                              Pageable pageable);
 
     /**
      * Получить все сущности из черного списка по id заблокированного пользователя.

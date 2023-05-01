@@ -93,7 +93,7 @@ public class FriendsService implements FriendsServiceInterface {
         }
         else {
             String wildcardFullNameFilter = "%" + paginationWithFullNameFilterDto.getFullNameFilter() + "%";
-            friends = friendsRepository.findAllByTargetUserIdAndFriendNameLikeAndDeletedDate(
+            friends = friendsRepository.findAllByTargetUserIdAndFriendNameLikeIgnoreCaseAndDeletedDate(
                     targetUserId, wildcardFullNameFilter, null, pageable);
         }
 

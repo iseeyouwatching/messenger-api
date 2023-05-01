@@ -9,7 +9,6 @@ import ru.hits.messengerapi.chat.dto.UpdateChatDto;
 import ru.hits.messengerapi.chat.service.ChatService;
 
 import javax.validation.Valid;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/chat")
