@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.hits.messengerapi.chat.dto.ChatMessageDto;
 import ru.hits.messengerapi.chat.dto.DialogueMessageDto;
 import ru.hits.messengerapi.chat.service.MessageService;
 
@@ -19,9 +20,14 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping("send-message-to-dialogue")
+    @PostMapping("/send-message-to-dialogue")
     public void sendMessageToDialogue(@RequestBody @Valid DialogueMessageDto dialogueMessageDto) {
         messageService.sendMessageToDialogue(dialogueMessageDto);
+    }
+
+    @PostMapping("/send-message-to-chat")
+    public void sendMessageToChat(@RequestBody @Valid ChatMessageDto chatMessageDto) {
+        messageService.sendMessageToChat(chatMessageDto);
     }
 
 }
