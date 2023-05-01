@@ -8,14 +8,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.hits.messengerapi.chat.entity.MessageEntity;
+import ru.hits.messengerapi.chat.repository.MessageRepository;
 import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 
@@ -23,6 +22,7 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 @RequiredArgsConstructor
 @Slf4j
 public class IntegrationRequestsService {
+    private final MessageRepository messageRepository;
 
     /**
      * Свойства безопасности приложения.
@@ -75,6 +75,26 @@ public class IntegrationRequestsService {
                 });
 
         return responseEntity.getBody();
+    }
+
+    public Map<String, String> syncUserData(UUID id) {
+        List<String> fullNameAndAvatarId = getFullNameAndAvatarId(id);
+        String fullName = fullNameAndAvatarId.get(0);
+        String avatarIdString = fullNameAndAvatarId.get(1);
+        UUID senderAvatarId = null;
+        if (avatarIdString != null) {
+            senderAvatarId = UUID.fromString(avatarIdString);
+        }
+
+        List<MessageEntity> messageEntities = messageRepository.findAllBySenderId(id);
+
+        for (MessageEntity message: messageEntities) {
+            message.setSenderName(fullName);
+            message.setSenderAvatarId(senderAvatarId);
+        }
+        messageRepository.saveAll(messageEntities);
+
+        return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
     public void checkExistenceInFriends(UUID authUserId, UUID receiverId) {

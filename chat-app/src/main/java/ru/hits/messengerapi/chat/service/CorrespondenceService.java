@@ -29,6 +29,7 @@ public class CorrespondenceService {
     private final ChatRepository chatRepository;
     private final ChatUserRepository chatUserRepository;
     private final MessageRepository messageRepository;
+    private final IntegrationRequestsService integrationRequestsService;
 
     public CorrespondenceInfoDto getCorrespondenceInfo(UUID id) {
         Optional<ChatEntity> chat = chatRepository.findById(id);
@@ -62,6 +63,7 @@ public class CorrespondenceService {
                     + ", потому что не состоит в ней.");
         }
 
+        integrationRequestsService.syncUserData(getAuthenticatedUserId());
         List<MessageEntity> messages = messageRepository.findAllByChatId(id);
         List<MessageInCorrespondenceDto> messageInCorrespondenceDtos = new ArrayList<>();
         for (MessageEntity message: messages) {
