@@ -34,8 +34,10 @@ public class MessageService {
 
     public void sendMessageToDialogue(DialogueMessageDto dialogueMessageDto) {
         integrationRequestsService.checkUserExistence(dialogueMessageDto.getReceiverId());
+
         UUID senderId = getAuthenticatedUserId();
         UUID receiverId = dialogueMessageDto.getReceiverId();
+        integrationRequestsService.checkExistenceInFriends(senderId, receiverId);
 
         Optional<ChatEntity> chat = chatRepository.findBySenderIdAndReceiverId(senderId, receiverId);
         if (chat.isEmpty()) {
@@ -48,6 +50,7 @@ public class MessageService {
                 .chat(chat.get())
                 .sendDate(LocalDateTime.now())
                 .messageText(dialogueMessageDto.getMessageText())
+                .senderId(senderId)
                 .build();
         messageRepository.save(message);
 

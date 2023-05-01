@@ -33,6 +33,7 @@ spring:
 integration:
   request:
     check-existence-by-id: http://localhost:8191/integration/users/check-existence-by-id
+    check-existence-in-friends: http://localhost:8192/integration/friends/check-existence-in-friends
 
 server:
   port: 8193

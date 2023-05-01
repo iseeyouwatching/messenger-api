@@ -6,6 +6,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
+import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.ServiceUnavailableException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
@@ -42,6 +43,11 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
                 ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
                 String errorMessage = errorResponse.getMessages().get(0);
                 throw new NotFoundException(errorMessage);
+            } else if (response.getStatusCode() == HttpStatus.CONFLICT) {
+                InputStream responseBody = response.getBody();
+                ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
+                String errorMessage = errorResponse.getMessages().get(0);
+                throw new ConflictException(errorMessage);
             }
         }
     }

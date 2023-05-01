@@ -38,4 +38,7 @@ public class MessageEntity {
     @Column(name = "message_text", length = 500)
     private String messageText;
 
+    @Column(name = "sender_id")
+    private UUID senderId;
+
 }
