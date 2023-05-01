@@ -3,9 +3,9 @@ package ru.hits.messengerapi.friends.service.implementation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.hits.messengerapi.common.exception.ConflictException;
+import ru.hits.messengerapi.common.exception.ForbiddenException;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
-import ru.hits.messengerapi.common.exception.MultiConflictException;
+import ru.hits.messengerapi.common.exception.MultiForbiddenException;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class IntegrationFriendsService {
         Optional<FriendEntity> friend =
                 friendsRepository.findByTargetUserIdAndAddedUserId(targetUserId, addedUserId);
         if (friend.isEmpty() || friend.get().getDeletedDate() != null) {
-            throw new ConflictException("Пользователь с ID " + targetUserId + " не может написать пользователю с ID "
+            throw new ForbiddenException("Пользователь с ID " + targetUserId + " не может написать пользователю с ID "
                     + addedUserId + ", так как они не являются друзьями.");
         }
         return true;
@@ -47,7 +47,7 @@ public class IntegrationFriendsService {
             }
         }
         if (!result.isEmpty()) {
-            throw new MultiConflictException(result);
+            throw new MultiForbiddenException(result);
         }
     }
 

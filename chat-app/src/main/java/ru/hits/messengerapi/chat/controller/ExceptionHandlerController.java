@@ -153,11 +153,11 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(MultiConflictException.class)
-    public ResponseEntity<ApiError> handleMultiConflictException(MultiConflictException exception,
+    @ExceptionHandler(MultiForbiddenException.class)
+    public ResponseEntity<ApiError> handleMultiForbiddenException(MultiForbiddenException exception,
                                                                  WebRequest request
     ) {
-        return new ResponseEntity<>(new ApiError(exception.getMessages()), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new ApiError(exception.getMessages()), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(ForbiddenException.class)

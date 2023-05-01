@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import ru.hits.messengerapi.common.exception.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -44,7 +42,7 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
                 InputStream responseBody = response.getBody();
                 ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
                 if (errorResponse.getMessages().size() > 1) {
-                    throw new MultiConflictException(errorResponse.getMessages());
+                    throw new MultiForbiddenException(errorResponse.getMessages());
                 }
                 else if (errorResponse.getMessages().size() == 1) {
                     String errorMessage = errorResponse.getMessages().get(0);

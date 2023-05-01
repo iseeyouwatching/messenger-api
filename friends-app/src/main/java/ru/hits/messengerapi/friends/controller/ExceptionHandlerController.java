@@ -15,7 +15,7 @@ import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.exception.UnauthorizedException;
-import ru.hits.messengerapi.common.exception.MultiConflictException;
+import ru.hits.messengerapi.common.exception.MultiForbiddenException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,13 +157,13 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(MultiConflictException.class)
-    public ResponseEntity<ApiError> handleMultiConflictException(MultiConflictException exception,
-                                                            WebRequest request
+    @ExceptionHandler(MultiForbiddenException.class)
+    public ResponseEntity<ApiError> handleMultiForbiddenException(MultiForbiddenException exception,
+                                                                 WebRequest request
     ) {
         ApiError apiError = new ApiError(exception.getMessages());
         System.out.println(apiError);
-        return new ResponseEntity<>(new ApiError(exception.getMessages()), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new ApiError(exception.getMessages()), HttpStatus.FORBIDDEN);
     }
 
     /**

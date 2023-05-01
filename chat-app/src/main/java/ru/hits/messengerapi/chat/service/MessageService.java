@@ -16,6 +16,7 @@ import ru.hits.messengerapi.chat.repository.ChatRepository;
 import ru.hits.messengerapi.chat.repository.ChatUserRepository;
 import ru.hits.messengerapi.chat.repository.MessageRepository;
 import ru.hits.messengerapi.common.exception.ConflictException;
+import ru.hits.messengerapi.common.exception.ForbiddenException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.JwtUserData;
 
@@ -87,7 +88,7 @@ public class MessageService {
 
         UUID senderId = getAuthenticatedUserId();
         if (chatUserRepository.findByChatIdAndUserId(chatMessageDto.getChatId(), senderId).isEmpty()) {
-            throw new ConflictException("Пользователь с ID " + senderId
+            throw new ForbiddenException("Пользователь с ID " + senderId
                     + " не может отправить сообщение в чат с ID " + chatMessageDto.getChatId()
                     + ", потому что не состоит в нём.");
         }
@@ -101,7 +102,6 @@ public class MessageService {
                 .build();
         messageRepository.save(message);
 
-        System.out.println(chatMessageDto.getAttachments());
         if (chatMessageDto.getAttachments() != null) {
             List<AttachmentEntity> attachments = new ArrayList<>();
             for (AttachmentDto attachmentDto: chatMessageDto.getAttachments()) {
