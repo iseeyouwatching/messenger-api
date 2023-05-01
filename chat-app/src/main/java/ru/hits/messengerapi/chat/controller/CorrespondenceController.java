@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.hits.messengerapi.chat.dto.CorrespondenceInfoDto;
+import ru.hits.messengerapi.chat.dto.MessageInCorrespondenceDto;
 import ru.hits.messengerapi.chat.service.CorrespondenceService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,9 +23,14 @@ public class CorrespondenceController {
 
     private final CorrespondenceService correspondenceService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/get-info")
     public ResponseEntity<CorrespondenceInfoDto> getCorrespondenceInfo(@PathVariable("id") UUID id) {
         return new ResponseEntity<>(correspondenceService.getCorrespondenceInfo(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/view")
+    public ResponseEntity<List<MessageInCorrespondenceDto>> viewCorrespondence(@PathVariable("id") UUID id) {
+        return new ResponseEntity<>(correspondenceService.viewCorrespondence(id), HttpStatus.OK);
     }
 
 }

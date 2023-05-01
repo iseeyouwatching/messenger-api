@@ -53,12 +53,20 @@ public class MessageService {
             chat = Optional.ofNullable(newChat);
         }
 
+        List<String> fullNameAndAvatarId = integrationRequestsService.getFullNameAndAvatarId(senderId);
+        String avatarIdString = fullNameAndAvatarId.get(1);
+        UUID senderAvatarId = null;
+        if (avatarIdString != null) {
+            senderAvatarId = UUID.fromString(avatarIdString);
+        }
         MessageEntity message = MessageEntity
                 .builder()
                 .chat(chat.get())
                 .sendDate(LocalDateTime.now())
                 .messageText(dialogueMessageDto.getMessageText())
                 .senderId(senderId)
+                .senderName(fullNameAndAvatarId.get(0))
+                .senderAvatarId(senderAvatarId)
                 .build();
         messageRepository.save(message);
 
@@ -93,12 +101,20 @@ public class MessageService {
                     + ", потому что не состоит в нём.");
         }
 
+        List<String> fullNameAndAvatarId = integrationRequestsService.getFullNameAndAvatarId(senderId);
+        String avatarIdString = fullNameAndAvatarId.get(1);
+        UUID senderAvatarId = null;
+        if (avatarIdString != null) {
+            senderAvatarId = UUID.fromString(avatarIdString);
+        }
         MessageEntity message = MessageEntity
                 .builder()
                 .chat(chat.get())
                 .sendDate(LocalDateTime.now())
                 .messageText(chatMessageDto.getMessageText())
                 .senderId(senderId)
+                .senderName(fullNameAndAvatarId.get(0))
+                .senderAvatarId(senderAvatarId)
                 .build();
         messageRepository.save(message);
 

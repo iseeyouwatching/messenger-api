@@ -8,6 +8,8 @@ import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.service.IntegrationUserServiceInterface;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,12 +68,30 @@ public class IntegrationUserService {
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
-            log.warn("Пользователь с ID {} не найден", id);
-            return "dont exist";
+            throw new NotFoundException("Пользователь с ID " + id + " не найден.");
         }
 
         String fullName = user.get().getFullName();
         log.info("Полное имя пользователя с ID {} успешно получено: {}", id, fullName);
         return fullName;
+    }
+
+    public List<String> getFullNameAndAvatar(UUID id) {
+        Optional<UserEntity> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("Пользователь с ID " + id + " не найден.");
+        }
+
+        List<String> result = new ArrayList<>();
+        result.add(user.get().getFullName());
+        if (user.get().getAvatar() != null) {
+            result.add(String.valueOf(user.get().getAvatar()));
+        }
+        else {
+            result.add(null);
+        }
+
+        return result;
     }
 }

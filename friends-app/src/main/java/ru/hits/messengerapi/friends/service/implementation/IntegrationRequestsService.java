@@ -100,11 +100,6 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
         ResponseEntity<String> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, String.class);
 
-        if (Objects.equals(responseEntity.getBody(), "dont exist")) {
-            log.warn("Пользователь с id {} не найден.", id);
-            throw new NotFoundException("Пользователя с id " + id + " не существует.");
-        }
-
         String fullName = responseEntity.getBody();
         log.info("Получено полное имя '{}' для пользователя с id = {}", fullName, id);
         return fullName;

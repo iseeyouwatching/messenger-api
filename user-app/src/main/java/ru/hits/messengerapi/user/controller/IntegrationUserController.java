@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.user.service.implementation.IntegrationUserService;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -66,6 +67,11 @@ public class IntegrationUserController {
         log.info("Получено полное имя '{}' для пользователя с id = {}", fullName, id);
 
         return new ResponseEntity<>(fullName, HttpStatus.OK);
+    }
+
+    @PostMapping ("/get-full-name-and-avatar")
+    public ResponseEntity<List<String>> getFullNameAndAvatar(@RequestBody UUID id) {
+        return new ResponseEntity<>(integrationUserService.getFullNameAndAvatar(id), HttpStatus.OK);
     }
 
 }

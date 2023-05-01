@@ -35,6 +35,7 @@ integration:
     check-existence-by-id: http://localhost:8191/integration/users/check-existence-by-id
     check-existence-in-friends: http://localhost:8192/integration/friends/check-existence-in-friends
     check-multi-existence-in-friends: http://localhost:8192/integration/friends/check-multi-existence-in-friends
+    get-full-name-and-avatar: http://localhost:8191/integration/users/get-full-name-and-avatar
 
 server:
   port: 8193

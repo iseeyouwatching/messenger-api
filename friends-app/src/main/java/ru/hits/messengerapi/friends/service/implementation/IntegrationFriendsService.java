@@ -33,7 +33,7 @@ public class IntegrationFriendsService {
         return true;
     }
 
-    public void checkMultiExistenceInFriends(List<UUID> uuids) {
+    public Boolean checkMultiExistenceInFriends(List<UUID> uuids) {
         List<FriendEntity> friends = friendsRepository.findAllByTargetUserId(uuids.get(0));
         List<UUID> friendsIDs = new ArrayList<>();
         for (FriendEntity friend: friends) {
@@ -49,6 +49,7 @@ public class IntegrationFriendsService {
         if (!result.isEmpty()) {
             throw new MultiForbiddenException(result);
         }
+        return true;
     }
 
 }
