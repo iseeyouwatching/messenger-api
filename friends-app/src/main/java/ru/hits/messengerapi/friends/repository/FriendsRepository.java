@@ -60,4 +60,6 @@ public interface FriendsRepository extends JpaRepository<FriendEntity, UUID> {
      */
     List<FriendEntity> findAllByAddedUserId(UUID addedUserId);
 
+    List<FriendEntity> findAllByTargetUserId(UUID targetUserId);
+
 }

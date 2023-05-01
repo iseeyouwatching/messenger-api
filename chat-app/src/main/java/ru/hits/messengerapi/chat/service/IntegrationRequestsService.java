@@ -32,6 +32,9 @@ public class IntegrationRequestsService {
     @Value("${integration.request.check-existence-in-friends}")
     private String integrationUsersRequestCheckExistenceInFriends;
 
+    @Value("${integration.request.check-multi-existence-in-friends}")
+    private String integrationUsersRequestCheckMultiExistenceInFriends;
+
     public void checkUserExistence(UUID id) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
@@ -57,6 +60,23 @@ public class IntegrationRequestsService {
         List<UUID> uuids = new ArrayList<>();
         uuids.add(authUserId);
         uuids.add(receiverId);
+        HttpEntity<List<UUID>> requestEntity = new HttpEntity<>(uuids, headers);
+
+        ResponseEntity<Boolean> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
+    }
+
+    public void checkExistenceMultiUsersInFriends(UUID authUserId, List<UUID> multiUsersIds) {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
+        String url = integrationUsersRequestCheckMultiExistenceInFriends;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+        List<UUID> uuids = new ArrayList<>();
+        uuids.add(authUserId);
+        uuids.addAll(multiUsersIds);
         HttpEntity<List<UUID>> requestEntity = new HttpEntity<>(uuids, headers);
 
         ResponseEntity<Boolean> responseEntity = restTemplate

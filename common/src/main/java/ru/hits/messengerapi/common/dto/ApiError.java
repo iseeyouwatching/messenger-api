@@ -28,4 +28,9 @@
             this.messages.add(message);
         }
 
+        public ApiError(List<String> messages) {
+            this.messages = new ArrayList<>();
+            this.messages.addAll(messages);
+        }
+
     }

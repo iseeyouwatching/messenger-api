@@ -31,10 +31,12 @@ public class ChatService {
     private final ChatUserRepository chatUserRepository;
     private final ChatMapper chatMapper;
     private final ChatUserMapper chatUserMapper;
+    private final IntegrationRequestsService integrationRequestsService;
 
     @Transactional
     public void createChat(CreateChatDto createChatDto) {
         UUID authenticatedUserId = getAuthenticatedUserId();
+        integrationRequestsService.checkExistenceMultiUsersInFriends(authenticatedUserId, createChatDto.getUsers());
         ChatEntity chat = chatMapper.createChatDtoToChat(createChatDto, authenticatedUserId);
         chat = chatRepository.save(chat);
         List<UUID> listOfIDs = createChatDto.getUsers();
