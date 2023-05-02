@@ -114,8 +114,8 @@ public class CorrespondenceService {
 
         List<PaginationCorrespondancesDto> result = new ArrayList<>();
         for (ChatEntity chat: chatEntities) {
-            List<MessageEntity> messages = messageRepository.findLastMessage(chat);
-            if (messages.isEmpty()) {
+            MessageEntity message = messageRepository.findFirstByOrderBySendDateDesc(chat);
+            if (message == null) {
                 if (chat.getChatType().equals(ChatType.CHAT)) {
                     result.add(new PaginationCorrespondancesDto(
                             chat.getId(),
@@ -141,9 +141,9 @@ public class CorrespondenceService {
                     result.add(new PaginationCorrespondancesDto(
                             chat.getId(),
                             chat.getName(),
-                            messages.get(0).getMessageText(),
-                            messages.get(0).getSendDate(),
-                            messages.get(0).getSenderId()
+                            message.getMessageText(),
+                            message.getSendDate(),
+                            message.getSenderId()
                     ));
                 }
                 else if (chat.getChatType().equals(ChatType.DIALOGUE)) {
@@ -151,9 +151,9 @@ public class CorrespondenceService {
                     result.add(new PaginationCorrespondancesDto(
                             chat.getId(),
                             fullName,
-                            messages.get(0).getMessageText(),
-                            messages.get(0).getSendDate(),
-                            messages.get(0).getSenderId()
+                            message.getMessageText(),
+                            message.getSendDate(),
+                            message.getSenderId()
                     ));
                 }
             }
