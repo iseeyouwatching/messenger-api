@@ -19,4 +19,19 @@ public interface MessageRepository extends JpaRepository<MessageEntity, UUID> {
     @Query("select m from MessageEntity m where m.chat = :chat order by m.sendDate desc")
     List<MessageEntity> findLastMessage(ChatEntity chat);
 
+    @Query("SELECT DISTINCT m FROM MessageEntity m " +
+            "LEFT JOIN FETCH m.attachments a " +
+            "JOIN m.chat c " +
+            "JOIN ChatUserEntity cu ON  c.id = cu.chatId " +
+            "WHERE (lower(m.messageText) like %:searchString% OR lower(a.fileName) like %:searchString%) " +
+            "AND cu.userId = :authenticatedUserId ORDER BY m.sendDate DESC")
+    List<MessageEntity> searchMessages(String searchString, UUID authenticatedUserId);
+
+    @Query("SELECT DISTINCT m FROM MessageEntity m " +
+            "LEFT JOIN FETCH m.attachments a " +
+            "JOIN m.chat c " +
+            "JOIN ChatUserEntity cu ON  c.id = cu.chatId " +
+            "AND cu.userId = :authenticatedUserId ORDER BY m.sendDate DESC")
+    List<MessageEntity> searchMessagesWithoutFilter(UUID authenticatedUserId);
+
 }

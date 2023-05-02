@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -46,5 +47,8 @@ public class MessageEntity {
 
     @Column(name = "sender_avatar_id")
     private UUID senderAvatarId;
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AttachmentEntity> attachments;
 
 }

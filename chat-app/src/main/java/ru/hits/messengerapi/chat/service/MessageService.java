@@ -5,17 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import ru.hits.messengerapi.chat.dto.AttachmentDto;
-import ru.hits.messengerapi.chat.dto.ChatMessageDto;
-import ru.hits.messengerapi.chat.dto.DialogueMessageDto;
+import ru.hits.messengerapi.chat.dto.*;
 import ru.hits.messengerapi.chat.entity.AttachmentEntity;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
+import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
+import ru.hits.messengerapi.chat.enumeration.ChatType;
 import ru.hits.messengerapi.chat.repository.AttachmentRepository;
 import ru.hits.messengerapi.chat.repository.ChatRepository;
 import ru.hits.messengerapi.chat.repository.ChatUserRepository;
 import ru.hits.messengerapi.chat.repository.MessageRepository;
-import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.ForbiddenException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.JwtUserData;
@@ -133,6 +132,44 @@ public class MessageService {
             }
             attachmentRepository.saveAll(attachments);
         }
+    }
+
+    public List<MessageDto> searchMessages(SearchStringDto searchStringDto) {
+        UUID authenticatedUserId = getAuthenticatedUserId();
+        List<MessageEntity> messages;
+        if (searchStringDto.getSearchString() != null) {
+            messages = messageRepository.searchMessages(
+                    searchStringDto.getSearchString().toLowerCase(), authenticatedUserId);
+        }
+        else {
+            messages = messageRepository.searchMessagesWithoutFilter(authenticatedUserId);
+        }
+
+        List<MessageDto> searchResults = new ArrayList<>();
+        for (MessageEntity message : messages) {
+            MessageDto searchResult = new MessageDto();
+            searchResult.setChatId(message.getChat().getId());
+            if (message.getChat().getChatType().equals(ChatType.CHAT)) {
+                searchResult.setChatName(message.getChat().getName());
+            }
+            else if (message.getChat().getChatType().equals(ChatType.DIALOGUE)) {
+                String fullName = integrationRequestsService
+                        .getFullNameAndAvatarId(message.getChat().getReceiverId()).get(0);
+                searchResult.setChatName(fullName);
+            }
+            searchResult.setMessageText(message.getMessageText());
+            searchResult.setMessageSendDate(message.getSendDate());
+
+            List<String> attachmentNames = new ArrayList<>();
+            for (AttachmentEntity attachment : message.getAttachments()) {
+                attachmentNames.add(attachment.getFileName());
+            }
+            searchResult.setFileNames(attachmentNames);
+
+            searchResults.add(searchResult);
+        }
+
+        return searchResults;
     }
 
     /**
