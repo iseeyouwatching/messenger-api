@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.chat.dto.CorrespondenceInfoDto;
 import ru.hits.messengerapi.chat.dto.MessageInCorrespondenceDto;
 import ru.hits.messengerapi.chat.dto.PaginationCorrespondancesDto;
-import ru.hits.messengerapi.chat.dto.PaginationWithFullNameFilterDto;
+import ru.hits.messengerapi.chat.dto.PaginationWithChatNameDto;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
 import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
@@ -76,13 +76,20 @@ public class CorrespondenceService {
             messageInCorrespondenceDtos.add(new MessageInCorrespondenceDto(message));
         }
 
+        Comparator<MessageInCorrespondenceDto> sortByDate =
+                Comparator.comparing(
+                        dto -> dto.getSendDate() != null ? dto.getSendDate() : LocalDateTime.MIN,
+                        Comparator.reverseOrder()
+                );
+        messageInCorrespondenceDtos.sort(sortByDate);
+
         return messageInCorrespondenceDtos;
     }
 
-    public List<PaginationCorrespondancesDto> getCorrespondances(PaginationWithFullNameFilterDto
-                                                                   paginationWithFullNameFilterDto) {
-        int pageNumber = paginationWithFullNameFilterDto.getPageInfo().getPageNumber();
-        int pageSize = paginationWithFullNameFilterDto.getPageInfo().getPageSize();
+    public List<PaginationCorrespondancesDto> getCorrespondances(PaginationWithChatNameDto
+                                                                         paginationWithChatNameDto) {
+        int pageNumber = paginationWithChatNameDto.getPageInfo().getPageNumber();
+        int pageSize = paginationWithChatNameDto.getPageInfo().getPageSize();
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
@@ -92,20 +99,29 @@ public class CorrespondenceService {
         List<ChatEntity> chatEntities = new ArrayList<>();
         for (ChatUserEntity chatUser: chatUserEntities) {
             chatRepository.findById(chatUser.getChatId()).ifPresent(chat -> {
-                if (paginationWithFullNameFilterDto.getFullNameFilter() == null) {
+                if (paginationWithChatNameDto.getChatName() == null) {
                     chatEntities.add(chat);
                 }
                 else {
                     if (chat.getChatType().equals(ChatType.CHAT) && chat.getName().toLowerCase().contains(
-                            paginationWithFullNameFilterDto.getFullNameFilter().toLowerCase())) {
+                            paginationWithChatNameDto.getChatName().toLowerCase())) {
                         chatEntities.add(chat);
                     }
                     else if (chat.getChatType().equals(ChatType.DIALOGUE))
                     {
-                        String fullName = integrationRequestsService.getFullNameAndAvatarId(chat.getReceiverId()).get(0);
-                        if (fullName.toLowerCase().contains(
-                                paginationWithFullNameFilterDto.getFullNameFilter().toLowerCase())) {
-                            chatEntities.add(chat);
+                        if (authenticatedUserId == chat.getReceiverId()) {
+                            if (chat.getName().toLowerCase().contains(
+                                    paginationWithChatNameDto.getChatName().toLowerCase())) {
+                                chatEntities.add(chat);
+                            }
+                        }
+                        else {
+                            String fullName = integrationRequestsService
+                                    .getFullNameAndAvatarId(chat.getReceiverId()).get(0);
+                            if (fullName.toLowerCase().contains(
+                                    paginationWithChatNameDto.getChatName().toLowerCase())) {
+                                chatEntities.add(chat);
+                            }
                         }
                     }
                 }
@@ -114,7 +130,7 @@ public class CorrespondenceService {
 
         List<PaginationCorrespondancesDto> result = new ArrayList<>();
         for (ChatEntity chat: chatEntities) {
-            MessageEntity message = messageRepository.findFirstByOrderBySendDateDesc(chat);
+            MessageEntity message = messageRepository.getFirstByChatOrderBySendDateDesc(chat);
             if (message == null) {
                 if (chat.getChatType().equals(ChatType.CHAT)) {
                     result.add(new PaginationCorrespondancesDto(
@@ -126,14 +142,25 @@ public class CorrespondenceService {
                     ));
                 }
                 else if (chat.getChatType().equals(ChatType.DIALOGUE)) {
-                    String fullName = integrationRequestsService.getFullNameAndAvatarId(chat.getReceiverId()).get(0);
-                    result.add(new PaginationCorrespondancesDto(
-                            chat.getId(),
-                            fullName,
-                            null,
-                            null,
-                            null
-                    ));
+                    if (authenticatedUserId.compareTo(chat.getReceiverId()) != 0) {
+                        String fullName = integrationRequestsService.getFullNameAndAvatarId(chat.getReceiverId()).get(0);
+                        result.add(new PaginationCorrespondancesDto(
+                                chat.getId(),
+                                fullName,
+                                null,
+                                null,
+                                null
+                        ));
+                    } else {
+                        result.add(new PaginationCorrespondancesDto(
+                                chat.getId(),
+                                chat.getName(),
+                                null,
+                                null,
+                                null
+                        ));
+                    }
+
                 }
             }
             else {
@@ -147,14 +174,24 @@ public class CorrespondenceService {
                     ));
                 }
                 else if (chat.getChatType().equals(ChatType.DIALOGUE)) {
-                    String fullName = integrationRequestsService.getFullNameAndAvatarId(chat.getReceiverId()).get(0);
-                    result.add(new PaginationCorrespondancesDto(
-                            chat.getId(),
-                            fullName,
-                            message.getMessageText(),
-                            message.getSendDate(),
-                            message.getSenderId()
-                    ));
+                    if (authenticatedUserId.compareTo(chat.getReceiverId()) != 0) {
+                        String fullName = integrationRequestsService.getFullNameAndAvatarId(chat.getReceiverId()).get(0);
+                        result.add(new PaginationCorrespondancesDto(
+                                chat.getId(),
+                                fullName,
+                                message.getMessageText(),
+                                message.getSendDate(),
+                                message.getSenderId()
+                        ));
+                    } else {
+                        result.add(new PaginationCorrespondancesDto(
+                                chat.getId(),
+                                chat.getName(),
+                                message.getMessageText(),
+                                message.getSendDate(),
+                                message.getSenderId()
+                        ));
+                    }
                 }
             }
         }

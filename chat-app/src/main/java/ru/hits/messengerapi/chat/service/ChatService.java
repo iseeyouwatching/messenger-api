@@ -13,6 +13,7 @@ import ru.hits.messengerapi.chat.mapper.ChatMapper;
 import ru.hits.messengerapi.chat.mapper.ChatUserMapper;
 import ru.hits.messengerapi.chat.repository.ChatRepository;
 import ru.hits.messengerapi.chat.repository.ChatUserRepository;
+import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.JwtUserData;
 
@@ -36,6 +37,11 @@ public class ChatService {
     @Transactional
     public void createChat(CreateChatDto createChatDto) {
         UUID authenticatedUserId = getAuthenticatedUserId();
+
+        if (createChatDto.getUsers().contains(authenticatedUserId)) {
+            throw new ConflictException("Пользователь не может добавить самого себя в чат.");
+        }
+
         integrationRequestsService.checkExistenceMultiUsersInFriends(authenticatedUserId, createChatDto.getUsers());
         ChatEntity chat = chatMapper.createChatDtoToChat(createChatDto, authenticatedUserId);
         chat = chatRepository.save(chat);
@@ -49,12 +55,22 @@ public class ChatService {
     @Transactional
     public ChatEntity createDialogue(UUID receiverId) {
         UUID authenticatedUserId = getAuthenticatedUserId();
+
+        if (chatRepository.findBySenderIdAndReceiverId(authenticatedUserId, receiverId).isPresent()) {
+            throw new ConflictException("Пользователь не может создать больше одного диалога с самим собой.");
+        }
+
         ChatEntity chat = chatMapper.senderIdAndreceiverIdToChat(authenticatedUserId, receiverId);
         chat = chatRepository.save(chat);
 
         List<UUID> listOfIDs = new ArrayList<>();
-        listOfIDs.add(receiverId);
-        listOfIDs.add(authenticatedUserId);
+        if (authenticatedUserId.compareTo(receiverId) == 0) {
+            listOfIDs.add(receiverId);
+        }
+        else {
+            listOfIDs.add(receiverId);
+            listOfIDs.add(authenticatedUserId);
+        }
 
         List<ChatUserEntity> chatUserEntityList =
                 chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.getId(), listOfIDs);
@@ -65,14 +81,17 @@ public class ChatService {
 
     @Transactional
     public void updateChat(UpdateChatDto updateChatDto) {
-        UUID authenticatedUserId = getAuthenticatedUserId();
-        integrationRequestsService.checkExistenceMultiUsersInFriends(authenticatedUserId, updateChatDto.getUsers());
-
         Optional<ChatEntity> chat = chatRepository.findById(updateChatDto.getId());
-
         if (chat.isEmpty()) {
             throw new NotFoundException("Чата с ID " + updateChatDto.getId() + " не существует.");
         }
+
+        UUID authenticatedUserId = getAuthenticatedUserId();
+        if (updateChatDto.getUsers().contains(authenticatedUserId)) {
+            throw new ConflictException("Пользователь не может добавить самого себя в чат.");
+        }
+        integrationRequestsService.checkExistenceMultiUsersInFriends(authenticatedUserId, updateChatDto.getUsers());
+
 
         if (updateChatDto.getName() != null) {
             chat.get().setName(updateChatDto.getName());

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.chat.dto.CorrespondenceInfoDto;
 import ru.hits.messengerapi.chat.dto.MessageInCorrespondenceDto;
 import ru.hits.messengerapi.chat.dto.PaginationCorrespondancesDto;
-import ru.hits.messengerapi.chat.dto.PaginationWithFullNameFilterDto;
+import ru.hits.messengerapi.chat.dto.PaginationWithChatNameDto;
 import ru.hits.messengerapi.chat.service.CorrespondenceService;
 
 import javax.validation.Valid;
@@ -35,9 +35,9 @@ public class CorrespondenceController {
 
     @PostMapping("/get")
     public ResponseEntity<List<PaginationCorrespondancesDto>> getCorrespondances(@RequestBody @Valid
-                                               PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+                                                                                 PaginationWithChatNameDto paginationWithChatNameDto) {
         return new ResponseEntity<>(
-                correspondenceService.getCorrespondances(paginationWithFullNameFilterDto),HttpStatus.OK);
+                correspondenceService.getCorrespondances(paginationWithChatNameDto),HttpStatus.OK);
     }
 
 }

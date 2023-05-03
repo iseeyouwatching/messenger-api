@@ -44,7 +44,10 @@ public class MessageService {
 
         UUID senderId = getAuthenticatedUserId();
         UUID receiverId = dialogueMessageDto.getReceiverId();
-        integrationRequestsService.checkExistenceInFriends(senderId, receiverId);
+
+        if (senderId.compareTo(receiverId) != 0) {
+            integrationRequestsService.checkExistenceInFriends(senderId, receiverId);
+        }
 
         Optional<ChatEntity> chat = chatRepository.findBySenderIdAndReceiverId(senderId, receiverId);
         if (chat.isEmpty()) {
@@ -153,9 +156,14 @@ public class MessageService {
                 searchResult.setChatName(message.getChat().getName());
             }
             else if (message.getChat().getChatType().equals(ChatType.DIALOGUE)) {
-                String fullName = integrationRequestsService
-                        .getFullNameAndAvatarId(message.getChat().getReceiverId()).get(0);
-                searchResult.setChatName(fullName);
+                if (authenticatedUserId != message.getChat().getReceiverId()) {
+                    String fullName = integrationRequestsService
+                            .getFullNameAndAvatarId(message.getChat().getReceiverId()).get(0);
+                    searchResult.setChatName(fullName);
+                }
+                else {
+                    searchResult.setChatName(message.getChat().getName());
+                }
             }
             searchResult.setMessageText(message.getMessageText());
             searchResult.setMessageSendDate(message.getSendDate());

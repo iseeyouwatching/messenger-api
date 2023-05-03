@@ -25,13 +25,24 @@ public class ChatMapper {
     }
 
     public ChatEntity senderIdAndreceiverIdToChat(UUID senderId, UUID receiverId) {
-        return ChatEntity
-                .builder()
-                .chatType(ChatType.DIALOGUE)
-                .creationDate(LocalDate.now())
-                .senderId(senderId)
-                .receiverId(receiverId)
-                .build();
+        if (senderId.compareTo(receiverId) != 0) {
+            return ChatEntity
+                    .builder()
+                    .chatType(ChatType.DIALOGUE)
+                    .creationDate(LocalDate.now())
+                    .senderId(senderId)
+                    .receiverId(receiverId)
+                    .build();
+        }
+        else {
+            return ChatEntity
+                    .builder()
+                    .chatType(ChatType.DIALOGUE)
+                    .name("Избранное")
+                    .creationDate(LocalDate.now())
+                    .senderId(senderId)
+                    .receiverId(receiverId)
+                    .build();
+        }
     }
-
 }

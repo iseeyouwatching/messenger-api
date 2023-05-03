@@ -16,8 +16,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, UUID> {
 
     List<MessageEntity> findAllBySenderId(UUID senderId);
 
-    @Query("select m from MessageEntity m where m.chat = :chat order by m.sendDate desc")
-    MessageEntity findFirstByOrderBySendDateDesc(ChatEntity chat);
+    MessageEntity getFirstByChatOrderBySendDateDesc(ChatEntity chat);
 
     @Query("SELECT DISTINCT m FROM MessageEntity m " +
             "LEFT JOIN FETCH m.attachments a " +

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PaginationWithFullNameFilterDto {
+public class PaginationWithChatNameDto {
 
 
     /**
@@ -22,6 +22,6 @@ public class PaginationWithFullNameFilterDto {
     /**
      * Фильтр по ФИО.
      */
-    private String fullNameFilter;
+    private String chatName;
 
 }
