@@ -156,7 +156,7 @@ public class MessageService {
                 searchResult.setChatName(message.getChat().getName());
             }
             else if (message.getChat().getChatType().equals(ChatType.DIALOGUE)) {
-                if (authenticatedUserId != message.getChat().getReceiverId()) {
+                if (authenticatedUserId.compareTo(message.getChat().getReceiverId()) != 0) {
                     String fullName = integrationRequestsService
                             .getFullNameAndAvatarId(message.getChat().getReceiverId()).get(0);
                     searchResult.setChatName(fullName);
@@ -169,7 +169,7 @@ public class MessageService {
             searchResult.setMessageSendDate(message.getSendDate());
 
             List<String> attachmentNames = new ArrayList<>();
-            for (AttachmentEntity attachment : message.getAttachments()) {
+            for (AttachmentEntity attachment : attachmentRepository.findAllByMessageId(message.getId())) {
                 attachmentNames.add(attachment.getFileName());
             }
             searchResult.setFileNames(attachmentNames);
