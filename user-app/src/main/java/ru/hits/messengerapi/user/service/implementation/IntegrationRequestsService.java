@@ -1,11 +1,13 @@
 package ru.hits.messengerapi.user.service.implementation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.user.service.IntegrationRequestsServiceInterface;
 
@@ -54,6 +56,7 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
         HttpEntity<Map<String, UUID>> requestEntity = new HttpEntity<>(idMap, headers);
 
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
         String url = integrationUsersRequestCheckExistenceInBlacklist;
         ResponseEntity<Boolean> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);

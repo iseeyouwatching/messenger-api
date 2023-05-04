@@ -63,6 +63,7 @@ public class IntegrationRequestsService {
      */
     public List<String> getFullNameAndAvatarId(UUID id) {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
         String url = integrationUsersRequestGetFullNameAndAvatar;
 
         HttpHeaders headers = new HttpHeaders();

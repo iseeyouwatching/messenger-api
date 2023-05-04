@@ -90,6 +90,7 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
     @Override
     public String getFullName(UUID id) {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
         String url = integrationUsersRequestGetFullName;
 
         HttpHeaders headers = new HttpHeaders();
