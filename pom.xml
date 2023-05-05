@@ -20,11 +20,14 @@
 		<module>friends-app</module>
 		<module>gateway</module>
 		<module>chat-app</module>
+		<module>notifications-app</module>
 	</modules>
 	<properties>
 		<java.version>11</java.version>
 		<spring-boot.version>2.6.6</spring-boot.version>
 		<spring-cloud.version>2021.0.6</spring-cloud.version>
+		<spring-cloud-stream.version>3.2.6</spring-cloud-stream.version>
+		<spring-cloud-amqp.version>2.7.9</spring-cloud-amqp.version>
 		<spring-gateway.version>3.1.6</spring-gateway.version>
 		<lombok.version>1.18.24</lombok.version>
 	</properties>
@@ -95,6 +98,26 @@
 				<groupId>com.auth0</groupId>
 				<artifactId>java-jwt</artifactId>
 				<version>4.3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-amqp</artifactId>
+				<version>${spring-cloud-amqp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-stream</artifactId>
+				<version>${spring-cloud-stream.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+				<version>${spring-cloud-stream.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+				<version>${spring-cloud-stream.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
