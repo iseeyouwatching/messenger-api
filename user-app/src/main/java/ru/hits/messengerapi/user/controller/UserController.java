@@ -3,13 +3,13 @@ package ru.hits.messengerapi.user.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.user.dto.*;
-import ru.hits.messengerapi.user.service.implementation.UserService;
+import ru.hits.messengerapi.user.service.UserService;
 
 import javax.validation.Valid;
+import java.net.UnknownHostException;
 
 /**
  * Контроллер для работы с пользователем.
@@ -54,7 +54,8 @@ public class UserController {
      * @return {@link ResponseEntity} с {@link UserProfileDto} и заголовком авторизации.
      */
     @PostMapping("/login")
-    public ResponseEntity<UserProfileDto> userSignIn(@RequestBody @Valid UserSignInDto userSignInDto) {
+    public ResponseEntity<UserProfileDto> userSignIn(@RequestBody @Valid UserSignInDto userSignInDto)
+            throws UnknownHostException {
         log.info("Получен запрос на вход для пользователя с login {}", userSignInDto.getLogin());
         UserProfileAndTokenDto userProfileAndTokenDto = userService.userSignIn(userSignInDto);
 

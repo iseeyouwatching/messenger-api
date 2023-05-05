@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.service.implementation;
+package ru.hits.messengerapi.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
-import ru.hits.messengerapi.user.service.IntegrationUserServiceInterface;
 
 import java.util.ArrayList;
 import java.util.List;

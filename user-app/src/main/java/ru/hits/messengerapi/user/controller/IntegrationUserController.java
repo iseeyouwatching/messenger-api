@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hits.messengerapi.user.service.implementation.IntegrationUserService;
+import ru.hits.messengerapi.user.service.IntegrationUserService;
 
 import java.util.List;
 import java.util.Map;

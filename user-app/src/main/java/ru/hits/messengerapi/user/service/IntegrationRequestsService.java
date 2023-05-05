@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.service.implementation;
+package ru.hits.messengerapi.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
-import ru.hits.messengerapi.user.service.IntegrationRequestsServiceInterface;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class IntegrationRequestsService implements IntegrationRequestsServiceInterface {
+public class IntegrationRequestsService {
 
     /**
      * Свойства безопасности приложения.
@@ -43,7 +42,6 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
      * @param blockedUserId ID заблокированного пользователя.
      * @return true - пользователь находится в черном списке другого пользователя, false - не находится.
      */
-    @Override
     public Boolean checkExistenceInBlacklist(UUID targetUserId, UUID blockedUserId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
