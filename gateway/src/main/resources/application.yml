@@ -17,3 +17,7 @@ spring:
           uri: http://localhost:8193/
           predicates:
             - Path=/api/chat/**
+        - id: notifications_route
+          uri: http://localhost:8194/
+          predicates:
+            - Path=/api/notifications/**
