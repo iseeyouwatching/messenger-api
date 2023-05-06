@@ -308,6 +308,13 @@ public class FriendsService implements FriendsServiceInterface {
 
             log.info("Пользователь с ID {} удален из списка друзей пользователя с ID {}.",
                     addedUserId, targetUserId);
+
+            NewNotificationDto newNotificationDto = NewNotificationDto.builder()
+                    .userId(friend.get().getAddedUserId())
+                    .type(NotificationType.FRIEND_REMOVE)
+                    .text("Пользователь с ID " + targetUserId + " удалил Вас из друзей.")
+                    .build();
+            sendByStreamBridge(newNotificationDto);
         }
         else {
             log.error("Пользователь с ID {} уже удален из списка друзей пользователя с ID {}.",
