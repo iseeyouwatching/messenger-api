@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.hits.messengerapi.common.dto.ApiError;
-import ru.hits.messengerapi.common.exception.BadRequestException;
-import ru.hits.messengerapi.common.exception.ConflictException;
-import ru.hits.messengerapi.common.exception.NotFoundException;
-import ru.hits.messengerapi.common.exception.UnauthorizedException;
+import ru.hits.messengerapi.common.exception.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -154,6 +151,14 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
                 new ApiError("Непредвиденная внутренняя ошибка сервера"),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> handleForbiddenException(ForbiddenException exception,
+                                                             WebRequest request
+    ) {
+        logError(request, exception);
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.FORBIDDEN);
     }
 
     /**

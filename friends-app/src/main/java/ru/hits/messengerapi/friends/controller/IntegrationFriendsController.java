@@ -23,8 +23,8 @@ public class IntegrationFriendsController {
 
     @PostMapping("/check-existence-in-friends")
     public ResponseEntity<Boolean> checkExistenceInFriends(@RequestBody List<UUID> uuids) {
-        boolean result = integrationFriendsService.checkExistenceInFriends(uuids.get(0), uuids.get(1));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(integrationFriendsService.checkExistenceInFriends(uuids.get(0), uuids.get(1)),
+                HttpStatus.OK);
     }
 
     @PostMapping("/check-multi-existence-in-friends")

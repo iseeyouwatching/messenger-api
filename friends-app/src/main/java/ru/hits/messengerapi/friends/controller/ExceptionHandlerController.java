@@ -11,11 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.hits.messengerapi.common.dto.ApiError;
-import ru.hits.messengerapi.common.exception.BadRequestException;
-import ru.hits.messengerapi.common.exception.ConflictException;
-import ru.hits.messengerapi.common.exception.NotFoundException;
-import ru.hits.messengerapi.common.exception.UnauthorizedException;
-import ru.hits.messengerapi.common.exception.MultiForbiddenException;
+import ru.hits.messengerapi.common.exception.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,9 +157,15 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiError> handleMultiForbiddenException(MultiForbiddenException exception,
                                                                  WebRequest request
     ) {
-        ApiError apiError = new ApiError(exception.getMessages());
-        System.out.println(apiError);
         return new ResponseEntity<>(new ApiError(exception.getMessages()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> handleForbiddenException(ForbiddenException exception,
+                                                             WebRequest request
+    ) {
+        logError(request, exception);
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.FORBIDDEN);
     }
 
     /**

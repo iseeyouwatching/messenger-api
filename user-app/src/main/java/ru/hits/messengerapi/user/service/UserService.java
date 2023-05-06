@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.hits.messengerapi.common.dto.MessageDto;
+import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
@@ -134,13 +134,13 @@ public class UserService {
         );
 
         log.info("Пользователь с логином {} авторизовался в системе.", user.get().getLogin());
-        MessageDto messageDto = MessageDto.builder()
+        NewNotificationDto newNotificationDto = NewNotificationDto.builder()
                 .userId(user.get().getId())
                 .type(NotificationType.LOGIN)
                 .text("Был выполнен вход в систему в "  + LocalDateTime.now() +
                         " с использованием IP-адреса " + InetAddress.getLocalHost().getHostAddress() + ".")
                 .build();
-        sendByStreamBridge(messageDto);
+        sendByStreamBridge(newNotificationDto);
 
         return userProfileAndTokenDto;
     }
@@ -341,8 +341,8 @@ public class UserService {
         return userData.getId();
     }
 
-    private void sendByStreamBridge(MessageDto messageDto) {
-        streamBridge.send("userSuccessfulLoginEvent-out-0", messageDto);
+    private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
+        streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }
 
 }

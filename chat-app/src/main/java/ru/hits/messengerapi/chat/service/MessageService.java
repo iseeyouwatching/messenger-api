@@ -2,19 +2,21 @@ package ru.hits.messengerapi.chat.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.chat.dto.*;
 import ru.hits.messengerapi.chat.entity.AttachmentEntity;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
-import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
 import ru.hits.messengerapi.chat.enumeration.ChatType;
 import ru.hits.messengerapi.chat.repository.AttachmentRepository;
 import ru.hits.messengerapi.chat.repository.ChatRepository;
 import ru.hits.messengerapi.chat.repository.ChatUserRepository;
 import ru.hits.messengerapi.chat.repository.MessageRepository;
+import ru.hits.messengerapi.common.dto.NewNotificationDto;
+import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.ForbiddenException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.JwtUserData;
@@ -37,6 +39,7 @@ public class MessageService {
     private final ChatUserRepository chatUserRepository;
     private final ChatService chatService;
     private final IntegrationRequestsService integrationRequestsService;
+    private final StreamBridge streamBridge;
 
     @Transactional
     public void sendMessageToDialogue(DialogueMessageDto dialogueMessageDto) {
@@ -87,6 +90,12 @@ public class MessageService {
             }
             attachmentRepository.saveAll(attachments);
         }
+        NewNotificationDto newNotificationDto = NewNotificationDto.builder()
+                .userId(receiverId)
+                .type(NotificationType.MESSAGE)
+                .text("Поступило новое личное сообщение от пользователя с ID " + senderId + ".")
+                .build();
+        sendByStreamBridge(newNotificationDto);
     }
 
     @Transactional
@@ -189,6 +198,10 @@ public class MessageService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         return userData.getId();
+    }
+
+    private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
+        streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }
 
 }

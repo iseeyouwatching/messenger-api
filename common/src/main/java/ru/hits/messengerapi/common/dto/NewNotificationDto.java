@@ -4,12 +4,11 @@ import lombok.Builder;
 import lombok.Data;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @Builder
-public class MessageDto {
+public class NewNotificationDto {
 
     private UUID userId;
     private NotificationType type;
