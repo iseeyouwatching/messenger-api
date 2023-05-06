@@ -3,7 +3,7 @@ package ru.hits.messengerapi.notifications.entity;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import ru.hits.messengerapi.notifications.enumeration.NotificationStatus;
-import ru.hits.messengerapi.notifications.enumeration.NotificationType;
+import ru.hits.messengerapi.common.enumeration.NotificationType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @Table(name = "notification")
-public class Notification {
+public class NotificationEntity {
 
     /**
      * Идентификатор сущности уведомления.
