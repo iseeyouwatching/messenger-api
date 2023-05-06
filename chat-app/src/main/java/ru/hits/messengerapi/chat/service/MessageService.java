@@ -93,7 +93,8 @@ public class MessageService {
         NewNotificationDto newNotificationDto = NewNotificationDto.builder()
                 .userId(receiverId)
                 .type(NotificationType.MESSAGE)
-                .text("Поступило новое личное сообщение от пользователя с ID " + senderId + ".")
+                .text("Поступило новое личное сообщение от пользователя с ID " + senderId
+                        + " и ФИО " + fullNameAndAvatarId.get(0) + ".")
                 .build();
         sendByStreamBridge(newNotificationDto);
     }

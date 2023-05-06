@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.friends.service.implementation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import ru.hits.messengerapi.common.dto.NewNotificationDto;
+import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
@@ -20,7 +23,9 @@ import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
+import java.net.InetAddress;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,23 +56,28 @@ public class FriendsService implements FriendsServiceInterface {
      */
     private final BlacklistService blacklistService;
 
+    private final StreamBridge streamBridge;
+
 
     /**
      * Конструктор класса {@link FriendsService}.
      *
-     * @param friendsRepository репозиторий друзей.
+     * @param friendsRepository          репозиторий друзей.
      * @param checkPaginationInfoService вспомогательный сервис для проверки данных для пагинации.
      * @param integrationRequestsService сервис, в котором хранится логика отправки интеграционных запросов.
-     * @param blacklistService сервис черного списка.
+     * @param blacklistService           сервис черного списка.
+     * @param streamBridge
      */
     public FriendsService(FriendsRepository friendsRepository,
                           CheckPaginationInfoService checkPaginationInfoService,
                           IntegrationRequestsService integrationRequestsService,
-                          @Lazy BlacklistService blacklistService) {
+                          @Lazy BlacklistService blacklistService,
+                          StreamBridge streamBridge) {
         this.friendsRepository = friendsRepository;
         this.checkPaginationInfoService = checkPaginationInfoService;
         this.integrationRequestsService = integrationRequestsService;
         this.blacklistService = blacklistService;
+        this.streamBridge = streamBridge;
     }
 
     /**
@@ -208,6 +218,15 @@ public class FriendsService implements FriendsServiceInterface {
                 friendsRepository.save(mutualFriendship.get());
 
                 log.info("Пользователи {} и {} стали друзьями.", targetUserId, addPersonDto.getId());
+
+                NewNotificationDto newNotificationDto = NewNotificationDto.builder()
+                        .userId(addPersonDto.getId())
+                        .type(NotificationType.FRIEND_REQUEST)
+                        .text("Пользователь с ID " + targetUserId + " и ФИО "
+                                + targetUserFullName + " добавил Вас в друзья.")
+                        .build();
+                sendByStreamBridge(newNotificationDto);
+
                 return new FriendDto(friend.get());
             }
         }
@@ -229,6 +248,14 @@ public class FriendsService implements FriendsServiceInterface {
         friendsRepository.save(mutualFriendship);
 
         log.info("Пользователи {} и {} стали друзьями.", targetUserId, addPersonDto.getId());
+
+        NewNotificationDto newNotificationDto = NewNotificationDto.builder()
+                .userId(addPersonDto.getId())
+                .type(NotificationType.FRIEND_REQUEST)
+                .text("Пользователь с ID " + targetUserId + " и ФИО "
+                        + targetUserFullName + " добавил Вас в друзья.")
+                .build();
+        sendByStreamBridge(newNotificationDto);
 
         return new FriendDto(newFriend);
     }
@@ -359,6 +386,10 @@ public class FriendsService implements FriendsServiceInterface {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData userData = (JwtUserData) authentication.getPrincipal();
         return userData.getId();
+    }
+
+    private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
+        streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }
 
 }
