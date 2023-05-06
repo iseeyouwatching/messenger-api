@@ -58,7 +58,6 @@ public class FriendsService implements FriendsServiceInterface {
 
     private final StreamBridge streamBridge;
 
-
     /**
      * Конструктор класса {@link FriendsService}.
      *

@@ -253,6 +253,13 @@ public class BlacklistService implements BlacklistServiceInterface {
             blacklistRepository.save(blockedUser.get());
             log.info("Пользователь с ID {} успешно удален из черного списка у пользователя с ID {}.",
                     blockedUserId, targetUserId);
+
+            NewNotificationDto newNotificationDto = NewNotificationDto.builder()
+                    .userId(blockedUserId)
+                    .type(NotificationType.REMOVE_FROM_BLACKLIST)
+                    .text("Пользователь с ID " + targetUserId + " удалил Вас из чёрного списка.")
+                    .build();
+            sendByStreamBridge(newNotificationDto);
         }
         else {
             log.warn("Пользователь с ID {} уже удален из черного списка у пользователя с ID {}.",
