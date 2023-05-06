@@ -2,6 +2,7 @@ package ru.hits.messengerapi.friends.service.implementation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import ru.hits.messengerapi.common.dto.NewNotificationDto;
+import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
@@ -57,6 +60,8 @@ public class BlacklistService implements BlacklistServiceInterface {
      * Репозиторий для работы с сущностью {@link FriendEntity}.
      */
     private final FriendsRepository friendsRepository;
+    private final StreamBridge streamBridge;
+
 
     /**
      * Получить заблокированных пользователей с информацией о странице и фильтре по ФИО для целевого пользователя.
@@ -187,6 +192,14 @@ public class BlacklistService implements BlacklistServiceInterface {
             log.info("Пользователь с ID {} и ФИО {} уже существует в черном списке пользователя " +
                             "с ID {} и ФИО {}, поэтому мы его только обновляем.",
                     addPersonDto.getId(), addPersonDto.getFullName(), targetUserId, userData.getFullName());
+
+            NewNotificationDto newNotificationDto = NewNotificationDto.builder()
+                    .userId(addPersonDto.getId())
+                    .type(NotificationType.ADDED_TO_BLACKLIST)
+                    .text("Пользователь с ID " + targetUserId + " добавил Вас в чёрный список.")
+                    .build();
+            sendByStreamBridge(newNotificationDto);
+
             return new BlockedUserDto(blockedUser.get());
         }
 
@@ -199,6 +212,13 @@ public class BlacklistService implements BlacklistServiceInterface {
         newBlockedUser = blacklistRepository.save(newBlockedUser);
         log.info("Пользователь с ID {} и ФИО {} добавлен в черный список пользователя с ID {} и ФИО {}.",
                 addPersonDto.getId(), addPersonDto.getFullName(), targetUserId, userData.getFullName());
+
+        NewNotificationDto newNotificationDto = NewNotificationDto.builder()
+                .userId(addPersonDto.getId())
+                .type(NotificationType.ADDED_TO_BLACKLIST)
+                .text("Пользователь с ID " + targetUserId + " добавил Вас в чёрный список.")
+                .build();
+        sendByStreamBridge(newNotificationDto);
 
         return new BlockedUserDto(newBlockedUser);
     }
@@ -360,5 +380,8 @@ public class BlacklistService implements BlacklistServiceInterface {
         return userData.getId();
     }
 
+    private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
+        streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
+    }
 
 }

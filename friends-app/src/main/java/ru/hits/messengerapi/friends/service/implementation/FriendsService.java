@@ -312,7 +312,8 @@ public class FriendsService implements FriendsServiceInterface {
             NewNotificationDto newNotificationDto = NewNotificationDto.builder()
                     .userId(friend.get().getAddedUserId())
                     .type(NotificationType.FRIEND_REMOVE)
-                    .text("Пользователь с ID " + targetUserId + " удалил Вас из друзей.")
+                    .text("Пользователь с ID " + targetUserId + " и ФИО "
+                            + addedFriend.get().getFriendName() + " удалил Вас из друзей.")
                     .build();
             sendByStreamBridge(newNotificationDto);
         }
