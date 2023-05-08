@@ -34,10 +34,10 @@ public class CorrespondenceController {
     }
 
     @PostMapping("/get")
-    public ResponseEntity<List<PaginationCorrespondancesDto>> getCorrespondances(@RequestBody @Valid
+    public ResponseEntity<List<PaginationCorrespondancesDto>> getCorrespondences(@RequestBody @Valid
                                                                                  PaginationWithChatNameDto paginationWithChatNameDto) {
         return new ResponseEntity<>(
-                correspondenceService.getCorrespondances(paginationWithChatNameDto),HttpStatus.OK);
+                correspondenceService.getCorrespondences(paginationWithChatNameDto),HttpStatus.OK);
     }
 
 }

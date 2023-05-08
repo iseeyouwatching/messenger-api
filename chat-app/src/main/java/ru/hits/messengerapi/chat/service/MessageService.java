@@ -77,16 +77,13 @@ public class MessageService {
 
         if (dialogueMessageDto.getAttachments() != null) {
             List<AttachmentEntity> attachments = new ArrayList<>();
-            for (AttachmentDto attachmentDto: dialogueMessageDto.getAttachments()) {
-                if (attachmentDto.getFileName() != null && attachmentDto.getFileId() != null) {
-                    AttachmentEntity attachment = AttachmentEntity
-                            .builder()
+            for (UUID attachmentId: dialogueMessageDto.getAttachments()) {
+                    AttachmentEntity attachment = AttachmentEntity.builder()
                             .message(message)
-                            .fileId(attachmentDto.getFileId())
-                            .fileName(attachmentDto.getFileName())
+                            .fileId(attachmentId)
+                            .fileName(null)
                             .build();
                     attachments.add(attachment);
-                }
             }
             attachmentRepository.saveAll(attachments);
         }
@@ -132,16 +129,13 @@ public class MessageService {
 
         if (chatMessageDto.getAttachments() != null) {
             List<AttachmentEntity> attachments = new ArrayList<>();
-            for (AttachmentDto attachmentDto: chatMessageDto.getAttachments()) {
-                if (attachmentDto.getFileName() != null && attachmentDto.getFileId() != null) {
-                    AttachmentEntity attachment = AttachmentEntity
-                            .builder()
-                            .message(message)
-                            .fileId(attachmentDto.getFileId())
-                            .fileName(attachmentDto.getFileName())
-                            .build();
-                    attachments.add(attachment);
-                }
+            for (UUID attachmentId: chatMessageDto.getAttachments()) {
+                AttachmentEntity attachment = AttachmentEntity.builder()
+                        .message(message)
+                        .fileId(attachmentId)
+                        .fileName(null)
+                        .build();
+                attachments.add(attachment);
             }
             attachmentRepository.saveAll(attachments);
         }

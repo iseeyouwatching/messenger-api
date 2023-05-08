@@ -86,7 +86,7 @@ public class CorrespondenceService {
         return messageInCorrespondenceDtos;
     }
 
-    public List<PaginationCorrespondancesDto> getCorrespondances(PaginationWithChatNameDto
+    public List<PaginationCorrespondancesDto> getCorrespondences(PaginationWithChatNameDto
                                                                          paginationWithChatNameDto) {
         int pageNumber = paginationWithChatNameDto.getPageInfo().getPageNumber();
         int pageSize = paginationWithChatNameDto.getPageInfo().getPageSize();

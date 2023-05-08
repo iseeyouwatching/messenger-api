@@ -18,6 +18,9 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+//    @PostMapping("/get")
+//    public ResponseEntity
+
     @GetMapping("/unread-count")
     public ResponseEntity<Long> getUnreadCount() {
         return new ResponseEntity<>(notificationService.getUnreadCount(), HttpStatus.OK);

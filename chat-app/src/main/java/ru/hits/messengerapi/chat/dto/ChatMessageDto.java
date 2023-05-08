@@ -22,6 +22,6 @@ public class ChatMessageDto {
     @Size(max = 500, message = "Сообщение должно содержать не больше 500 символов.")
     private String messageText;
 
-    private List<AttachmentDto> attachments;
+    private List<UUID> attachments;
 
 }
