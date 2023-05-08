@@ -41,7 +41,10 @@ public class IntegrationFriendsService {
         }
         List<String> result = new ArrayList<>();
         for (int i = 1; i < uuids.size(); i++) {
-            if (!friendsIDs.contains(uuids.get(i))) {
+            if (!friendsIDs.contains(uuids.get(i))
+                    || (friendsIDs.contains(uuids.get(i))
+                    && friendsRepository.findByTargetUserIdAndAddedUserId(uuids.get(0),
+                    uuids.get(i)).get().getIsDeleted())) {
                 result.add("Пользователь с ID " + uuids.get(0) + " не может добавить в чат пользователя с ID "
                         + uuids.get(i) + ", так как они не являются друзьями.");
             }

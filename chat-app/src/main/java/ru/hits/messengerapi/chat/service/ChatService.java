@@ -15,6 +15,7 @@ import ru.hits.messengerapi.chat.mapper.ChatUserMapper;
 import ru.hits.messengerapi.chat.repository.ChatRepository;
 import ru.hits.messengerapi.chat.repository.ChatUserRepository;
 import ru.hits.messengerapi.common.exception.ConflictException;
+import ru.hits.messengerapi.common.exception.ForbiddenException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.JwtUserData;
 
@@ -87,6 +88,12 @@ public class ChatService {
         }
 
         UUID authenticatedUserId = getAuthenticatedUserId();
+        if (chatUserRepository.findByChatIdAndUserId(updateChatDto.getId(), authenticatedUserId).isEmpty()) {
+            throw new ForbiddenException("Пользователь с ID " + authenticatedUserId
+                    + " не может изменить данные чата с ID " + updateChatDto.getId()
+                    + ", так как не состоит в нём.");
+        }
+
         if (updateChatDto.getUsers().contains(authenticatedUserId)) {
             throw new ConflictException("Пользователь не может добавить самого себя в чат.");
         }
