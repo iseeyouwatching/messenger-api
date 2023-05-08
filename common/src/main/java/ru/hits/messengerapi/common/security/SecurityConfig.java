@@ -83,7 +83,7 @@ public class SecurityConfig {
                         && !request.getServletPath().startsWith(securityProps.getJwtToken().getRootPath())
                         && !request.getServletPath().startsWith(securityProps.getIntegrations().getRootPath()))
                 .authorizeRequests()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .and();
         return finalize(http);
     }
