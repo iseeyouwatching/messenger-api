@@ -23,6 +23,7 @@ import ru.hits.messengerapi.common.security.JwtUserData;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,11 +88,18 @@ public class MessageService {
             }
             attachmentRepository.saveAll(attachments);
         }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDateTime = LocalDateTime.now().format(formatter);
+
         NewNotificationDto newNotificationDto = NewNotificationDto.builder()
                 .userId(receiverId)
                 .type(NotificationType.MESSAGE)
                 .text("Поступило новое личное сообщение от пользователя с ID " + senderId
-                        + " и ФИО " + fullNameAndAvatarId.get(0) + ".")
+                        + " и ФИО " + fullNameAndAvatarId.get(0) + "."
+                        + " Дата и время отправки сообщения: " + formattedDateTime + "." + " Часть сообщения: '"
+                        + dialogueMessageDto.getMessageText()
+                        .substring(0, Math.min(dialogueMessageDto.getMessageText().length(), 100)) + "'.")
                 .build();
         sendByStreamBridge(newNotificationDto);
     }

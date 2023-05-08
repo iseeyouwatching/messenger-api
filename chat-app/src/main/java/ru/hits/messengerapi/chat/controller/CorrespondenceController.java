@@ -1,5 +1,8 @@
 package ru.hits.messengerapi.chat.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,20 +22,33 @@ import java.util.UUID;
 @RequestMapping("/api/chat/correspondence")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Переписки.")
 public class CorrespondenceController {
 
     private final CorrespondenceService correspondenceService;
 
+    @Operation(
+            summary = "Получить информацию о переписке по ID.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @GetMapping("/{id}/get-info")
     public ResponseEntity<CorrespondenceInfoDto> getCorrespondenceInfo(@PathVariable("id") UUID id) {
         return new ResponseEntity<>(correspondenceService.getCorrespondenceInfo(id), HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Посмотреть переписку.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @GetMapping("/{id}/view")
     public ResponseEntity<List<MessageInCorrespondenceDto>> viewCorrespondence(@PathVariable("id") UUID id) {
         return new ResponseEntity<>(correspondenceService.viewCorrespondence(id), HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Посмотреть список переписок.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @PostMapping("/get")
     public ResponseEntity<List<PaginationCorrespondancesDto>> getCorrespondences(@RequestBody @Valid
                                                                                  PaginationWithChatNameDto paginationWithChatNameDto) {

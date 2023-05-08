@@ -5,8 +5,6 @@ import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.notifications.entity.NotificationEntity;
 import ru.hits.messengerapi.notifications.enumeration.NotificationStatus;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 

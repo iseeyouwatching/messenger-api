@@ -97,9 +97,7 @@ public class ChatService {
             chat.get().setName(updateChatDto.getName());
         }
 
-        if (updateChatDto.getAvatar() != null) {
-            chat.get().setAvatarId(updateChatDto.getAvatar());
-        }
+        chat.get().setAvatarId(updateChatDto.getAvatar());
 
         if (updateChatDto.getUsers() != null) {
             List<UUID> listOfIDs = updateChatDto.getUsers();
