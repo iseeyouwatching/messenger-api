@@ -3,6 +3,8 @@ package ru.hits.messengerapi.notifications.dto;
 import lombok.*;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,6 +16,6 @@ public class NotificationsFiltersDto {
 
     private String textFilter;
 
-    private NotificationType typeFilter;
+    private List<NotificationType> types;
 
 }

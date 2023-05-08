@@ -21,7 +21,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/notifications_db
     user: hits
     password: hits
-    enabled: false
   datasource:
     url: jdbc:postgresql://localhost:5432/notifications_db
     username: hits
@@ -29,7 +28,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}

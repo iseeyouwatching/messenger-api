@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.notifications.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface NotificationRepository extends JpaRepository<NotificationEntity, UUID> {
+public interface NotificationRepository extends JpaRepository<NotificationEntity, UUID>,
+        JpaSpecificationExecutor<NotificationEntity> {
 
     Long countByUserIdAndStatus(UUID userId, NotificationStatus status);
 

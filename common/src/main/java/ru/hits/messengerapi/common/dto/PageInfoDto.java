@@ -15,11 +15,11 @@ public class PageInfoDto {
     /**
      * Номер страницы.
      */
-    private int pageNumber;
+    private Integer pageNumber;
 
     /**
      * Размер страницы.
      */
-    private int pageSize;
+    private Integer pageSize;
 
 }

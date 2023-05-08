@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@OpenAPIDefinition(info = @Info(title = "Chat service", version = "v1"))
+@OpenAPIDefinition(info = @Info(title = "Сервис уведомлений", version = "v1"))
 @SecurityScheme(
         name = "bearerAuth",
         type = SecuritySchemeType.HTTP,
