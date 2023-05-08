@@ -108,15 +108,27 @@ public class ChatService {
 
         if (updateChatDto.getUsers() != null) {
             List<UUID> listOfIDs = updateChatDto.getUsers();
-            listOfIDs.add(authenticatedUserId);
-            List<ChatUserEntity> chatUserEntityList =
-                    chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.get().getId(), listOfIDs);
-            chatUserRepository.deleteAllByChatIdAndUserIdNotIn(chat.get().getId(), updateChatDto.getUsers());
-            for (ChatUserEntity chatUser : chatUserEntityList) {
-                if (chatUserRepository.findByChatIdAndUserId(chat.get().getId(), chatUser.getUserId()).isEmpty()) {
-                    chatUserRepository.save(chatUser);
+            if (authenticatedUserId.compareTo(chat.get().getAdminId()) == 0) {
+                listOfIDs.add(authenticatedUserId);
+                List<ChatUserEntity> chatUserEntityList =
+                        chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.get().getId(), listOfIDs);
+                chatUserRepository.deleteAllByChatIdAndUserIdNotIn(chat.get().getId(), updateChatDto.getUsers());
+                for (ChatUserEntity chatUser : chatUserEntityList) {
+                    if (chatUserRepository.findByChatIdAndUserId(chat.get().getId(), chatUser.getUserId()).isEmpty()) {
+                        chatUserRepository.save(chatUser);
+                    }
                 }
             }
+            else {
+                List<ChatUserEntity> chatUserEntityList =
+                        chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.get().getId(), listOfIDs);
+                for (ChatUserEntity chatUser : chatUserEntityList) {
+                    if (chatUserRepository.findByChatIdAndUserId(chat.get().getId(), chatUser.getUserId()).isEmpty()) {
+                        chatUserRepository.save(chatUser);
+                    }
+                }
+            }
+
         }
 
         chatRepository.save(chat.get());
