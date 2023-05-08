@@ -28,6 +28,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -134,10 +135,14 @@ public class UserService {
         );
 
         log.info("Пользователь с логином {} авторизовался в системе.", user.get().getLogin());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDateTime = LocalDateTime.now().format(formatter);
+
         NewNotificationDto newNotificationDto = NewNotificationDto.builder()
                 .userId(user.get().getId())
                 .type(NotificationType.LOGIN)
-                .text("Был выполнен вход в систему в "  + LocalDateTime.now() +
+                .text("Был выполнен вход в систему в "  + formattedDateTime +
                         " с использованием IP-адреса " + InetAddress.getLocalHost().getHostAddress() + ".")
                 .build();
         sendByStreamBridge(newNotificationDto);
