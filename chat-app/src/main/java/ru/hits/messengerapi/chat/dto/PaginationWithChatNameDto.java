@@ -5,13 +5,15 @@ import ru.hits.messengerapi.common.dto.PageInfoDto;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * DTO, содержащая информацию о странице и фильтре по ФИО.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class PaginationWithChatNameDto {
-
 
     /**
      * Информация о странице.

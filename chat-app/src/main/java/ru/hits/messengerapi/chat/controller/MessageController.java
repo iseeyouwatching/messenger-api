@@ -20,6 +20,9 @@ import ru.hits.messengerapi.chat.service.MessageService;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * Контроллер для работы с сообщениями.
+ */
 @RestController
 @RequestMapping("/api/chat/message")
 @RequiredArgsConstructor
@@ -27,8 +30,16 @@ import java.util.List;
 @Tag(name = "Сообщения.")
 public class MessageController {
 
+    /**
+     * Сервис сообщений.
+     */
     private final MessageService messageService;
 
+    /**
+     * Отправляет сообщение в личные сообщения.
+     *
+     * @param dialogueMessageDto DTO объект, содержащий информацию о сообщении и получателе.
+     */
     @Operation(
             summary = "Отправить сообщение в личные сообщения.",
             security = @SecurityRequirement(name = "bearerAuth")
@@ -37,6 +48,12 @@ public class MessageController {
     public void sendMessageToDialogue(@RequestBody @Valid DialogueMessageDto dialogueMessageDto) {
         messageService.sendMessageToDialogue(dialogueMessageDto);
     }
+
+    /**
+     * Отправляет сообщение в чат.
+     *
+     * @param chatMessageDto DTO объект, содержащий информацию о сообщении и чате.
+     */
 
     @Operation(
             summary = "Отправить сообщение в чат.",
@@ -47,6 +64,13 @@ public class MessageController {
         messageService.sendMessageToChat(chatMessageDto);
     }
 
+    /**
+     * Поиск сообщений.
+     *
+     * @param searchStringDto DTO объект, содержащий строку для поиска.
+     * @return объект класса {@link ResponseEntity}, содержащий список сообщений,
+     * удовлетворяющих поисковому запросу.
+     */
     @Operation(
             summary = "Поиск сообщений.",
             security = @SecurityRequirement(name = "bearerAuth")

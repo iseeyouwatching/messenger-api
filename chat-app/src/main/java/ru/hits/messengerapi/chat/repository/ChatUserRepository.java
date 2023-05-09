@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Репозиторий для работы с сущностью {@link ChatUserEntity}.
+ */
 @Repository
 public interface ChatUserRepository extends JpaRepository<ChatUserEntity, UUID> {
 

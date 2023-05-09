@@ -6,6 +6,9 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.UUID;
 
+/**
+ * Сущность чат-пользователь.
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,9 +29,15 @@ public class ChatUserEntity {
     )
     private UUID id;
 
+    /**
+     * Уникальный идентификатор чата.
+     */
     @Column(name = "chat_id")
     private UUID chatId;
 
+    /**
+     * Уникальный идентификатор пользователя.
+     */
     @Column(name = "user_id")
     private UUID userId;
 

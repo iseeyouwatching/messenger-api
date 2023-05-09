@@ -5,6 +5,9 @@ import ru.hits.messengerapi.common.dto.PageInfoDto;
 
 import java.util.List;
 
+/**
+ * DTO, содержащая список переписок, информацию о странице и фильтр по названию переписки.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,10 +15,19 @@ import java.util.List;
 @Setter
 public class CorrespondencesPageListDto {
 
+    /**
+     * Список переписок.
+     */
     private List<CorrespondenceDto> correspondences;
 
+    /**
+     * Информация о странице.
+     */
     private PageInfoDto pageInfo;
 
+    /**
+     * Фильтр по названию переписки.
+     */
     private String chatNameFilter;
 
 }

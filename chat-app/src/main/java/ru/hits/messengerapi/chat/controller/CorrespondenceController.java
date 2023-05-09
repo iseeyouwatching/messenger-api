@@ -15,6 +15,9 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Контроллер, отвечающий за обработку запросов, связанных с переписками.
+ */
 @RestController
 @RequestMapping("/api/chat/correspondence")
 @RequiredArgsConstructor
@@ -22,8 +25,17 @@ import java.util.UUID;
 @Tag(name = "Переписки.")
 public class CorrespondenceController {
 
+    /**
+     * Сервис переписок.
+     */
     private final CorrespondenceService correspondenceService;
 
+    /**
+     * Получает информацию о переписке по ее идентификатору.
+     *
+     * @param id идентификатор переписки.
+     * @return информация о переписке в виде объекта {@link CorrespondenceInfoDto}.
+     */
     @Operation(
             summary = "Получить информацию о переписке по ID.",
             security = @SecurityRequirement(name = "bearerAuth")
@@ -33,6 +45,12 @@ public class CorrespondenceController {
         return new ResponseEntity<>(correspondenceService.getCorrespondenceInfo(id), HttpStatus.OK);
     }
 
+    /**
+     * Возвращает список сообщений в заданной переписке.
+     *
+     * @param id идентификатор переписки.
+     * @return список сообщений в виде объекта {@link MessageInCorrespondenceDto}.
+     */
     @Operation(
             summary = "Посмотреть переписку.",
             security = @SecurityRequirement(name = "bearerAuth")
@@ -42,6 +60,13 @@ public class CorrespondenceController {
         return new ResponseEntity<>(correspondenceService.viewCorrespondence(id), HttpStatus.OK);
     }
 
+    /**
+     * Возвращает список переписок, удовлетворяющих заданным критериям поиска и параметрам пагинации.
+     *
+     * @param paginationWithChatNameDto объект, содержащий параметры пагинации и имя чата
+     *                                  для фильтрации результатов.
+     * @return список переписок в виде объекта {@link CorrespondencesPageListDto}.
+     */
     @Operation(
             summary = "Посмотреть список переписок.",
             security = @SecurityRequirement(name = "bearerAuth")

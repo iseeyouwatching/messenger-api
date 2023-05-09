@@ -153,13 +153,30 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         );
     }
 
+    /**
+     * Метод обрабатывает исключение типа {@link MultiForbiddenException}, которое возникает,
+     * когда несколько пользователей не являются друзьями другого пользователя.
+     *
+     * @param exception исключение типа {@link MultiForbiddenException}.
+     * @param request объект запроса.
+     * @return объект ответа с ошибкой в формате JSON.
+     */
     @ExceptionHandler(MultiForbiddenException.class)
     public ResponseEntity<ApiError> handleMultiForbiddenException(MultiForbiddenException exception,
                                                                  WebRequest request
     ) {
+        logError(request, exception);
         return new ResponseEntity<>(new ApiError(exception.getMessages()), HttpStatus.FORBIDDEN);
     }
 
+    /**
+     * Метод обрабатывает исключение типа {@link ForbiddenException}, которое возникает,
+     * когда сервер понял запрос, но отказывается его авторизовать.
+     *
+     * @param exception исключение типа {@link ForbiddenException}.
+     * @param request объект запроса.
+     * @return объект ответа с ошибкой в формате JSON.
+     */
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ApiError> handleForbiddenException(ForbiddenException exception,
                                                                 WebRequest request
@@ -167,7 +184,6 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         logError(request, exception);
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.FORBIDDEN);
     }
-
 
     /**
      * Метод для логирования всех исключений, которые доходят до контроллера.

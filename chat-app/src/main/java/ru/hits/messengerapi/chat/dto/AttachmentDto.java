@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.UUID;
 
+/**
+ * DTO, содержащая информацию о вложении.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,8 +14,14 @@ import java.util.UUID;
 @Setter
 public class AttachmentDto {
 
+    /**
+     * Уникальный идентификатор файла.
+     */
     private UUID fileId;
 
+    /**
+     * Имя файла.
+     */
     private String fileName;
 
 }
