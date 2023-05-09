@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hits.messengerapi.chat.dto.CorrespondenceInfoDto;
-import ru.hits.messengerapi.chat.dto.MessageInCorrespondenceDto;
-import ru.hits.messengerapi.chat.dto.PaginationCorrespondancesDto;
-import ru.hits.messengerapi.chat.dto.PaginationWithChatNameDto;
+import ru.hits.messengerapi.chat.dto.*;
 import ru.hits.messengerapi.chat.service.CorrespondenceService;
 
 import javax.validation.Valid;
@@ -50,7 +47,7 @@ public class CorrespondenceController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @PostMapping("/get")
-    public ResponseEntity<List<PaginationCorrespondancesDto>> getCorrespondences(@RequestBody @Valid
+    public ResponseEntity<CorrespondencesPageListDto> getCorrespondences(@RequestBody @Valid
                                                                                  PaginationWithChatNameDto paginationWithChatNameDto) {
         return new ResponseEntity<>(
                 correspondenceService.getCorrespondences(paginationWithChatNameDto),HttpStatus.OK);

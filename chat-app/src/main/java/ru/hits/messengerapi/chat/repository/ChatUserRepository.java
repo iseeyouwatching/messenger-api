@@ -14,7 +14,7 @@ public interface ChatUserRepository extends JpaRepository<ChatUserEntity, UUID> 
 
     void deleteAllByChatIdAndUserIdNotIn(UUID chatId, List<UUID> users);
 
-    List<ChatUserEntity> findByUserId(UUID userId, Pageable pageable);
+    List<ChatUserEntity> findAllByUserId(UUID userId, Pageable pageable);
 
     Optional<ChatUserEntity> findByChatIdAndUserId(UUID chatId, UUID userId);
 

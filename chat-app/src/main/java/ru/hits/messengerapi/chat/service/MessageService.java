@@ -172,6 +172,10 @@ public class MessageService {
                     String fullName = integrationRequestsService
                             .getFullNameAndAvatarId(message.getChat().getReceiverId()).get(0);
                     searchResult.setChatName(fullName);
+                } else if (authenticatedUserId.compareTo(message.getChat().getSenderId()) != 0) {
+                    String fullName = integrationRequestsService
+                            .getFullNameAndAvatarId(message.getChat().getSenderId()).get(0);
+                    searchResult.setChatName(fullName);
                 }
                 else {
                     searchResult.setChatName(message.getChat().getName());

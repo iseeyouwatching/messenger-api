@@ -1,5 +1,8 @@
 package ru.hits.messengerapi.friends.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,7 @@ import java.util.UUID;
 @RequestMapping("/integration/blacklist")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Интеграционные запросы, связанные с чёрным списком.")
 public class IntegrationBlacklistController {
 
     /**
@@ -31,6 +35,8 @@ public class IntegrationBlacklistController {
      * @param map ID пользователей.
      * @return true - если пользователь находится в черном списке другого пользователя, false - если нет.
      */
+    @Operation(summary = "Проверить нахождение пользователя в чёрном списке у другого пользователя.")
+    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-in-blacklist")
     public ResponseEntity<Boolean> checkIfTheUserBlacklisted(@RequestBody Map<String, UUID> map) {
         UUID targetUserId = map.get("targetUserId");
