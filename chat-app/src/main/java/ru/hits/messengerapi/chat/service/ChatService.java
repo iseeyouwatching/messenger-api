@@ -24,17 +24,50 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Сервис чатов.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ChatService {
 
+    /**
+     * Репозиторий для работы с сущностью {@link ChatEntity}.
+     */
     private final ChatRepository chatRepository;
+
+    /**
+     * Репозиторий для работы с сущностью {@link ChatUserEntity}.
+     */
     private final ChatUserRepository chatUserRepository;
+
+    /**
+     * Класс-маппер, отвечающий за преобразование объектов типа {@link CreateChatDto} и {@link UUID}
+     * в объекты типа {@link ChatEntity } и наоборот.
+     */
     private final ChatMapper chatMapper;
+
+    /**
+     * Класс-маппер для преобразования данных о чате и идентификаторах пользователей в
+     * список сущностей "чат-пользователь".
+     */
     private final ChatUserMapper chatUserMapper;
+
+    /**
+     * Сервис интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
 
+    /**
+     * Метод для создания нового чата на основе переданных данных из объекта {@link CreateChatDto}.
+     * Если чат успешно создан, добавляет всех пользователей из списка в базу данных и
+     * связывает их с созданным чатом.
+     *
+     * @param createChatDto объект, содержащий данные для создания нового чата.
+     * @throws ConflictException если в списке пользователей есть идентификатор текущего
+     * аутентифицированного пользователя.
+     */
     @Transactional
     public void createChat(CreateChatDto createChatDto) {
         UUID authenticatedUserId = getAuthenticatedUserId();
@@ -53,6 +86,15 @@ public class ChatService {
         chatUserRepository.saveAll(chatUserEntityList);
     }
 
+
+    /**
+     * Метод для создания нового диалога с пользователем, идентификатор которого передан в качестве параметра
+     * {@code receiverId}. Если диалог уже существует, выбрасывает исключение {@link ConflictException}.
+     *
+     * @param receiverId идентификатор пользователя, с которым создается диалог.
+     * @return объект {@link ChatEntity}, созданный на основе переданных данных.
+     * @throws ConflictException если текущий пользователь пытается создать больше одного диалога с самим собой.
+     */
     @Transactional
     public ChatEntity createDialogue(UUID receiverId) {
         UUID authenticatedUserId = getAuthenticatedUserId();
@@ -80,6 +122,15 @@ public class ChatService {
         return chat;
     }
 
+
+    /**
+     * Метод для обновления данных чата.
+     *
+     * @param updateChatDto DTO-объект с данными, которые необходимо изменить.
+     * @throws NotFoundException если чат с указанным ID не найден.
+     * @throws ForbiddenException если пользователь не является членом чата и не может изменить его данные.
+     * @throws ConflictException если пользователь пытается добавить самого себя в чат.
+     */
     @Transactional
     public void updateChat(UpdateChatDto updateChatDto) {
         Optional<ChatEntity> chat = chatRepository.findById(updateChatDto.getId());
@@ -128,9 +179,7 @@ public class ChatService {
                     }
                 }
             }
-
         }
-
         chatRepository.save(chat.get());
     }
 

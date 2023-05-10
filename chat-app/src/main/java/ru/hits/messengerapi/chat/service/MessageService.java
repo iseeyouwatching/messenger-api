@@ -10,6 +10,7 @@ import ru.hits.messengerapi.chat.dto.*;
 import ru.hits.messengerapi.chat.entity.AttachmentEntity;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
+import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 import ru.hits.messengerapi.chat.enumeration.ChatType;
 import ru.hits.messengerapi.chat.repository.AttachmentRepository;
 import ru.hits.messengerapi.chat.repository.ChatRepository;
@@ -29,19 +30,54 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Сервис сообщений.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MessageService {
 
+    /**
+     * Репозиторий для работы с сущностью {@link MessageEntity}.
+     */
     private final MessageRepository messageRepository;
+
+    /**
+     * Репозиторий для работы с сущностью {@link AttachmentEntity}.
+     */
     private final AttachmentRepository attachmentRepository;
+
+    /**
+     * Репозиторий для работы с сущностью {@link ChatEntity}.
+     */
     private final ChatRepository chatRepository;
+
+    /**
+     * Репозиторий для работы с сущностью {@link ChatUserEntity}.
+     */
     private final ChatUserRepository chatUserRepository;
+
+    /**
+     * Сервис чатов.
+     */
     private final ChatService chatService;
+
+    /**
+     * Сервис интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
+
+    /**
+     * Объект, позволяющий отправлять сообщения в RabbitMQ, используя Spring Cloud Stream.
+     */
     private final StreamBridge streamBridge;
 
+    /**
+     * Метод для отправки сообщения в диалог.
+     *
+     * @param dialogueMessageDto DTO с информацией о сообщении, которое отправится в диалог.
+     */
     @Transactional
     public void sendMessageToDialogue(DialogueMessageDto dialogueMessageDto) {
         integrationRequestsService.checkUserExistence(dialogueMessageDto.getReceiverId());
@@ -104,6 +140,13 @@ public class MessageService {
         sendByStreamBridge(newNotificationDto);
     }
 
+    /**
+     * Метод для отправки сообщения в чат.
+     *
+     * @param chatMessageDto DTO с информацией о сообщении, которое отправится в чат.
+     * @throws NotFoundException если чата не существует.
+     * @throws ForbiddenException если пользователь пытается отправить сообщение в чат, но не состоит в нём.
+     */
     @Transactional
     public void sendMessageToChat(ChatMessageDto chatMessageDto) {
         Optional<ChatEntity> chat = chatRepository.findById(chatMessageDto.getChatId());
@@ -149,6 +192,12 @@ public class MessageService {
         }
     }
 
+    /**
+     * Метод для поиска сообщений.
+     *
+     * @param searchStringDto поисковая строка.
+     * @return список найденных сообщений.
+     */
     public List<MessageDto> searchMessages(SearchStringDto searchStringDto) {
         UUID authenticatedUserId = getAuthenticatedUserId();
         List<MessageEntity> messages;
@@ -207,6 +256,12 @@ public class MessageService {
         return userData.getId();
     }
 
+    /**
+     * Отправляет объект типа NewNotificationDto посредством StreamBridge.
+     *
+     * @param newNotificationDto объект класса {@link NewNotificationDto},
+     *                           содержащий информацию о новом уведомлении
+     */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }

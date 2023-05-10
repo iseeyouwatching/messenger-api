@@ -11,17 +11,23 @@ import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
 import ru.hits.messengerapi.chat.repository.MessageRepository;
 import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
-import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 
 import java.util.*;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 
+/**
+ * Сервис интеграционных запросов.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class IntegrationRequestsService {
+
+    /**
+     * Репозиторий для работы с сущностью {@link MessageEntity}.
+     */
     private final MessageRepository messageRepository;
 
     /**
@@ -29,18 +35,35 @@ public class IntegrationRequestsService {
      */
     private final SecurityProps securityProps;
 
+    /**
+     * URL, куда отправляется запрос на проверку существования пользователя по его ID.
+     */
     @Value("${integration.request.check-existence-by-id}")
     private String integrationUsersRequestCheckExistenceById;
 
+    /**
+     * URL, куда отправляется запрос на проверку существования пользователя в друзьях.
+     */
     @Value("${integration.request.check-existence-in-friends}")
     private String integrationUsersRequestCheckExistenceInFriends;
 
+    /**
+     * URL, куда отправляется запрос на проверку существования пользователей в друзьях.
+     */
     @Value("${integration.request.check-multi-existence-in-friends}")
     private String integrationUsersRequestCheckMultiExistenceInFriends;
 
+    /**
+     * URL, куда отправляется запрос на получение ФИО и аватарки.
+     */
     @Value("${integration.request.get-full-name-and-avatar}")
     private String integrationUsersRequestGetFullNameAndAvatar;
 
+    /**
+     * Метод для проверки существования пользователя по его ID.
+     *
+     * @param id идентификатор пользователя.
+     */
     public void checkUserExistence(UUID id) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
@@ -56,10 +79,10 @@ public class IntegrationRequestsService {
     }
 
     /**
-     * Метод для получения ФИО пользователя по его ID.
+     * Метод для получения ФИО и аватарки пользователя по его ID.
      *
      * @param id идентификатор пользователя.
-     * @return ФИО пользователя.
+     * @return ФИО и аватарка пользователя.
      */
     public List<String> getFullNameAndAvatarId(UUID id) {
         RestTemplate restTemplate = new RestTemplate();
@@ -78,6 +101,12 @@ public class IntegrationRequestsService {
         return responseEntity.getBody();
     }
 
+    /**
+     * Метод для синхронизации данных пользователя.
+     *
+     * @param id идентификатор пользователя, чьи данные необходимо синхронизировать.
+     * @return сообщение об успешной синхронизации.
+     */
     public Map<String, String> syncUserData(UUID id) {
         List<String> fullNameAndAvatarId = getFullNameAndAvatarId(id);
         String fullName = fullNameAndAvatarId.get(0);
@@ -98,6 +127,12 @@ public class IntegrationRequestsService {
         return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
+    /**
+     * Метод для проверки существования пользователя в друзьях у другого пользователя.
+     *
+     * @param authUserId идентификатор аутентифицированного пользователя.
+     * @param receiverId идентификатор пользователя, которого мы проверяем.
+     */
     public void checkExistenceInFriends(UUID authUserId, UUID receiverId) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
@@ -115,6 +150,12 @@ public class IntegrationRequestsService {
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
     }
 
+    /**
+     * Метод для проверки существования пользователей в друзьях у другого пользователя.
+     *
+     * @param authUserId идентификатор аутентифицированного пользователя.
+     * @param multiUsersIds идентификаторы пользователей, которых мы проверяем.
+     */
     public void checkExistenceMultiUsersInFriends(UUID authUserId, List<UUID> multiUsersIds) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));

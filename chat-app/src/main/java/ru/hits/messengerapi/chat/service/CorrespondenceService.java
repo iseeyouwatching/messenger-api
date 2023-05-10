@@ -24,17 +24,47 @@ import ru.hits.messengerapi.common.security.JwtUserData;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Сервис переписок.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CorrespondenceService {
 
+    /**
+     * Репозиторий для работы с сущностью {@link ChatEntity}.
+     */
     private final ChatRepository chatRepository;
+
+    /**
+     * Репозиторий для работы с сущностью {@link ChatUserEntity}.
+     */
     private final ChatUserRepository chatUserRepository;
+
+    /**
+     * Репозиторий для работы с сущностью {@link MessageEntity}.
+     */
     private final MessageRepository messageRepository;
+
+    /**
+     * Сервис интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
+
+    /**
+     * Сервис для проверки данных пагинации.
+     */
     private final CheckPaginationInfoService checkPaginationInfoService;
 
+    /**
+     * Получает информацию о переписке.
+     *
+     * @param id идентификатор переписки.
+     * @throws NotFoundException если переписки не существует.
+     * @throws ForbiddenException если пользователь не состоит в переписке и пытается посмотреть данные о ней.
+     * @return информация о переписке.
+     */
     public CorrespondenceInfoDto getCorrespondenceInfo(UUID id) {
         Optional<ChatEntity> chat = chatRepository.findById(id);
         if (chat.isEmpty()) {
@@ -67,6 +97,14 @@ public class CorrespondenceService {
         );
     }
 
+    /**
+     * Метод для получения списка сообщений в переписке.
+     *
+     * @param id идентификатор переписки.
+     * @throws NotFoundException если переписки не существует.
+     * @throws ForbiddenException если пользователь не состоит в переписке и пытается посмотреть ее.
+     * @return список сообщений в переписке.
+     */
     public List<MessageInCorrespondenceDto> viewCorrespondence(UUID id) {
         Optional<ChatEntity> chat = chatRepository.findById(id);
         if (chat.isEmpty()) {
@@ -75,7 +113,7 @@ public class CorrespondenceService {
 
         if (chatUserRepository.findByChatIdAndUserId(id, getAuthenticatedUserId()).isEmpty()) {
             throw new ForbiddenException("Пользователь с ID " + getAuthenticatedUserId()
-                    + " не может посмотреть информацию о переписке с ID " + id
+                    + " не может посмотреть переписку с ID " + id
                     + ", потому что не состоит в ней.");
         }
 
@@ -96,6 +134,12 @@ public class CorrespondenceService {
         return messageInCorrespondenceDtos;
     }
 
+    /**
+     * Метод для постраничного получения информации о переписках.
+     *
+     * @param paginationWithChatNameDto DTO с информацией о пагинации и фильтре по названию чата.
+     * @return постраничная инфомрация о переписках.
+     */
     public CorrespondencesPageListDto getCorrespondences(PaginationWithChatNameDto
                                                                          paginationWithChatNameDto) {
         int pageNumber =paginationWithChatNameDto.getPageInfo() != null &&
@@ -236,7 +280,8 @@ public class CorrespondenceService {
 
         Comparator<CorrespondenceDto> sortByDate =
                 Comparator.comparing(
-                        dto -> dto.getLastMessageSendDate() != null ? dto.getLastMessageSendDate() : LocalDateTime.MIN,
+                        dto -> dto.getLastMessageSendDate() != null ? dto.getLastMessageSendDate()
+                                : LocalDateTime.MIN,
                         Comparator.reverseOrder()
                 );
         correspondenceDtos.sort(sortByDate);
