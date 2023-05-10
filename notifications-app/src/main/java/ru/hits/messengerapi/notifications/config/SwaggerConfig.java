@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Класс конфигурации Swagger.
+ */
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Сервис уведомлений", version = "v1"))
 @SecurityScheme(
@@ -15,6 +18,4 @@ import org.springframework.context.annotation.Configuration;
         scheme = "Bearer"
 )
 public class SwaggerConfig {
-
-
 }

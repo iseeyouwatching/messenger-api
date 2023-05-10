@@ -5,6 +5,9 @@ import ru.hits.messengerapi.common.dto.PageInfoDto;
 
 import java.util.List;
 
+/**
+ * DTO для постраничного вывода списка уведомлений.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,6 +15,9 @@ import java.util.List;
 @Setter
 public class NotificationsPageListDto {
 
+    /**
+     * Список уведомлений.
+     */
     private List<NotificationDto> notifications;
 
     /**

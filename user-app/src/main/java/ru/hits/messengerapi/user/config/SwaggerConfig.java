@@ -25,6 +25,4 @@ import org.springframework.context.annotation.Configuration;
         paramName = "API_KEY"
 )
 public class SwaggerConfig {
-
-
 }
