@@ -8,8 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hits.messengerapi.friends.service.implementation.BlacklistService;
-import ru.hits.messengerapi.friends.service.implementation.IntegrationRequestsService;
+import ru.hits.messengerapi.friends.service.BlacklistService;
 
 import java.util.Map;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.service.implementation;
+package ru.hits.messengerapi.friends.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,6 @@ import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
-import ru.hits.messengerapi.friends.service.BlacklistServiceInterface;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -34,7 +33,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BlacklistService implements BlacklistServiceInterface {
+public class BlacklistService {
 
     /**
      * Репозиторий для работы с сущностью {@link BlacklistEntity}.
@@ -60,6 +59,10 @@ public class BlacklistService implements BlacklistServiceInterface {
      * Репозиторий для работы с сущностью {@link FriendEntity}.
      */
     private final FriendsRepository friendsRepository;
+
+    /**
+     * Объект, позволяющий отправлять сообщения в RabbitMQ, используя Spring Cloud Stream.
+     */
     private final StreamBridge streamBridge;
 
 
@@ -69,7 +72,6 @@ public class BlacklistService implements BlacklistServiceInterface {
      * @param paginationWithFullNameFilterDto объект {@link PaginationWithFullNameFilterDto}, содержащий информацию о странице и фильтре по ФИО.
      * @return список заблокированных пользователей, информация о странице и фильтре по ФИО.
      */
-    @Override
     public BlockedUsersPageListDto getBlockedUsers(PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
         int pageNumber = paginationWithFullNameFilterDto.getPageInfo().getPageNumber();
         int pageSize = paginationWithFullNameFilterDto.getPageInfo().getPageSize();
@@ -113,7 +115,6 @@ public class BlacklistService implements BlacklistServiceInterface {
      * @return полная информация о заблокированном пользователе.
      * @throws NotFoundException если пользователя нет в ЧС.
      */
-    @Override
     public BlockedUserDto getBlockedUser(UUID blockedUserId) {
         UUID targetUserId = getAuthenticatedUserId();
 
@@ -144,7 +145,6 @@ public class BlacklistService implements BlacklistServiceInterface {
      *                                2) целевой пользователь хочет добавить в ЧС пользователя,
      *                                который уже добавлен в ЧС
      */
-    @Override
     public BlockedUserDto addToBlacklist(AddPersonDto addPersonDto) {
         integrationRequestsService.checkUserExistence(addPersonDto);
 
@@ -231,7 +231,6 @@ public class BlacklistService implements BlacklistServiceInterface {
      * @throws NotFoundException если пользователя нет в ЧС.
      * @throws ConflictException если пользователь уже удален из ЧС.
      */
-    @Override
     public BlockedUserDto deleteFromBlacklist(UUID blockedUserId) {
         UUID targetUserId = getAuthenticatedUserId();
 
@@ -277,7 +276,6 @@ public class BlacklistService implements BlacklistServiceInterface {
      * @param paginationAndFilters информация о пагинации и фильтрах.
      * @return найденные заблокированные пользователи с информацией о странице и фильтрах.
      */
-    @Override
     public SearchedBlockedUsersDto searchBlockedUsers(PaginationWithBlockedUserFiltersDto paginationAndFilters) {
         int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
         int pageSize = paginationAndFilters.getPageInfo().getPageSize();
@@ -330,7 +328,6 @@ public class BlacklistService implements BlacklistServiceInterface {
      * @param blockedUserId id заблокированного пользователя
      * @return true - если пользователь находится в ЧС, false - если нет.
      */
-    @Override
     public boolean checkIfTheUserBlacklisted(UUID blockedUserId) {
         UUID targetUserId = getAuthenticatedUserId();
 
@@ -359,7 +356,6 @@ public class BlacklistService implements BlacklistServiceInterface {
      * @param blockedUserId id заблокированного пользователя.
      * @return true - если пользователь находится в ЧС, false - если нет.
      */
-    @Override
     public boolean checkIfTheTargetUserBlacklisted(UUID targetUserId, UUID blockedUserId) {
         Optional<BlacklistEntity> blockedUser = blacklistRepository.findByTargetUserIdAndBlockedUserId(
                 targetUserId,
@@ -387,6 +383,12 @@ public class BlacklistService implements BlacklistServiceInterface {
         return userData.getId();
     }
 
+    /**
+     * Отправляет объект типа {@link NewNotificationDto} посредством StreamBridge.
+     *
+     * @param newNotificationDto объект класса {@link NewNotificationDto},
+     *                           содержащий информацию о новом уведомлении
+     */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }

@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.hits.messengerapi.friends.service.implementation.IntegrationFriendsService;
+import ru.hits.messengerapi.friends.service.IntegrationFriendsService;
 
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сервис интеграционных запросов, связанных с друзьями.
+ */
 @RestController
 @RequestMapping("/integration/friends")
 @RequiredArgsConstructor
@@ -23,8 +26,17 @@ import java.util.UUID;
 @Tag(name = "Интеграционные запросы, связанные с друзьями.")
 public class IntegrationFriendsController {
 
+    /**
+     * Сервис с логикой интеграционных запросов, связанных с друзьями.
+     */
     private final IntegrationFriendsService integrationFriendsService;
 
+    /**
+     * Проверка нахождения пользователя в друзьях у другого пользователя.
+     *
+     * @param uuids список идентификаторов пользователей.
+     * @return true - если пользователь находится в друзьях у другого пользователя.
+     */
     @Operation(summary = "Проверить нахождение пользователя в друзьях у другого пользователя.")
     @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-in-friends")
@@ -33,6 +45,12 @@ public class IntegrationFriendsController {
                 HttpStatus.OK);
     }
 
+    /**
+     * Проверка нахождения пользователей в друзьях у другого пользователя.
+     *
+     * @param uuids список идентификаторов пользователей.
+     * @return true - если пользователи находятся в друзьях у другого пользователя.
+     */
     @Operation(summary = "Проверить нахождение пользователей в друзьях у другого пользователя.")
     @SecurityRequirement(name = "api_key")
     @PostMapping("/check-multi-existence-in-friends")

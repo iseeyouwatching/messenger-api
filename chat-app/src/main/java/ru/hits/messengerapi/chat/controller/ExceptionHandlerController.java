@@ -155,7 +155,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     /**
      * Метод обрабатывает исключение типа {@link MultiForbiddenException}, которое возникает,
-     * когда несколько пользователей не являются друзьями другого пользователя.
+     * когда сервер понял запрос, но отказывается его авторизовать.
      *
      * @param exception исключение типа {@link MultiForbiddenException}.
      * @param request объект запроса.

@@ -257,7 +257,7 @@ public class MessageService {
     }
 
     /**
-     * Отправляет объект типа NewNotificationDto посредством StreamBridge.
+     * Отправляет объект типа {@link NewNotificationDto} посредством StreamBridge.
      *
      * @param newNotificationDto объект класса {@link NewNotificationDto},
      *                           содержащий информацию о новом уведомлении

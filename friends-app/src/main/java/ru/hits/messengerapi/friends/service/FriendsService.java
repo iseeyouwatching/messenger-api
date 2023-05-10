@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.service.implementation;
+package ru.hits.messengerapi.friends.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -21,7 +21,6 @@ import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
-import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class FriendsService implements FriendsServiceInterface {
+public class FriendsService {
 
     /**
      * Репозиторий для работы с сущностью {@link FriendEntity}.
@@ -54,6 +53,9 @@ public class FriendsService implements FriendsServiceInterface {
      */
     private final BlacklistService blacklistService;
 
+    /**
+     * Объект, позволяющий отправлять сообщения в RabbitMQ, используя Spring Cloud Stream.
+     */
     private final StreamBridge streamBridge;
 
     /**
@@ -63,7 +65,8 @@ public class FriendsService implements FriendsServiceInterface {
      * @param checkPaginationInfoService вспомогательный сервис для проверки данных для пагинации.
      * @param integrationRequestsService сервис, в котором хранится логика отправки интеграционных запросов.
      * @param blacklistService           сервис черного списка.
-     * @param streamBridge
+     * @param streamBridge               Объект, позволяющий отправлять сообщения в RabbitMQ,
+     *                                   используя Spring Cloud Stream.
      */
     public FriendsService(FriendsRepository friendsRepository,
                           CheckPaginationInfoService checkPaginationInfoService,
@@ -83,7 +86,6 @@ public class FriendsService implements FriendsServiceInterface {
      * @param paginationWithFullNameFilterDto информация о пагинации и фильтре по ФИО.
      * @return список друзей, информация о странице и фильтре по ФИО.
      */
-    @Override
     public FriendsPageListDto getFriends(PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
         int pageNumber = paginationWithFullNameFilterDto.getPageInfo().getPageNumber();
         int pageSize = paginationWithFullNameFilterDto.getPageInfo().getPageSize();
@@ -123,7 +125,6 @@ public class FriendsService implements FriendsServiceInterface {
      * @return полная информация о друге.
      * @throws NotFoundException если пользователя нет в списке друзей.
      */
-    @Override
     public FriendDto getFriend(UUID addedUserId) {
         UUID targetUserId = getAuthenticatedUserId();
 
@@ -155,7 +156,6 @@ public class FriendsService implements FriendsServiceInterface {
      *                                4) пользователь хочет добавить в друзья пользователя,
      *                                у которого находится в ЧС
      */
-    @Override
     public FriendDto addToFriends(AddPersonDto addPersonDto) {
         integrationRequestsService.checkUserExistence(addPersonDto);
 
@@ -266,7 +266,6 @@ public class FriendsService implements FriendsServiceInterface {
      * @throws ConflictException если пользователь, которого хочет добавить в друзья целевой пользователь,
      *                           уже удален из друзей
      */
-    @Override
     public FriendDto deleteFriend(UUID addedUserId) {
         UUID targetUserId = getAuthenticatedUserId();
 
@@ -330,7 +329,6 @@ public class FriendsService implements FriendsServiceInterface {
      * @param paginationAndFilters информация о пагинации и фильтрах.
      * @return найденные друзья с информацией о странице и фильтрах.
      */
-    @Override
     public SearchedFriendsDto searchFriends(PaginationWithFriendFiltersDto paginationAndFilters) {
         int pageNumber = paginationAndFilters.getPageInfo().getPageNumber();
         int pageSize = paginationAndFilters.getPageInfo().getPageSize();
@@ -393,6 +391,12 @@ public class FriendsService implements FriendsServiceInterface {
         return userData.getId();
     }
 
+    /**
+     * Отправляет объект типа {@link NewNotificationDto} посредством StreamBridge.
+     *
+     * @param newNotificationDto объект класса {@link NewNotificationDto},
+     *                           содержащий информацию о новом уведомлении
+     */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }

@@ -14,8 +14,8 @@ import ru.hits.messengerapi.friends.dto.blacklist.PaginationWithBlockedUserFilte
 import ru.hits.messengerapi.friends.dto.blacklist.SearchedBlockedUsersDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
-import ru.hits.messengerapi.friends.service.implementation.BlacklistService;
-import ru.hits.messengerapi.friends.service.implementation.IntegrationRequestsService;
+import ru.hits.messengerapi.friends.service.BlacklistService;
+import ru.hits.messengerapi.friends.service.IntegrationRequestsService;
 
 import javax.validation.Valid;
 import java.util.Map;

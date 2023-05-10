@@ -61,6 +61,12 @@ public interface FriendsRepository extends JpaRepository<FriendEntity, UUID> {
      */
     List<FriendEntity> findAllByAddedUserId(UUID addedUserId);
 
+    /**
+     * Найти сущности друзей по id целевого пользователя.
+     *
+     * @param targetUserId id целевого пользователя.
+     * @return список сущностей друзей, удовлетворяющих условиям поиска.
+     */
     List<FriendEntity> findAllByTargetUserId(UUID targetUserId);
 
 }

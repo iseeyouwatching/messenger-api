@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.service.implementation;
+package ru.hits.messengerapi.friends.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -8,18 +8,15 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
-import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
-import ru.hits.messengerapi.friends.service.IntegrationRequestsServiceInterface;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
@@ -30,7 +27,7 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class IntegrationRequestsService implements IntegrationRequestsServiceInterface {
+public class IntegrationRequestsService {
 
     /**
      * Репозиторий для работы с сущностью {@link BlacklistEntity}.
@@ -64,7 +61,6 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
      *
      * @param addPersonDto информация проверяемого пользователя.
      */
-    @Override
     public void checkUserExistence(AddPersonDto addPersonDto) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
@@ -87,7 +83,6 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
      * @param id идентификатор пользователя.
      * @return ФИО пользователя.
      */
-    @Override
     public String getFullName(UUID id) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
@@ -112,7 +107,6 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
      * @param id идентификатор пользователя.
      * @return сообщение об успешной синхронизации.
      */
-    @Override
     public Map<String, String> syncBlockedUserData(UUID id) {
         String fullName = getFullName(id);
         log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);
@@ -133,7 +127,6 @@ public class IntegrationRequestsService implements IntegrationRequestsServiceInt
      * @param id идентификатор пользователя.
      * @return сообщение об успешной синхронизации.
      */
-    @Override
     public Map<String, String> syncFriendData(UUID id) {
         String fullName = getFullName(id);
         log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);

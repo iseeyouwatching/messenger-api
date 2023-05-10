@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.friends.service.implementation;
+package ru.hits.messengerapi.friends.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Сервис с логикой интеграционных запросов, связанных с друзьями.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +26,14 @@ public class IntegrationFriendsService {
      */
     private final FriendsRepository friendsRepository;
 
+    /**
+     * Метод ля проверки существования пользователя в друзьях у другого пользователя.
+     *
+     * @param targetUserId идентификатор пользователя, у которого проверяем существование в друзьях
+     *                     другого пользователя.
+     * @param addedUserId идентификатор пользователя, которого проверяем.
+     * @return true - если пользователь существует в друзьях у другого пользователя.
+     */
     public Boolean checkExistenceInFriends(UUID targetUserId, UUID addedUserId) {
         Optional<FriendEntity> friend =
                 friendsRepository.findByTargetUserIdAndAddedUserId(targetUserId, addedUserId);
@@ -33,6 +44,12 @@ public class IntegrationFriendsService {
         return true;
     }
 
+    /**
+     * Метод ля проверки существования пользователей в друзьях у другого пользователя.
+     *
+     * @param uuids список идентификаторов пользователей.
+     * @return true - если пользователи существуют в друзьях у другого пользователя.
+     */
     public Boolean checkMultiExistenceInFriends(List<UUID> uuids) {
         List<FriendEntity> friends = friendsRepository.findAllByTargetUserId(uuids.get(0));
         List<UUID> friendsIDs = new ArrayList<>();

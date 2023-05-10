@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.friends.*;
-import ru.hits.messengerapi.friends.service.implementation.FriendsService;
-import ru.hits.messengerapi.friends.service.implementation.IntegrationRequestsService;
+import ru.hits.messengerapi.friends.service.FriendsService;
+import ru.hits.messengerapi.friends.service.IntegrationRequestsService;
 
 import javax.validation.Valid;
 import java.util.Map;
