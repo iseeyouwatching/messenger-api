@@ -31,11 +31,17 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис уведомлений для сохранения и получения новых уведомлений и для работы со списком уведомлений.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
 
+    /**
+     * Репозиторий для работы с сущностью {@link NotificationEntity}.
+     */
     private final NotificationRepository notificationRepository;
 
     /**
@@ -43,6 +49,11 @@ public class NotificationService {
      */
     private final CheckPaginationInfoService checkPaginationInfoService;
 
+    /**
+     * Сохраняет новое уведомление в базу данных.
+     *
+     * @param newNotificationDto DTO нового уведомления.
+     */
     @Transactional
     public void getNotification(NewNotificationDto newNotificationDto) {
         NotificationEntity notification = NotificationEntity.builder()
@@ -55,10 +66,22 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    /**
+     * Возвращает количество непрочитанных уведомлений пользователя.
+     *
+     * @return Количество непрочитанных уведомлений пользователя.
+     */
     public Long getUnreadCount() {
         return notificationRepository.countByUserIdAndStatus(getAuthenticatedUserId(), NotificationStatus.UNREAD);
     }
 
+    /**
+     * Помечает уведомления как прочитанные или непрочитанные.
+     *
+     * @param notificationsStatusUpdateDTO DTO обновления статуса уведомлений.
+     * @return Количество непрочитанных уведомлений пользователя.
+     * @throws NotFoundException если не найдено уведомление с указанным ID.
+     */
     @Transactional
     public Long markNotificationsAsReadOrUnread(NotificationsStatusUpdateDTO notificationsStatusUpdateDTO) {
         List<UUID> invalidIds = new ArrayList<>();
@@ -82,6 +105,12 @@ public class NotificationService {
         return getUnreadCount();
     }
 
+    /**
+     * Возвращает список уведомлений пользователя.
+     *
+     * @param paginationAndFiltersDto DTO фильтрации и пагинации списка уведомлений.
+     * @return список уведомлений пользователя.
+     */
     public NotificationsPageListDto getNotifications(PaginationAndFiltersDto paginationAndFiltersDto) {
         int pageNumber = paginationAndFiltersDto.getPageInfo() != null &&
                 paginationAndFiltersDto.getPageInfo().getPageNumber() == null ? 1

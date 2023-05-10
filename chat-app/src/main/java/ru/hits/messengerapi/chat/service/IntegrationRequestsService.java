@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
 import ru.hits.messengerapi.chat.repository.MessageRepository;
@@ -107,6 +108,7 @@ public class IntegrationRequestsService {
      * @param id идентификатор пользователя, чьи данные необходимо синхронизировать.
      * @return сообщение об успешной синхронизации.
      */
+    @Transactional
     public Map<String, String> syncUserData(UUID id) {
         List<String> fullNameAndAvatarId = getFullNameAndAvatarId(id);
         String fullName = fullNameAndAvatarId.get(0);

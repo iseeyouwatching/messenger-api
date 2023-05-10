@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
@@ -107,6 +108,7 @@ public class IntegrationRequestsService {
      * @param id идентификатор пользователя.
      * @return сообщение об успешной синхронизации.
      */
+    @Transactional
     public Map<String, String> syncBlockedUserData(UUID id) {
         String fullName = getFullName(id);
         log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);
@@ -127,6 +129,7 @@ public class IntegrationRequestsService {
      * @param id идентификатор пользователя.
      * @return сообщение об успешной синхронизации.
      */
+    @Transactional
     public Map<String, String> syncFriendData(UUID id) {
         String fullName = getFullName(id);
         log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);

@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.BadRequestException;
@@ -79,6 +80,7 @@ public class UserService {
      * @throws ConflictException в случае, если пользователь с заданным логином/почтой уже существует.
      * @throws BadRequestException в случае, если дата рождения в DTO задана позже текущей даты.
      */
+    @Transactional
     public UserProfileAndTokenDto userSignUp(UserSignUpDto userSignUpDto) {
         if (userRepository.findByLogin(userSignUpDto.getLogin()).isPresent()) {
             log.warn("Пользователь с логином {} уже существует.", userSignUpDto.getLogin());
@@ -262,6 +264,7 @@ public class UserService {
      * @throws NotFoundException если пользователь с указанным ID не найден.
      * @throws BadRequestException если дата рождения позже текущей даты.
      */
+    @Transactional
     public UserProfileDto updateUserInfo(UpdateUserInfoDto updateUserInfoDto) {
         UserEntity user = getUserById();
         validateFields(updateUserInfoDto);

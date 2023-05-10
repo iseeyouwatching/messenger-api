@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.ConflictException;
@@ -145,6 +146,7 @@ public class BlacklistService {
      *                                2) целевой пользователь хочет добавить в ЧС пользователя,
      *                                который уже добавлен в ЧС
      */
+    @Transactional
     public BlockedUserDto addToBlacklist(AddPersonDto addPersonDto) {
         integrationRequestsService.checkUserExistence(addPersonDto);
 
@@ -231,6 +233,7 @@ public class BlacklistService {
      * @throws NotFoundException если пользователя нет в ЧС.
      * @throws ConflictException если пользователь уже удален из ЧС.
      */
+    @Transactional
     public BlockedUserDto deleteFromBlacklist(UUID blockedUserId) {
         UUID targetUserId = getAuthenticatedUserId();
 

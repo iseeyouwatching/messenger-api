@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.ConflictException;
@@ -156,6 +157,7 @@ public class FriendsService {
      *                                4) пользователь хочет добавить в друзья пользователя,
      *                                у которого находится в ЧС
      */
+    @Transactional
     public FriendDto addToFriends(AddPersonDto addPersonDto) {
         integrationRequestsService.checkUserExistence(addPersonDto);
 
@@ -266,6 +268,7 @@ public class FriendsService {
      * @throws ConflictException если пользователь, которого хочет добавить в друзья целевой пользователь,
      *                           уже удален из друзей
      */
+    @Transactional
     public FriendDto deleteFriend(UUID addedUserId) {
         UUID targetUserId = getAuthenticatedUserId();
 
