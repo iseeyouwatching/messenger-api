@@ -153,6 +153,14 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         );
     }
 
+    /**
+     * Метод обрабатывает исключение типа {@link ForbiddenException}, которое возникает,
+     * когда сервер понял запрос, но отказывается его авторизовать.
+     *
+     * @param exception исключение типа {@link ForbiddenException}.
+     * @param request объект запроса.
+     * @return объект ответа с ошибкой в формате JSON.
+     */
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ApiError> handleForbiddenException(ForbiddenException exception,
                                                              WebRequest request

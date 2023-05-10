@@ -53,6 +53,12 @@ public class IntegrationUserController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /**
+     * Метод для проверки существования пользователя по ID.
+     *
+     * @param id идентификатор пользователя.
+     * @return true - если пользователь с таким ID существует.
+     */
     @Operation(summary = "Проверить существование пользователя по ID.")
     @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-by-id")
@@ -80,6 +86,12 @@ public class IntegrationUserController {
         return new ResponseEntity<>(fullName, HttpStatus.OK);
     }
 
+    /**
+     * Метод для получения ФИО и аватарки пользователя по его ID.
+     *
+     * @param id идентификатор пользователя.
+     * @return ФИО и аватарка пользователя.
+     */
     @Operation(summary = "Получить ФИО и аватарку пользователя по его ID.")
     @SecurityRequirement(name = "api_key")
     @PostMapping ("/get-full-name-and-avatar")

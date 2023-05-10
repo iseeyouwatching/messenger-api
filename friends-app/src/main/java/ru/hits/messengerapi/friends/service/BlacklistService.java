@@ -387,7 +387,7 @@ public class BlacklistService {
      * Отправляет объект типа {@link NewNotificationDto} посредством StreamBridge.
      *
      * @param newNotificationDto объект класса {@link NewNotificationDto},
-     *                           содержащий информацию о новом уведомлении
+     *                           содержащий информацию о новом уведомлении.
      */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);

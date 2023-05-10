@@ -44,6 +44,12 @@ public class IntegrationUserService {
         return true;
     }
 
+    /**
+     * Метод для проверки существования пользователя по его ID.
+     *
+     * @param id идентификатор пользователя.
+     * @return true - если пользователь существует.
+     */
     public Boolean checkUserById(UUID id) {
         boolean isUserPresent = userRepository.findById(id).isPresent();
         if (isUserPresent) {
@@ -75,6 +81,12 @@ public class IntegrationUserService {
         return fullName;
     }
 
+    /**
+     * Метод для получения ФИО и аватарки пользователя.
+     *
+     * @param id идентификатор пользователя.
+     * @return ФИО и аватарка пользователя.
+     */
     public List<String> getFullNameAndAvatar(UUID id) {
         Optional<UserEntity> user = userRepository.findById(id);
 
