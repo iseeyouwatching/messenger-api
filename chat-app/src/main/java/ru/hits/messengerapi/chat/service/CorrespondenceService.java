@@ -18,7 +18,7 @@ import ru.hits.messengerapi.chat.repository.MessageRepository;
 import ru.hits.messengerapi.common.dto.PageInfoDto;
 import ru.hits.messengerapi.common.exception.ForbiddenException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
-import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
+import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
 
 import java.time.LocalDateTime;

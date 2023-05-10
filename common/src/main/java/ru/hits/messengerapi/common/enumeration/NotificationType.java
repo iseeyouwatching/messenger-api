@@ -1,5 +1,8 @@
 package ru.hits.messengerapi.common.enumeration;
 
+/**
+ * Перечисление с типами уведомлений.
+ */
 public enum NotificationType {
 
     FRIEND_REQUEST,

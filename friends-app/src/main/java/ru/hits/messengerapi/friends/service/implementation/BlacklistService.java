@@ -14,7 +14,7 @@ import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
-import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
+import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.blacklist.*;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;

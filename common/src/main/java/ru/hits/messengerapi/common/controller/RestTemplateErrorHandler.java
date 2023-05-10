@@ -5,25 +5,57 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.exception.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Обработчик ошибок для {@link RestTemplate}. Реализует интерфейс {@link ResponseErrorHandler}.
+ */
 @Component
 public class RestTemplateErrorHandler implements ResponseErrorHandler {
 
+    /**
+     * ObjectMapper для десериализации ответов от сервера.
+     */
     private final ObjectMapper objectMapper;
 
+    /**
+     * Конструктор класса.
+     *
+     * @param objectMapper ObjectMapper для десериализации ответов от сервера.
+     */
     public RestTemplateErrorHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Проверяет, содержит ли ответ ошибку
+     *
+     * @param response ответ от сервера.
+     * @return true, если ответ содержит ошибку 4xx или 5xx, иначе - false.
+     * @throws IOException если произошла ошибка при чтении ответа.
+     */
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError();
     }
+
+    /**
+     * Обрабатывает ошибку, полученную от сервера.
+     *
+     * @param response ответ от сервера.
+     * @throws IOException если произошла ошибка при чтении ответа.
+     * @throws UnauthorizedException если запрос не авторизован.
+     * @throws NotFoundException если запрашиваемый ресурс не найден.
+     * @throws ConflictException если произошло конфликтное состояние на сервере.
+     * @throws ForbiddenException если у пользователя нет прав на выполнение запроса.
+     * @throws MultiForbiddenException если у пользователя нет прав на выполнение нескольких запросов.
+     * @throws ServiceUnavailableException если сервис сейчас недоступен.
+     */
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is5xxServerError()) {
@@ -57,13 +89,30 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
         }
     }
 
+    /**
+     * Класс для десериализации ответов от сервера.
+     */
     private static class ErrorResponse {
+
+        /**
+         * Список сообщений.
+         */
         private List<String> messages;
 
+        /**
+         * Метод для получения сообщений.
+         *
+         * @return список сообщений.
+         */
         public List<String> getMessages() {
             return messages;
         }
 
+        /**
+         * Устанавливает список сообщений.
+         *
+         * @param messages список сообщений.
+         */
         public void setMessages(List<String> messages) {
             this.messages = messages;
         }

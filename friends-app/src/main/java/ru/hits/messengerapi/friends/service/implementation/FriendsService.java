@@ -14,7 +14,7 @@ import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.ConflictException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
-import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
+import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
@@ -23,9 +23,7 @@ import ru.hits.messengerapi.friends.entity.FriendEntity;
 import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.FriendsServiceInterface;
 
-import java.net.InetAddress;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 

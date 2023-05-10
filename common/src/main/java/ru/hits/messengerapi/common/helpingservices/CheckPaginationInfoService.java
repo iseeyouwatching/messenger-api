@@ -1,10 +1,9 @@
-package ru.hits.messengerapi.common.helpingservices.implementation;
+package ru.hits.messengerapi.common.helpingservices;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.common.exception.BadRequestException;
-import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoInterface;
 
 /**
  * Вспомогательный сервис для проверки на корректность данных необходимых для пагинации.
@@ -12,7 +11,7 @@ import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoInterface;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CheckPaginationInfoService implements CheckPaginationInfoInterface {
+public class CheckPaginationInfoService {
 
     /**
      * Метод для проверки на корректность номера страницы.
@@ -20,7 +19,6 @@ public class CheckPaginationInfoService implements CheckPaginationInfoInterface 
      * @param pageNumber номер страницы.
      * @throws BadRequestException некорректный запрос.
      */
-    @Override
     public void checkPageNumber(int pageNumber) {
         if (pageNumber <= 0) {
             log.error("Номер страницы должен быть больше 0.");
@@ -34,7 +32,6 @@ public class CheckPaginationInfoService implements CheckPaginationInfoInterface 
      * @param pageSize размер страницы.
      * @throws BadRequestException некорректный запрос.
      */
-    @Override
     public void checkPageSize(int pageSize) {
         if (pageSize <= 0) {
             log.error("Размер страницы должен быть больше 0.");
@@ -48,7 +45,6 @@ public class CheckPaginationInfoService implements CheckPaginationInfoInterface 
      * @param pageNumber номер страницы.
      * @param pageSize   размер страницы.
      */
-    @Override
     public void checkPagination(int pageNumber, int pageSize) {
         checkPageNumber(pageNumber);
         checkPageSize(pageSize);

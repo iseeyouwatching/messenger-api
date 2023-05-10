@@ -7,14 +7,15 @@ import lombok.Data;
     import java.util.List;
 
 /**
-* Класс, представляющий ошибку в ответе API.*/
+ * Класс, представляющий ошибку в ответе API.
+ */
 @Data
 @Slf4j
 public class ApiError {
 
     /**
-     * * Список сообщений об ошибке.
-     * */
+     * Список сообщений об ошибке.
+     */
     private List<String> messages;
 
     /**
@@ -27,8 +28,14 @@ public class ApiError {
         this.messages.add(message);
     }
 
+    /**
+     * Конструктор класса.
+     *
+     * @param messages список сообщений.
+     */
     public ApiError(List<String> messages) {
         this.messages = new ArrayList<>();
         this.messages.addAll(messages);
     }
+
 }

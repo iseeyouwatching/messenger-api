@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.dto.PageInfoDto;
 import ru.hits.messengerapi.common.exception.NotFoundException;
-import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
+import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
 import ru.hits.messengerapi.notifications.dto.NotificationDto;
 import ru.hits.messengerapi.notifications.dto.NotificationsPageListDto;

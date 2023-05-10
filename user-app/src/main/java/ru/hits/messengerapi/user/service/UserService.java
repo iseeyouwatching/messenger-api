@@ -22,7 +22,7 @@ import ru.hits.messengerapi.user.dto.*;
 
 import ru.hits.messengerapi.user.entity.UserEntity;
 import ru.hits.messengerapi.user.repository.UserRepository;
-import ru.hits.messengerapi.common.helpingservices.implementation.CheckPaginationInfoService;
+import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
