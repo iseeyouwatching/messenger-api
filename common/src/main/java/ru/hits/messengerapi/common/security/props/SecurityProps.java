@@ -1,8 +1,6 @@
 package ru.hits.messengerapi.common.security.props;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -10,6 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("app.security")
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @ToString
 public class SecurityProps {

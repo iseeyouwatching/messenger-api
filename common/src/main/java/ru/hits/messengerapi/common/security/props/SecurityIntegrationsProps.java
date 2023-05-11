@@ -1,8 +1,6 @@
 package ru.hits.messengerapi.common.security.props;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Класс, содержащий свойства необходимые для интеграционных запросов.
@@ -10,6 +8,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class SecurityIntegrationsProps {
 
     /**
