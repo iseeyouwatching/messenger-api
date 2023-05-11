@@ -189,7 +189,11 @@ public class UserService {
                     .phoneNumber(filtersDto.getPhoneNumber())
                     .city(filtersDto.getCity())
                     .build();
-            example = Example.of(userEntity);
+            ExampleMatcher matcher = ExampleMatcher.matching()
+                    .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+                    .withIgnoreCase(true)
+                    .withIgnoreNullValues();
+            example = Example.of(userEntity, matcher);
         }
 
         Page<UserEntity> page = example == null ? userRepository.findAll(pageable) :
