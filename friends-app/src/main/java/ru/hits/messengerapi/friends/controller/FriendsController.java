@@ -40,7 +40,8 @@ public class FriendsController {
     /**
      * Метод для получения списка друзей пользователя.
      *
-     * @param paginationWithFullNameFilterDto объект класса {@link PaginationWithFullNameFilterDto} с данными для пагинации.
+     * @param paginationWithFullNameFilterDto объект класса {@link PaginationWithFullNameFilterDto}
+     *                                        с данными для пагинации.
      * @return список друзей с информацией о странице и фильтре.
      */
     @Operation(
@@ -48,7 +49,8 @@ public class FriendsController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @PostMapping("/get")
-    public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationWithFullNameFilterDto paginationWithFullNameFilterDto) {
+    public ResponseEntity<FriendsPageListDto> getFriends(@RequestBody @Valid PaginationWithFullNameFilterDto
+                                                                     paginationWithFullNameFilterDto) {
         log.info("Запрос на получение списка друзей пользователя с параметрами: {}",
                 paginationWithFullNameFilterDto);
         return new ResponseEntity<>(friendsService.getFriends(paginationWithFullNameFilterDto), HttpStatus.OK);
@@ -87,22 +89,22 @@ public class FriendsController {
         return new ResponseEntity<>(friendsService.addToFriends(addPersonDto), HttpStatus.OK);
     }
 
-    /**
-     * Метод для синхронизации информации о пользователе, находящегося в друзьях.
-     *
-     * @param id идентификатор пользователя, находящегося в друзьях.
-     * @return сообщение об успешной синхронизации данных.
-     */
-    @Operation(
-            summary = "Синхронизация данных друга.",
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @PatchMapping("/sync/{id}")
-    public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
-        Map<String, String> response = integrationRequestsService.syncFriendData(id);
-        log.info("Данные друга с идентификатором {} синхронизированы", id);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    /**
+//     * Метод для синхронизации информации о пользователе, находящегося в друзьях.
+//     *
+//     * @param id идентификатор пользователя, находящегося в друзьях.
+//     * @return сообщение об успешной синхронизации данных.
+//     */
+//    @Operation(
+//            summary = "Синхронизация данных друга.",
+//            security = @SecurityRequirement(name = "bearerAuth")
+//    )
+//    @PatchMapping("/sync/{id}")
+//    public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
+//        Map<String, String> response = integrationRequestsService.syncFriendData(id);
+//        log.info("Данные друга с идентификатором {} синхронизированы", id);
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
     /**
      * Метод для удаления друга из списка друзей по его идентификатору.

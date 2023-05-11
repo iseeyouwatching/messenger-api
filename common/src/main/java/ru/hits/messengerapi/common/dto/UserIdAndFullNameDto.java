@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.dto;
+package ru.hits.messengerapi.common.dto;
 
 import lombok.*;
 
@@ -12,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class UserIdAndFullNameDto {
 
     /**

@@ -94,21 +94,21 @@ public class BlacklistController {
         return new ResponseEntity<>(blacklistService.addToBlacklist(addPersonDto), HttpStatus.OK);
     }
 
-    /**
-     * Метод для синхронизации информации о пользователе из черного списка.
-     *
-     * @param id идентификатор пользователя в черном списке.
-     * @return сообщение об успешной синхронизации данных.
-     */
-    @Operation(
-            summary = "Синхронизация данных заблокированного пользователя.",
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @PatchMapping("/sync/{id}")
-    public ResponseEntity<Map<String, String>> syncBlockedUserData(@PathVariable("id") UUID id) {
-        log.info("Синхронизация данных заблокированного пользователя с ID: {}", id);
-        return new ResponseEntity<>(integrationRequestsService.syncBlockedUserData(id), HttpStatus.OK);
-    }
+//    /**
+//     * Метод для синхронизации информации о пользователе из черного списка.
+//     *
+//     * @param id идентификатор пользователя в черном списке.
+//     * @return сообщение об успешной синхронизации данных.
+//     */
+//    @Operation(
+//            summary = "Синхронизация данных заблокированного пользователя.",
+//            security = @SecurityRequirement(name = "bearerAuth")
+//    )
+//    @PatchMapping("/sync/{id}")
+//    public ResponseEntity<Map<String, String>> syncBlockedUserData(@PathVariable("id") UUID id) {
+//        log.info("Синхронизация данных заблокированного пользователя с ID: {}", id);
+//        return new ResponseEntity<>(integrationRequestsService.syncBlockedUserData(id), HttpStatus.OK);
+//    }
 
     /**
      * Метод для удаления пользователя из черного списка.

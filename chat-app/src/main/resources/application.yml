@@ -37,6 +37,8 @@ spring:
   cloud.stream.bindings:
     newNotificationEvent-out-0:
       destination: ${app.id}_NEW_NOTIFICATION_EVENT
+    userDataSynchronizationEvent-in-0:
+      destination: ${app.id}_USER_DATA_SYNCHRONIZATION_EVENT
 
 integration:
   request:

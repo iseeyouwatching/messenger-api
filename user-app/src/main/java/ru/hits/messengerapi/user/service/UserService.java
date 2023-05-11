@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.hits.messengerapi.common.dto.NewNotificationDto;
+import ru.hits.messengerapi.common.dto.UserIdAndFullNameDto;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.ConflictException;
@@ -275,7 +276,11 @@ public class UserService {
         updateUserEntity(user, updateUserInfoDto);
 
         UserEntity savedUser = userRepository.save(user);
-
+        UserIdAndFullNameDto userIdAndFullNameDto = UserIdAndFullNameDto.builder()
+                .fullName(savedUser.getFullName())
+                .id(savedUser.getId())
+                .build();
+        synchronizeUserData(userIdAndFullNameDto);
         log.info("Профиль пользователя с ID {} успешно обновлен.", user.getId());
 
         return new UserProfileDto(savedUser);
@@ -361,6 +366,10 @@ public class UserService {
      */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
+    }
+
+    private void synchronizeUserData(UserIdAndFullNameDto userIdAndFullNameDto) {
+        streamBridge.send("userDataSynchronizationEvent-out-0", userIdAndFullNameDto);
     }
 
 }

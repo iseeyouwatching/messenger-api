@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.controller.RestTemplateErrorHandler;
+import ru.hits.messengerapi.common.dto.UserIdAndFullNameDto;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
@@ -105,12 +106,12 @@ public class IntegrationRequestsService {
     /**
      * Синхронизация данных заблокированного пользователя.
      *
-     * @param id идентификатор пользователя.
-     * @return сообщение об успешной синхронизации.
+     * @param userIdAndFullNameDto DTO с информацией о ID и ФИО пользователя.
      */
     @Transactional
-    public Map<String, String> syncBlockedUserData(UUID id) {
-        String fullName = getFullName(id);
+    public void syncBlockedUserData(UserIdAndFullNameDto userIdAndFullNameDto) {
+        UUID id = userIdAndFullNameDto.getId();
+        String fullName = userIdAndFullNameDto.getFullName();
         log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);
 
         List<BlacklistEntity> blockedUsers = blacklistRepository.findAllByBlockedUserId(id);
@@ -119,19 +120,17 @@ public class IntegrationRequestsService {
         blacklistRepository.saveAll(blockedUsers);
 
         log.info("Данные заблокированного пользователя с ID {} были успешно синхронизированы.", id);
-
-        return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
     /**
      * Синхронизация данных друга.
      *
-     * @param id идентификатор пользователя.
-     * @return сообщение об успешной синхронизации.
+     * @param userIdAndFullNameDto DTO с информацией о ID и ФИО пользователя.
      */
     @Transactional
-    public Map<String, String> syncFriendData(UUID id) {
-        String fullName = getFullName(id);
+    public void syncFriendData(UserIdAndFullNameDto userIdAndFullNameDto) {
+        UUID id = userIdAndFullNameDto.getId();
+        String fullName = userIdAndFullNameDto.getFullName();
         log.debug("Получено полное имя {} для пользователя с ID {}", fullName, id);
 
         List<FriendEntity> friends = friendsRepository.findAllByAddedUserId(id);
@@ -140,7 +139,6 @@ public class IntegrationRequestsService {
         friendsRepository.saveAll(friends);
 
         log.info("Синхронизация данных для пользователя с ID {} завершена.", id);
-        return Map.of("message", "Синхронизация данных прошла успешно.");
     }
 
 }

@@ -182,14 +182,12 @@ public class BlacklistService {
                             "так как он добавлен в черный список.",
                     addPersonDto.getId(), addPersonDto.getFullName(), targetUserId, userData.getFullName());
             friendsService.deleteFriend(addPersonDto.getId());
-            integrationRequestsService.syncFriendData(addPersonDto.getId());
         }
 
         if (blockedUser.isPresent()) {
             blockedUser.get().setDeletedDate(null);
             blockedUser.get().setIsDeleted(false);
             blockedUser.get().setAddedDate(LocalDate.now());
-            integrationRequestsService.syncBlockedUserData(addPersonDto.getId());
             blacklistRepository.save(blockedUser.get());
             log.info("Пользователь с ID {} и ФИО {} уже существует в черном списке пользователя " +
                             "с ID {} и ФИО {}, поэтому мы его только обновляем.",

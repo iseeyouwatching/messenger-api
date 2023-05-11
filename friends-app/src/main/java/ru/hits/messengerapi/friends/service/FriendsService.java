@@ -203,7 +203,6 @@ public class FriendsService {
             friend.get().setDeletedDate(null);
             friend.get().setIsDeleted(false);
             friend.get().setAddedDate(LocalDate.now());
-            integrationRequestsService.syncFriendData(addPersonDto.getId());
             friendsRepository.save(friend.get());
 
             Optional<FriendEntity> mutualFriendship = friendsRepository.findByTargetUserIdAndAddedUserId(
@@ -213,7 +212,6 @@ public class FriendsService {
                 mutualFriendship.get().setDeletedDate(null);
                 mutualFriendship.get().setIsDeleted(false);
                 mutualFriendship.get().setAddedDate(friend.get().getAddedDate());
-                integrationRequestsService.syncFriendData(targetUserId);
                 friendsRepository.save(mutualFriendship.get());
 
                 log.info("Пользователи {} и {} стали друзьями.", targetUserId, addPersonDto.getId());
