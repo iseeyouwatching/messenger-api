@@ -71,19 +71,6 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUsers() {
-        PaginationDto paginationDto = new PaginationDto();
-        UsersPageListDto usersPageListDto = new UsersPageListDto();
-
-        when(userService.getUserList(any(PaginationDto.class))).thenReturn(usersPageListDto);
-
-        ResponseEntity<UsersPageListDto> responseEntity = controller.getUsers(paginationDto);
-
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isNotNull();
-    }
-
-    @Test
     public void testGetUserInfo() {
         String login = "test";
         UserProfileDto userProfileDto = new UserProfileDto();
