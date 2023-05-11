@@ -18,7 +18,18 @@ import java.util.function.Consumer;
 @Configuration
 @RequiredArgsConstructor
 public class RabbitUserEventListener {
+
+    /**
+     * Репозиторий для работы с сущностью {@link MessageEntity}.
+     */
     private final MessageRepository messageRepository;
+
+    /**
+     * Обрабатывает событие синхронизации данных пользователя. Обновляет имя отправителя у сообщений,
+     * которые были отправлены пользователем с указанным идентификатором.
+     *
+     * @return consumer, обрабатывающий событие синхронизации данных пользователя.
+     */
     @Bean
     public Consumer<UserIdAndFullNameDto> userDataSynchronizationEvent() {
         return userData -> {

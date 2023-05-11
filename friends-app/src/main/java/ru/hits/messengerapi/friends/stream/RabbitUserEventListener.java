@@ -16,8 +16,18 @@ import java.util.function.Consumer;
 @Configuration
 @RequiredArgsConstructor
 public class RabbitUserEventListener {
+
+    /**
+     * Сервис для интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
 
+    /**
+     * Обрабатывает событие синхронизации данных пользователей.
+     * Вызывает методы сервиса для синхронизации заблокированных пользователей и друзей.
+     *
+     * @return consumer, обрабатывающий событие синхронизации данных пользователя.
+     */
     @Bean
     public Consumer<UserIdAndFullNameDto> userDataSynchronizationEvent() {
         return userData -> {
