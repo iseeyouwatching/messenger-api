@@ -399,6 +399,7 @@ public class FriendsService {
      *                           содержащий информацию о новом уведомлении.
      */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
+        log.info("Отправка нового уведомления: {}", newNotificationDto);
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }
 

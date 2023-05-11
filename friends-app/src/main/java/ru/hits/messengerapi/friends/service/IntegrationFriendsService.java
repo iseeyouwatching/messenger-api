@@ -38,6 +38,8 @@ public class IntegrationFriendsService {
         Optional<FriendEntity> friend =
                 friendsRepository.findByTargetUserIdAndAddedUserId(targetUserId, addedUserId);
         if (friend.isEmpty() || friend.get().getDeletedDate() != null) {
+            log.warn("Пользователь с ID {} не может написать пользователю с ID {}, так как они не являются друзьями.",
+                    targetUserId, addedUserId);
             throw new ForbiddenException("Пользователь с ID " + targetUserId + " не может написать пользователю с ID "
                     + addedUserId + ", так как они не являются друзьями.");
         }
@@ -67,6 +69,7 @@ public class IntegrationFriendsService {
             }
         }
         if (!result.isEmpty()) {
+            log.error("Проверка нахождения пользователей в друзьях у другого пользователя. Ошибка: {}", result);
             throw new MultiForbiddenException(result);
         }
         return true;

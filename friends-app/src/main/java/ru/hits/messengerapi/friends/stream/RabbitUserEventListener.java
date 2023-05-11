@@ -31,6 +31,7 @@ public class RabbitUserEventListener {
     @Bean
     public Consumer<UserIdAndFullNameDto> userDataSynchronizationEvent() {
         return userData -> {
+            log.info("Обработка события синхронизации данных пользователя с ID {}", userData.getId());
             integrationRequestsService.syncBlockedUserData(userData);
             integrationRequestsService.syncFriendData(userData);
         };

@@ -41,6 +41,7 @@ public class IntegrationFriendsController {
     @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-in-friends")
     public ResponseEntity<Boolean> checkExistenceInFriends(@RequestBody List<UUID> uuids) {
+        log.info("Проверка нахождения пользователя в друзьях у другого пользователя: {}", uuids);
         return new ResponseEntity<>(integrationFriendsService.checkExistenceInFriends(uuids.get(0), uuids.get(1)),
                 HttpStatus.OK);
     }
@@ -55,6 +56,7 @@ public class IntegrationFriendsController {
     @SecurityRequirement(name = "api_key")
     @PostMapping("/check-multi-existence-in-friends")
     public ResponseEntity<Boolean> checkMultiExistenceInFriends(@RequestBody List<UUID> uuids) {
+        log.info("Проверка нахождения пользователей в друзьях у другого пользователя: {}", uuids);
         return new ResponseEntity<>(integrationFriendsService.checkMultiExistenceInFriends(uuids), HttpStatus.OK);
     }
 }
