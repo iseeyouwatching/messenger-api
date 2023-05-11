@@ -80,6 +80,7 @@ public class MessageService {
      */
     @Transactional
     public void sendMessageToDialogue(DialogueMessageDto dialogueMessageDto) {
+        log.debug("Начало отправки сообщения в диалог");
         integrationRequestsService.checkUserExistence(dialogueMessageDto.getReceiverId());
 
         UUID senderId = getAuthenticatedUserId();
@@ -138,6 +139,7 @@ public class MessageService {
                         .substring(0, Math.min(dialogueMessageDto.getMessageText().length(), 100)) + "'.")
                 .build();
         sendByStreamBridge(newNotificationDto);
+        log.debug("Отправка сообщения в диалог завершена");
     }
 
     /**
@@ -149,6 +151,7 @@ public class MessageService {
      */
     @Transactional
     public void sendMessageToChat(ChatMessageDto chatMessageDto) {
+        log.debug("Начало отправки сообщения в чат");
         Optional<ChatEntity> chat = chatRepository.findById(chatMessageDto.getChatId());
         if (chat.isEmpty()) {
             throw new NotFoundException("Чата с ID " + chatMessageDto.getChatId() + " не существует.");
@@ -190,6 +193,7 @@ public class MessageService {
             }
             attachmentRepository.saveAll(attachments);
         }
+        log.debug("Отправка сообщения в чат завершена");
     }
 
     /**
@@ -240,8 +244,11 @@ public class MessageService {
             searchResult.setFileNames(attachmentNames);
 
             searchResults.add(searchResult);
-        }
 
+            log.info("Сообщение найдено: chatId={}, chatName={}, messageText={}, messageSendDate={}, fileNames={}",
+                    searchResult.getChatId(), searchResult.getChatName(), searchResult.getMessageText(),
+                    searchResult.getMessageSendDate(), searchResult.getFileNames());
+        }
         return searchResults;
     }
 
@@ -263,6 +270,7 @@ public class MessageService {
      *                           содержащий информацию о новом уведомлении.
      */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
+        log.info("Отправка нового уведомления: {}", newNotificationDto);
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }
 

@@ -84,6 +84,7 @@ public class ChatService {
         List<ChatUserEntity> chatUserEntityList =
                 chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.getId(), listOfIDs);
         chatUserRepository.saveAll(chatUserEntityList);
+        log.debug("Создан новый чат с ID: {}", chat.getId());
     }
 
 
@@ -100,6 +101,7 @@ public class ChatService {
         UUID authenticatedUserId = getAuthenticatedUserId();
 
         if (chatRepository.findBySenderIdAndReceiverId(authenticatedUserId, receiverId).isPresent()) {
+            log.warn("Пользователь не может создать больше одного диалога с самим собой.");
             throw new ConflictException("Пользователь не может создать больше одного диалога с самим собой.");
         }
 
@@ -119,6 +121,7 @@ public class ChatService {
                 chatUserMapper.chatAndUserIdToListOfChatAndUser(chat.getId(), listOfIDs);
         chatUserRepository.saveAll(chatUserEntityList);
 
+        log.info("Создан диалог между пользователями с ID {} и {}.", authenticatedUserId, receiverId);
         return chat;
     }
 
@@ -181,6 +184,7 @@ public class ChatService {
             }
         }
         chatRepository.save(chat.get());
+        log.info("Чат с ID {} был обновлен.", updateChatDto.getId());
     }
 
     /**

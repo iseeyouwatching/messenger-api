@@ -42,6 +42,7 @@ public class CorrespondenceController {
     )
     @GetMapping("/{id}/get-info")
     public ResponseEntity<CorrespondenceInfoDto> getCorrespondenceInfo(@PathVariable("id") UUID id) {
+        log.info("Получение информации о переписке с ID: {}", id);
         return new ResponseEntity<>(correspondenceService.getCorrespondenceInfo(id), HttpStatus.OK);
     }
 
@@ -57,6 +58,7 @@ public class CorrespondenceController {
     )
     @GetMapping("/{id}/view")
     public ResponseEntity<List<MessageInCorrespondenceDto>> viewCorrespondence(@PathVariable("id") UUID id) {
+        log.info("Просмотр переписки с ID: {}", id);
         return new ResponseEntity<>(correspondenceService.viewCorrespondence(id), HttpStatus.OK);
     }
 
@@ -74,6 +76,7 @@ public class CorrespondenceController {
     @PostMapping("/get")
     public ResponseEntity<CorrespondencesPageListDto> getCorrespondences(@RequestBody @Valid
                                                                                  PaginationWithChatNameDto paginationWithChatNameDto) {
+        log.info("Получение списка переписок: {}", paginationWithChatNameDto);
         return new ResponseEntity<>(
                 correspondenceService.getCorrespondences(paginationWithChatNameDto),HttpStatus.OK);
     }

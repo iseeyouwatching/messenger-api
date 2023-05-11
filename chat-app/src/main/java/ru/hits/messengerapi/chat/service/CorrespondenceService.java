@@ -66,6 +66,7 @@ public class CorrespondenceService {
      * @return информация о переписке.
      */
     public CorrespondenceInfoDto getCorrespondenceInfo(UUID id) {
+        log.info("Получение информации о переписке с ID {}", id);
         Optional<ChatEntity> chat = chatRepository.findById(id);
         if (chat.isEmpty()) {
             throw new NotFoundException("Переписки с ID " + id + " не существует.");
@@ -89,6 +90,7 @@ public class CorrespondenceService {
             chatName = chat.get().getName();
         }
 
+        log.info("Информация о переписке с ID {} получена успешно", id);
         return new CorrespondenceInfoDto(
                 chatName,
                 chat.get().getAvatarId(),
@@ -108,16 +110,19 @@ public class CorrespondenceService {
     public List<MessageInCorrespondenceDto> viewCorrespondence(UUID id) {
         Optional<ChatEntity> chat = chatRepository.findById(id);
         if (chat.isEmpty()) {
-            throw new NotFoundException("Переписки с ID " + id + " не существует.");
+            String errorMessage = "Переписки с ID " + id + " не существует.";
+            log.error(errorMessage);
+            throw new NotFoundException(errorMessage);
         }
 
         if (chatUserRepository.findByChatIdAndUserId(id, getAuthenticatedUserId()).isEmpty()) {
-            throw new ForbiddenException("Пользователь с ID " + getAuthenticatedUserId()
+            String errorMessage = "Пользователь с ID " + getAuthenticatedUserId()
                     + " не может посмотреть переписку с ID " + id
-                    + ", потому что не состоит в ней.");
+                    + ", потому что не состоит в ней.";
+            log.error(errorMessage);
+            throw new ForbiddenException(errorMessage);
         }
 
-        integrationRequestsService.syncUserData(getAuthenticatedUserId());
         List<MessageEntity> messages = messageRepository.findAllByChatId(id);
         List<MessageInCorrespondenceDto> messageInCorrespondenceDtos = new ArrayList<>();
         for (MessageEntity message: messages) {
@@ -142,6 +147,7 @@ public class CorrespondenceService {
      */
     public CorrespondencesPageListDto getCorrespondences(PaginationWithChatNameDto
                                                                          paginationWithChatNameDto) {
+        log.info("Начинаем получение переписок с параметрами {}", paginationWithChatNameDto);
         int pageNumber =paginationWithChatNameDto.getPageInfo() != null &&
                 paginationWithChatNameDto.getPageInfo().getPageNumber() == null ? 1
                 : paginationWithChatNameDto.getPageInfo().getPageNumber();

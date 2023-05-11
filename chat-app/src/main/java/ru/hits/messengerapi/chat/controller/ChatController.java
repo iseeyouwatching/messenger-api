@@ -40,6 +40,7 @@ public class ChatController {
     @PostMapping
     public void createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         chatService.createChat(createChatDto);
+        log.info("Чат успешно создан.");
     }
 
     /**
@@ -54,6 +55,7 @@ public class ChatController {
     @PutMapping
     public void updateChat(@RequestBody @Valid UpdateChatDto updateChatDto) {
         chatService.updateChat(updateChatDto);
+        log.info("Чат успешно обновлен.");
     }
 
 }

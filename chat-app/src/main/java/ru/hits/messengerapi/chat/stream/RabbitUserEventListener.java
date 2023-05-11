@@ -33,9 +33,12 @@ public class RabbitUserEventListener {
     @Bean
     public Consumer<UserIdAndFullNameDto> userDataSynchronizationEvent() {
         return userData -> {
+            log.info("Получено событие синхронизации данных пользователя: id={}, fullName={}",
+                    userData.getId(), userData.getFullName());
             List<MessageEntity> messages = messageRepository.findAllBySenderId(userData.getId());
             messages.forEach(message -> message.setSenderName(userData.getFullName()));
             messageRepository.saveAll(messages);
+            log.info("Данные отправителя для {} сообщений обновлены.", messages.size());
         };
     }
 

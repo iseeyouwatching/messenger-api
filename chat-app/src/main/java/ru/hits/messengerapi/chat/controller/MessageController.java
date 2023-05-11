@@ -46,6 +46,7 @@ public class MessageController {
     )
     @PostMapping("/dialogue")
     public void sendMessageToDialogue(@RequestBody @Valid DialogueMessageDto dialogueMessageDto) {
+        log.info("Отправка сообщения в личные сообщения: {}", dialogueMessageDto);
         messageService.sendMessageToDialogue(dialogueMessageDto);
     }
 
@@ -61,6 +62,7 @@ public class MessageController {
     )
     @PostMapping("/chat")
     public void sendMessageToChat(@RequestBody @Valid ChatMessageDto chatMessageDto) {
+        log.info("Отправка сообщения в чат: {}", chatMessageDto);
         messageService.sendMessageToChat(chatMessageDto);
     }
 
@@ -77,6 +79,7 @@ public class MessageController {
     )
     @PostMapping("/search")
     public ResponseEntity<List<MessageDto>> searchMessages(@RequestBody @Valid SearchStringDto searchStringDto) {
+        log.info("Поиск сообщений: {}", searchStringDto);
         return new ResponseEntity<>(messageService.searchMessages(searchStringDto), HttpStatus.OK);
     }
 

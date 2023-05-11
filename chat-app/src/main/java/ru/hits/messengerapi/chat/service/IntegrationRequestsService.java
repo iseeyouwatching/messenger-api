@@ -77,6 +77,13 @@ public class IntegrationRequestsService {
 
         ResponseEntity<Boolean> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
+
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            log.info("Запрос на проверку существования пользователя с ID {} выполнен успешно.", id);
+        } else {
+            log.warn("Запрос на проверку существования пользователя с ID {} завершился с ошибкой. Код ошибки: {}.",
+                    id, responseEntity.getStatusCodeValue());
+        }
     }
 
     /**
@@ -99,34 +106,14 @@ public class IntegrationRequestsService {
                 .exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {
                 });
 
-        return responseEntity.getBody();
-    }
-
-    /**
-     * Метод для синхронизации данных пользователя.
-     *
-     * @param id идентификатор пользователя, чьи данные необходимо синхронизировать.
-     * @return сообщение об успешной синхронизации.
-     */
-    @Transactional
-    public Map<String, String> syncUserData(UUID id) {
-        List<String> fullNameAndAvatarId = getFullNameAndAvatarId(id);
-        String fullName = fullNameAndAvatarId.get(0);
-        String avatarIdString = fullNameAndAvatarId.get(1);
-        UUID senderAvatarId = null;
-        if (avatarIdString != null) {
-            senderAvatarId = UUID.fromString(avatarIdString);
+        List<String> result = responseEntity.getBody();
+        if (result != null) {
+            log.debug("Получены данные о полном имени и ID аватара пользователя с ID {}", id);
+        } else {
+            log.warn("Не удалось получить данные о полном имени и ID аватара пользователя с ID {}", id);
         }
 
-        List<MessageEntity> messageEntities = messageRepository.findAllBySenderId(id);
-
-        for (MessageEntity message: messageEntities) {
-            message.setSenderName(fullName);
-            message.setSenderAvatarId(senderAvatarId);
-        }
-        messageRepository.saveAll(messageEntities);
-
-        return Map.of("message", "Синхронизация данных прошла успешно.");
+        return result;
     }
 
     /**
@@ -148,8 +135,12 @@ public class IntegrationRequestsService {
         uuids.add(receiverId);
         HttpEntity<List<UUID>> requestEntity = new HttpEntity<>(uuids, headers);
 
+        log.debug("Вызов метода checkExistenceInFriends с параметрами authUserId={}, receiverId={}", authUserId, receiverId);
+
         ResponseEntity<Boolean> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
+
+        log.debug("Ответ от метода checkExistenceInFriends: {}", responseEntity.getBody());
     }
 
     /**
@@ -173,6 +164,13 @@ public class IntegrationRequestsService {
 
         ResponseEntity<Boolean> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Boolean.class);
+
+        if (responseEntity != null && responseEntity.getBody() != null) {
+            log.info("Проверка наличия нескольких пользователей в друзьях прошла успешно. Результат: {}",
+                    responseEntity.getBody());
+        } else {
+            log.warn("Проверка наличия нескольких пользователей в друзьях завершилась с ошибкой. Результат: null");
+        }
     }
 
 }

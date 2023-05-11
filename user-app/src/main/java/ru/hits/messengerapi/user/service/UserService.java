@@ -365,10 +365,12 @@ public class UserService {
      *                           содержащий информацию о новом уведомлении.
      */
     private void sendByStreamBridge(NewNotificationDto newNotificationDto) {
+        log.info("Отправка нового уведомления: {}", newNotificationDto);
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }
 
     private void synchronizeUserData(UserIdAndFullNameDto userIdAndFullNameDto) {
+        log.info("Синхронизация данных пользователя по стриму: {}", userIdAndFullNameDto);
         streamBridge.send("userDataSynchronizationEvent-out-0", userIdAndFullNameDto);
     }
 
