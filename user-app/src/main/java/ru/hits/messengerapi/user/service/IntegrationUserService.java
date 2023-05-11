@@ -88,6 +88,7 @@ public class IntegrationUserService {
      * @return ФИО и аватарка пользователя.
      */
     public List<String> getFullNameAndAvatar(UUID id) {
+
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
@@ -103,6 +104,7 @@ public class IntegrationUserService {
             result.add(null);
         }
 
+        log.info("Получены полное имя и аватар пользователя с ID {}: {}", id, result);
         return result;
     }
 }

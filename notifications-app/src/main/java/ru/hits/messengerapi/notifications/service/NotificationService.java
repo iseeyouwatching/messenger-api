@@ -64,6 +64,8 @@ public class NotificationService {
                 .receiveTime(LocalDateTime.now())
                 .build();
         notificationRepository.save(notification);
+        log.info("Уведомление типа {} для пользователя с ID {} сохранено",
+                newNotificationDto.getType(), newNotificationDto.getUserId());
     }
 
     /**
@@ -72,7 +74,9 @@ public class NotificationService {
      * @return Количество непрочитанных уведомлений пользователя.
      */
     public Long getUnreadCount() {
-        return notificationRepository.countByUserIdAndStatus(getAuthenticatedUserId(), NotificationStatus.UNREAD);
+        Long count = notificationRepository.countByUserIdAndStatus(getAuthenticatedUserId(), NotificationStatus.UNREAD);
+        log.info("Количество непрочитанных уведомлений для пользователя с ID {}: {}", getAuthenticatedUserId(), count);
+        return count;
     }
 
     /**
@@ -98,11 +102,15 @@ public class NotificationService {
         if (notificationsStatusUpdateDTO.getStatus().equals(NotificationStatus.READ)) {
             notificationRepository.markAsRead(notificationsStatusUpdateDTO.getNotificationsIDs(),
                     notificationsStatusUpdateDTO.getStatus(), LocalDateTime.now());
+            log.info("Уведомления с ID {} отмечены как прочитанные", notificationsStatusUpdateDTO.getNotificationsIDs());
         } else if (notificationsStatusUpdateDTO.getStatus().equals(NotificationStatus.UNREAD)) {
             notificationRepository.markAsUnread(notificationsStatusUpdateDTO.getNotificationsIDs(),
                     notificationsStatusUpdateDTO.getStatus(), null);
+            log.info("Уведомления с ID {} отмечены как непрочитанные", notificationsStatusUpdateDTO.getNotificationsIDs());
         }
-        return getUnreadCount();
+        Long unreadCount = getUnreadCount();
+        log.info("Количество непрочитанных уведомлений для пользователя с ID {}: {}", getAuthenticatedUserId(), unreadCount);
+        return unreadCount;
     }
 
     /**
@@ -112,6 +120,7 @@ public class NotificationService {
      * @return список уведомлений пользователя.
      */
     public NotificationsPageListDto getNotifications(PaginationAndFiltersDto paginationAndFiltersDto) {
+        log.info("Запрос уведомлений с параметрами: {}", paginationAndFiltersDto);
         int pageNumber = paginationAndFiltersDto.getPageInfo() != null &&
                 paginationAndFiltersDto.getPageInfo().getPageNumber() == null ? 1
                 : paginationAndFiltersDto.getPageInfo().getPageNumber();
@@ -157,6 +166,8 @@ public class NotificationService {
         result.setPageInfo(new PageInfoDto(notificationsPage.getPageable().getPageNumber() + 1,
                 notificationsPage.getPageable().getPageSize()));
         result.setFilters(paginationAndFiltersDto.getFilters());
+
+        log.info("Получено {} уведомлений", notificationDtos.size());
 
         return result;
     }

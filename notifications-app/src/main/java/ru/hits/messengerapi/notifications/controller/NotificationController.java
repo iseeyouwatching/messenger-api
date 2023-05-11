@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.notifications.dto.NotificationsPageListDto;
 import ru.hits.messengerapi.notifications.dto.NotificationsStatusUpdateDTO;
 import ru.hits.messengerapi.notifications.dto.PaginationAndFiltersDto;
+import ru.hits.messengerapi.notifications.enumeration.NotificationStatus;
 import ru.hits.messengerapi.notifications.service.NotificationService;
 
 import javax.validation.Valid;
@@ -43,7 +44,10 @@ public class NotificationController {
     @PostMapping("/get")
     public ResponseEntity<NotificationsPageListDto> getNotifications(@RequestBody @Valid PaginationAndFiltersDto
                                                                                  paginationAndFiltersDto) {
-        return new ResponseEntity<>(notificationService.getNotifications(paginationAndFiltersDto), HttpStatus.OK);
+        log.debug("Получение списка уведомлений с параметрами: {}", paginationAndFiltersDto);
+        NotificationsPageListDto notificationsPageListDto = notificationService.getNotifications(paginationAndFiltersDto);
+        log.debug("Список уведомлений: {}", notificationsPageListDto);
+        return new ResponseEntity<>(notificationsPageListDto, HttpStatus.OK);
     }
 
     /**
@@ -57,7 +61,10 @@ public class NotificationController {
     )
     @GetMapping("/unread-count")
     public ResponseEntity<Long> getUnreadCount() {
-        return new ResponseEntity<>(notificationService.getUnreadCount(), HttpStatus.OK);
+        log.debug("Получение количества непрочитанных уведомлений");
+        Long unreadCount = notificationService.getUnreadCount();
+        log.debug("Количество непрочитанных уведомлений: {}", unreadCount);
+        return new ResponseEntity<>(unreadCount, HttpStatus.OK);
     }
 
     /**
@@ -74,9 +81,12 @@ public class NotificationController {
     @PutMapping("/mark-as-read-or-unread")
     public ResponseEntity<Long> markAsReadOrUnread(@RequestBody @Valid
                                                NotificationsStatusUpdateDTO notificationsStatusUpdateDTO) {
-        return new ResponseEntity<>(notificationService
-                .markNotificationsAsReadOrUnread(notificationsStatusUpdateDTO),
-                HttpStatus.OK);
+        log.debug("Пометка уведомлений как {} с параметрами: {}",
+                notificationsStatusUpdateDTO.getStatus() == NotificationStatus.READ ? "прочитанные" : "непрочитанные",
+                notificationsStatusUpdateDTO);
+        Long updatedNotificationsCount = notificationService.markNotificationsAsReadOrUnread(notificationsStatusUpdateDTO);
+        log.debug("Количество обновленных уведомлений: {}", updatedNotificationsCount);
+        return new ResponseEntity<>(updatedNotificationsCount, HttpStatus.OK);
     }
 
 }
