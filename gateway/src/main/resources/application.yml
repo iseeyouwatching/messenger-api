@@ -21,3 +21,7 @@ spring:
           uri: http://localhost:8194/
           predicates:
             - Path=/api/notifications/**
+        - id: file_storage_route
+          uri: http://localhost:8195/
+          predicates:
+          - Path=/api/files/**

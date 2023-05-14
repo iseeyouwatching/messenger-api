@@ -1,0 +1,43 @@
+minio:
+  access-key: tEKGW3yu9B6EXbKh
+  secret-key: myPeazkx8tjTGDxQ1b4Z8wQGyOMLtV7E
+  bucket: hits-bucket
+  url: http://localhost:9900
+
+app:
+  security:
+    jwt-token:
+      permit-all:
+        - /api/users/register
+        - /api/users/login
+      root-path: /api
+      secret: qqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrtttyyyuuuiiiooopppqqqwwweeerrrttty
+      issuer: messenger-api
+      subject: User details
+    integrations:
+      root-path: /integration
+      api-key: ac816388c1c44ac2b2ae431f89c82e7e345d25a0e6474e75a78f9a5ce496060c
+
+spring:
+  application:
+    name: file-storage
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:5432/file_storage_db
+    user: hits
+    password: hits
+    enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/file_storage_db
+    username: hits
+    password: hits
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+server:
+  port: 8195
