@@ -73,18 +73,17 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
             } else if (response.getStatusCode() == HttpStatus.CONFLICT) {
                 InputStream responseBody = response.getBody();
                 ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
-                if (errorResponse.getMessages().size() > 1) {
-                    throw new MultiForbiddenException(errorResponse.getMessages());
-                }
-                else if (errorResponse.getMessages().size() == 1) {
-                    String errorMessage = errorResponse.getMessages().get(0);
-                    throw new ConflictException(errorMessage);
-                }
+                String errorMessage = errorResponse.getMessages().get(0);
+                throw new ConflictException(errorMessage);
             } else if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
                 InputStream responseBody = response.getBody();
                 ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
-                String errorMessage = errorResponse.getMessages().get(0);
-                throw new ForbiddenException(errorMessage);
+                if (errorResponse.getMessages().size() > 1) {
+                    throw new MultiForbiddenException(errorResponse.getMessages());
+                } else if (errorResponse.getMessages().size() == 1) {
+                    String errorMessage = errorResponse.getMessages().get(0);
+                    throw new ForbiddenException(errorMessage);
+                }
             }
         }
     }
