@@ -35,6 +35,9 @@ public class IntegrationRequestsService {
     @Value("${integration.request.check-existence-in-blacklist}")
     private String integrationUsersRequestCheckExistenceInBlacklist;
 
+    @Value("${integration.request.check-avatar-id-existence}")
+    private String integrationFileStorageRequestCheckAvatarIdExistence;
+
     /**
      * Метод для проверки нахождения пользователя в черном списке другого пользователя.
      *
@@ -66,4 +69,17 @@ public class IntegrationRequestsService {
 
         return isBlocked;
     }
+
+    public void checkAvatarIdExistence(UUID id) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
+        String url = integrationFileStorageRequestCheckAvatarIdExistence;
+
+        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Void.class, id);
+    }
+
 }

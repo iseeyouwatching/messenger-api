@@ -43,6 +43,7 @@ spring:
 integration:
   request:
     check-existence-in-blacklist: http://localhost:8192/integration/blacklist/check-existence-in-blacklist
+    check-avatar-id-existence: http://localhost:8195/integration/files/check-avatar-id-existence/{id}
 
 server:
   port: 8191

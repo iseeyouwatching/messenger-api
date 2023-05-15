@@ -100,6 +100,10 @@ public class UserService {
             throw new BadRequestException(message);
         }
 
+        if (userSignUpDto.getAvatar() != null) {
+            integrationRequestsService.checkAvatarIdExistence(userSignUpDto.getAvatar());
+        }
+
         UserEntity user = modelMapper.map(userSignUpDto, UserEntity.class);
         user.setPassword(bCryptPasswordEncoder.encode(userSignUpDto.getPassword()));
         user = userRepository.save(user);
@@ -343,8 +347,10 @@ public class UserService {
         }
 
         if (updateUserInfoDto.getAvatar() != null) {
+            integrationRequestsService.checkAvatarIdExistence(updateUserInfoDto.getAvatar());
             user.setAvatar(updateUserInfoDto.getAvatar());
         }
+
     }
 
     /**
