@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.hits.messengerapi.chat.dto.*;
+import ru.hits.messengerapi.chat.entity.AttachmentEntity;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
 import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
@@ -79,10 +80,10 @@ public class CorrespondenceService {
         }
 
         String chatName;
-        if (getAuthenticatedUserId().compareTo(chat.get().getReceiverId()) != 0) {
+        if (chat.get().getChatType().equals(ChatType.DIALOGUE) && getAuthenticatedUserId().compareTo(chat.get().getReceiverId()) != 0) {
             chatName = integrationRequestsService
                     .getFullNameAndAvatarId(chat.get().getReceiverId()).get(0);
-        } else if (getAuthenticatedUserId().compareTo(chat.get().getSenderId()) != 0) {
+        } else if (chat.get().getChatType().equals(ChatType.DIALOGUE) && getAuthenticatedUserId().compareTo(chat.get().getSenderId()) != 0) {
             chatName = integrationRequestsService
                     .getFullNameAndAvatarId(chat.get().getSenderId()).get(0);
         }
@@ -126,7 +127,13 @@ public class CorrespondenceService {
         List<MessageEntity> messages = messageRepository.findAllByChatId(id);
         List<MessageInCorrespondenceDto> messageInCorrespondenceDtos = new ArrayList<>();
         for (MessageEntity message: messages) {
-            messageInCorrespondenceDtos.add(new MessageInCorrespondenceDto(message));
+            List<FileDto> fileDtos = new ArrayList<>();
+            for (AttachmentEntity attachment: message.getAttachments()) {
+                FileDto fileDto = new FileDto(attachment.getFileId(), attachment.getFileName(),
+                        integrationRequestsService.getFileSize(attachment.getFileId()));
+                fileDtos.add(fileDto);
+            }
+            messageInCorrespondenceDtos.add(new MessageInCorrespondenceDto(message, fileDtos));
         }
 
         Comparator<MessageInCorrespondenceDto> sortByDate =
@@ -155,11 +162,10 @@ public class CorrespondenceService {
                 paginationWithChatNameDto.getPageInfo().getPageSize() == null ? 50
                 : paginationWithChatNameDto.getPageInfo().getPageSize();
         checkPaginationInfoService.checkPagination(pageNumber, pageSize);
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         UUID authenticatedUserId = getAuthenticatedUserId();
 
-        List<ChatUserEntity> chatUserEntities = chatUserRepository.findAllByUserId(authenticatedUserId, pageable);
+        List<ChatUserEntity> chatUserEntities = chatUserRepository.findAllByUserId(authenticatedUserId);
         List<ChatEntity> chatEntities = new ArrayList<>();
         for (ChatUserEntity chatUser: chatUserEntities) {
             chatRepository.findById(chatUser.getChatId()).ifPresent(chat -> {
@@ -201,6 +207,7 @@ public class CorrespondenceService {
                             chat.getId(),
                             chat.getName(),
                             null,
+                            false,
                             null,
                             null
                     ));
@@ -213,6 +220,7 @@ public class CorrespondenceService {
                                 chat.getId(),
                                 fullName,
                                 null,
+                                false,
                                 null,
                                 null
                         ));
@@ -223,6 +231,7 @@ public class CorrespondenceService {
                                 chat.getId(),
                                 fullName,
                                 null,
+                                false,
                                 null,
                                 null
                         ));
@@ -232,6 +241,7 @@ public class CorrespondenceService {
                                 chat.getId(),
                                 chat.getName(),
                                 null,
+                                false,
                                 null,
                                 null
                         ));
@@ -245,6 +255,7 @@ public class CorrespondenceService {
                             chat.getId(),
                             chat.getName(),
                             message.getMessageText(),
+                            !message.getAttachments().isEmpty(),
                             message.getSendDate(),
                             message.getSenderId()
                     ));
@@ -257,6 +268,7 @@ public class CorrespondenceService {
                                 chat.getId(),
                                 fullName,
                                 message.getMessageText(),
+                                !message.getAttachments().isEmpty(),
                                 message.getSendDate(),
                                 message.getSenderId()
                         ));
@@ -267,6 +279,7 @@ public class CorrespondenceService {
                                 chat.getId(),
                                 fullName,
                                 message.getMessageText(),
+                                !message.getAttachments().isEmpty(),
                                 message.getSendDate(),
                                 message.getSenderId()
                         ));
@@ -276,6 +289,7 @@ public class CorrespondenceService {
                                 chat.getId(),
                                 chat.getName(),
                                 message.getMessageText(),
+                                !message.getAttachments().isEmpty(),
                                 message.getSendDate(),
                                 message.getSenderId()
                         ));
@@ -291,6 +305,14 @@ public class CorrespondenceService {
                         Comparator.reverseOrder()
                 );
         correspondenceDtos.sort(sortByDate);
+
+        int startIndex = (pageNumber - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, correspondenceDtos.size());
+        if (startIndex > endIndex) {
+            correspondenceDtos = new ArrayList<>();
+        } else {
+            correspondenceDtos = correspondenceDtos.subList(startIndex, endIndex);
+        }
 
         CorrespondencesPageListDto result = new CorrespondencesPageListDto();
         result.setCorrespondences(correspondenceDtos);

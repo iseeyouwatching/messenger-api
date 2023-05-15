@@ -29,10 +29,9 @@ public interface ChatUserRepository extends JpaRepository<ChatUserEntity, UUID> 
      * и возвращает их в указанной странице.
      *
      * @param userId идентификатор пользователя, для которого нужно найти все записи в базе данных.
-     * @param pageable страница, на которой нужно получить результаты.
      * @return список объектов класса {@link ChatUserEntity}, удовлетворяющих критерию поиска.
      */
-    List<ChatUserEntity> findAllByUserId(UUID userId, Pageable pageable);
+    List<ChatUserEntity> findAllByUserId(UUID userId);
 
     /**
      * Находит и возвращает объект класса {@link ChatUserEntity}, соответствующий заданным идентификаторам чата

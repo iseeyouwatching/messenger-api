@@ -31,6 +31,7 @@ public class FileController {
 
     /**
      * Метод для загрузки файла на сервер.
+     *
      * @param file загружаемый файл.
      * @return идентификатор загруженного файла.
      * @throws IOException  если произошла ошибка ввода-вывода при загрузке файла.
@@ -48,6 +49,12 @@ public class FileController {
         return fileService.upload(file);
     }
 
+    /**
+     * Метод для получения загруженного файла.
+     *
+     * @param id идентификатор файла.
+     * @return файл.
+     */
     @GetMapping(value = "/download/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> download(@PathVariable("id") UUID id) {
         FileDownloadDto fileDownloadDto = fileService.download(id);

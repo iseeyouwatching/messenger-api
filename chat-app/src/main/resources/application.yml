@@ -46,6 +46,11 @@ integration:
     check-existence-in-friends: http://localhost:8192/integration/friends/check-existence-in-friends
     check-multi-existence-in-friends: http://localhost:8192/integration/friends/check-multi-existence-in-friends
     get-full-name-and-avatar: http://localhost:8191/integration/users/get-full-name-and-avatar
+    check-multi-attachment-existence: http://localhost:8195/integration/files/check-multi-attachment-existence
+    check-avatar-id-existence: http://localhost:8195/integration/files/check-avatar-id-existence/{id}
+    get-filename: http://localhost:8195/integration/files/get-filename/{id}
+    get-file-size: http://localhost:8195/integration/files/get-file-size/{id}
+
 
 server:
   port: 8193

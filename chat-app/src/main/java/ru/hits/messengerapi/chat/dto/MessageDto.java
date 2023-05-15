@@ -32,6 +32,11 @@ public class MessageDto {
     private String messageText;
 
     /**
+     * Признак наличия файлов-вложений.
+     */
+    private Boolean fileAvailability;
+
+    /**
      * Дата и время отправки сообщения.
      */
     private LocalDateTime messageSendDate;

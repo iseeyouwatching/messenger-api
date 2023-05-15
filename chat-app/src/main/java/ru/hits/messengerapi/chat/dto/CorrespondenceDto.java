@@ -31,6 +31,11 @@ public class CorrespondenceDto {
     private String lastMessageText;
 
     /**
+     * Признак наличия файлов-вложений.
+     */
+    private Boolean fileAvailability;
+
+    /**
      * Дата и время отправки последнего сообщения в переписке.
      */
     private LocalDateTime lastMessageSendDate;

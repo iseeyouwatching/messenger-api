@@ -4,6 +4,7 @@ import lombok.*;
 import ru.hits.messengerapi.chat.entity.MessageEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,16 +43,23 @@ public class MessageInCorrespondenceDto {
     private UUID senderAvatarId;
 
     /**
+     * Список файлов.
+     */
+    private List<FileDto> files;
+
+    /**
      * Создает объект класса {@link MessageInCorrespondenceDto} на основе сущности {@link MessageEntity}.
      *
      * @param message сущность сообщения.
+     * @param fileDto список файлов.
      */
-    public MessageInCorrespondenceDto(MessageEntity message) {
+    public MessageInCorrespondenceDto(MessageEntity message, List<FileDto> fileDto) {
         this.messageId = message.getId();
         this.sendDate = message.getSendDate();
         this.messageText = message.getMessageText();
         this.senderName = message.getSenderName();
         this.senderAvatarId = message.getSenderAvatarId();
+        this.files = fileDto;
     }
 
 }

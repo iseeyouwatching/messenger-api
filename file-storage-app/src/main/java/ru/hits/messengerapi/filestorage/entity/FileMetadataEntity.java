@@ -38,4 +38,6 @@ public class FileMetadataEntity {
     @Column(name = "creation_date")
     private LocalDate creationDate;
 
+    private String size;
+
 }

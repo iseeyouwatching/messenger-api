@@ -61,6 +61,31 @@ public class IntegrationRequestsService {
     private String integrationUsersRequestGetFullNameAndAvatar;
 
     /**
+     * URL, куда отправляется запрос на проверку существования списка идентификаторов вложений.
+     */
+    @Value("${integration.request.check-multi-attachment-existence}")
+    private String integrationFilesRequestCheckMultiAttachmentExistence;
+
+    /**
+     * URL, куда отправляется запрос на проверку существования файла (аватарки) по идентификатору.
+     */
+    @Value("${integration.request.check-avatar-id-existence}")
+    private String integrationFileStorageRequestCheckAvatarIdExistence;
+
+    /**
+     * URL, куда отправляется запрос на получение названия файла по идентификатору.
+     */
+    @Value("${integration.request.get-filename}")
+    private String integrationFileGetFilename;
+
+    /**
+     * URL, куда отправляется запрос на получение размера файла по идентификатору.
+     */
+    @Value("${integration.request.get-file-size}")
+    private String integrationFileGetFileSize;
+
+
+    /**
      * Метод для проверки существования пользователя по его ID.
      *
      * @param id идентификатор пользователя.
@@ -171,6 +196,80 @@ public class IntegrationRequestsService {
         } else {
             log.warn("Проверка наличия нескольких пользователей в друзьях завершилась с ошибкой. Результат: null");
         }
+    }
+
+    /**
+     * Метод для проверки существования списка идентификаторов вложений.
+     *
+     * @param attachmentsIds список идентификаторов вложений.
+     */
+    public void checkMultiAttachmentExistence(List<UUID> attachmentsIds) {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
+        String url = integrationFilesRequestCheckMultiAttachmentExistence;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+        HttpEntity<List<UUID>> requestEntity = new HttpEntity<>(attachmentsIds, headers);
+
+        ResponseEntity<Void> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, requestEntity, Void.class);
+    }
+
+    /**
+     * Мето для проверки существования файла (аватарки) с переданным идентификатором.
+     *
+     * @param id идентификатор файла.
+     */
+    public void checkAvatarIdExistence(UUID id) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
+        String url = integrationFileStorageRequestCheckAvatarIdExistence;
+
+        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Void.class, id);
+    }
+
+    /**
+     * Метод для получения названия файла по его идентификатору.
+     *
+     * @param id идентификатор файла.
+     * @return название файла.
+     */
+    public String getFilename(UUID id) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
+        String url = integrationFileGetFilename;
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers),String.class, id);
+        return response.getBody();
+    }
+
+    /**
+     * Метод для получения размера файла по его идентификатору.
+     *
+     * @param id идентификатор файла.
+     * @return размер файла.
+     */
+    public String getFileSize(UUID id) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
+        String url = integrationFileGetFileSize;
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers),String.class, id);
+        return response.getBody();
     }
 
 }

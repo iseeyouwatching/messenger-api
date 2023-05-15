@@ -158,7 +158,10 @@ public class ChatService {
             chat.get().setName(updateChatDto.getName());
         }
 
-        chat.get().setAvatarId(updateChatDto.getAvatar());
+        if (updateChatDto.getAvatar() != null) {
+            integrationRequestsService.checkAvatarIdExistence(updateChatDto.getAvatar());
+            chat.get().setAvatarId(updateChatDto.getAvatar());
+        }
 
         if (updateChatDto.getUsers() != null) {
             List<UUID> listOfIDs = updateChatDto.getUsers();

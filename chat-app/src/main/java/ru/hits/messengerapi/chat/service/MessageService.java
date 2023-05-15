@@ -114,12 +114,13 @@ public class MessageService {
         messageRepository.save(message);
 
         if (dialogueMessageDto.getAttachments() != null) {
+            integrationRequestsService.checkMultiAttachmentExistence(dialogueMessageDto.getAttachments());
             List<AttachmentEntity> attachments = new ArrayList<>();
             for (UUID attachmentId: dialogueMessageDto.getAttachments()) {
                     AttachmentEntity attachment = AttachmentEntity.builder()
                             .message(message)
                             .fileId(attachmentId)
-                            .fileName(null)
+                            .fileName(integrationRequestsService.getFilename(attachmentId))
                             .build();
                     attachments.add(attachment);
             }
@@ -182,12 +183,13 @@ public class MessageService {
         messageRepository.save(message);
 
         if (chatMessageDto.getAttachments() != null) {
+            integrationRequestsService.checkMultiAttachmentExistence(chatMessageDto.getAttachments());
             List<AttachmentEntity> attachments = new ArrayList<>();
             for (UUID attachmentId: chatMessageDto.getAttachments()) {
                 AttachmentEntity attachment = AttachmentEntity.builder()
                         .message(message)
                         .fileId(attachmentId)
-                        .fileName(null)
+                        .fileName(integrationRequestsService.getFilename(attachmentId))
                         .build();
                 attachments.add(attachment);
             }
@@ -242,6 +244,12 @@ public class MessageService {
                 attachmentNames.add(attachment.getFileName());
             }
             searchResult.setFileNames(attachmentNames);
+            if (!searchResult.getFileNames().isEmpty()) {
+                searchResult.setFileAvailability(true);
+            }
+            else {
+                searchResult.setFileAvailability(false);
+            }
 
             searchResults.add(searchResult);
 

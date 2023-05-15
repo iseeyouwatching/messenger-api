@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.hits.messengerapi.chat.dto.CreateChatDto;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
 import ru.hits.messengerapi.chat.enumeration.ChatType;
+import ru.hits.messengerapi.chat.service.IntegrationRequestsService;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChatMapper {
 
+    private final IntegrationRequestsService integrationRequestsService;
+
     /**
      * Преобразует объект типа {@link CreateChatDto} и {@link UUID} в объект типа {@link ChatEntity},
      * устанавливая атрибуты чата соответствующими значениями из переданных параметров.
@@ -26,6 +29,9 @@ public class ChatMapper {
      * @return объект типа {@link ChatEntity} с заполненными атрибутами из переданных параметров.
      */
     public ChatEntity createChatDtoToChat(CreateChatDto createChatDto, UUID adminId) {
+        if (createChatDto.getAvatar() != null) {
+            integrationRequestsService.checkAvatarIdExistence(createChatDto.getAvatar());
+        }
         return ChatEntity
                 .builder()
                 .chatType(ChatType.CHAT)

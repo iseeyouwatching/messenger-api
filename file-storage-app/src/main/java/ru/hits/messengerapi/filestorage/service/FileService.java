@@ -55,6 +55,9 @@ public class FileService {
         fileMetadata.setObjectName(UUID.fromString(id));
         fileMetadata.setContentType(file.getContentType());
         fileMetadata.setCreationDate(LocalDate.now());
+        long fileSize = file.getSize();
+        double fileSizeInMB = (double) fileSize / (1024 * 1024);
+        fileMetadata.setSize(fileSizeInMB + "MB");
         fileMetadataRepository.save(fileMetadata);
 
         return id;
