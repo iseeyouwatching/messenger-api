@@ -1,7 +1,6 @@
 package ru.hits.messengerapi.common.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import ru.hits.messengerapi.common.enumeration.NotificationType;
 
 import java.util.UUID;
@@ -10,6 +9,10 @@ import java.util.UUID;
  * DTO для передачи информации о новом уведомлении пользователя.
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Builder
 public class NewNotificationDto {
 
