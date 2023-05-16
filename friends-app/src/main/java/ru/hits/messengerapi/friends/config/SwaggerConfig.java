@@ -1,7 +1,6 @@
 package ru.hits.messengerapi.friends.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -18,11 +17,5 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT",
         scheme = "Bearer"
 )
-//@SecurityScheme(
-//        name = "api_key",
-//        type = SecuritySchemeType.APIKEY,
-//        in = SecuritySchemeIn.HEADER,
-//        paramName = "API_KEY"
-//)
 public class SwaggerConfig {
 }

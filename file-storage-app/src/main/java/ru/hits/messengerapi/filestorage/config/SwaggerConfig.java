@@ -1,4 +1,4 @@
-package ru.hits.messengerapi.user.config;
+package ru.hits.messengerapi.filestorage.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * Класс конфигурации Swagger.
  */
 @Configuration
-@OpenAPIDefinition(info = @Info(title = "Сервис аутентификации и профилей", version = "v1"))
+@OpenAPIDefinition(info = @Info(title = "Сервис файлового хранилища", version = "v1"))
 @SecurityScheme(
         name = "bearerAuth",
         type = SecuritySchemeType.HTTP,

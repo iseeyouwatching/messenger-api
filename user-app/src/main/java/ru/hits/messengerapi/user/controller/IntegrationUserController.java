@@ -36,8 +36,6 @@ public class IntegrationUserController {
      * @param userIdAndFullNameDto DTO с ФИО и ID пользователя.
      * @return exist - если пользователь существует, dont exist - если пользователя не существует.
      */
-//    @Operation(summary = "Проверить существование пользователя по ID и ФИО.")
-//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence")
     public ResponseEntity<Boolean> checkUserByIdAndFullName(
             @RequestBody UserIdAndFullNameDto userIdAndFullNameDto) {
@@ -59,8 +57,6 @@ public class IntegrationUserController {
      * @param id идентификатор пользователя.
      * @return true - если пользователь с таким ID существует.
      */
-//    @Operation(summary = "Проверить существование пользователя по ID.")
-//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-by-id")
     public ResponseEntity<Boolean> checkUserById(@RequestBody UUID id) {
         boolean result = integrationUserService.checkUserById(id);
@@ -75,8 +71,6 @@ public class IntegrationUserController {
      * @param id идентификатор пользователя.
      * @return ФИО пользователя.
      */
-//    @Operation(summary = "Получить ФИО пользователя по его ID.")
-//    @SecurityRequirement(name = "api_key")
     @PostMapping ("/get-full-name")
     public ResponseEntity<String> getFullName(@RequestBody UUID id) {
         log.info("Получен запрос на получение полного имени пользователя с id = {}", id);
@@ -92,8 +86,6 @@ public class IntegrationUserController {
      * @param id идентификатор пользователя.
      * @return ФИО и аватарка пользователя.
      */
-//    @Operation(summary = "Получить ФИО и аватарку пользователя по его ID.")
-//    @SecurityRequirement(name = "api_key")
     @PostMapping ("/get-full-name-and-avatar")
     public ResponseEntity<List<String>> getFullNameAndAvatar(@RequestBody UUID id) {
         return new ResponseEntity<>(integrationUserService.getFullNameAndAvatar(id), HttpStatus.OK);

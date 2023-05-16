@@ -38,8 +38,6 @@ public class IntegrationFriendsController {
      * @param uuids список идентификаторов пользователей.
      * @return true - если пользователь находится в друзьях у другого пользователя.
      */
-//    @Operation(summary = "Проверить нахождение пользователя в друзьях у другого пользователя.")
-//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-in-friends")
     public ResponseEntity<Boolean> checkExistenceInFriends(@RequestBody List<UUID> uuids) {
         log.info("Проверка нахождения пользователя в друзьях у другого пользователя: {}", uuids);
@@ -53,8 +51,6 @@ public class IntegrationFriendsController {
      * @param uuids список идентификаторов пользователей.
      * @return true - если пользователи находятся в друзьях у другого пользователя.
      */
-//    @Operation(summary = "Проверить нахождение пользователей в друзьях у другого пользователя.")
-//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-multi-existence-in-friends")
     public ResponseEntity<Boolean> checkMultiExistenceInFriends(@RequestBody List<UUID> uuids) {
         log.info("Проверка нахождения пользователей в друзьях у другого пользователя: {}", uuids);

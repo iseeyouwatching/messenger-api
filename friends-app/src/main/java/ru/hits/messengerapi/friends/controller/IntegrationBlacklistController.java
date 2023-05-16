@@ -35,8 +35,6 @@ public class IntegrationBlacklistController {
      * @param map ID пользователей.
      * @return true - если пользователь находится в черном списке другого пользователя, false - если нет.
      */
-//    @Operation(summary = "Проверить нахождение пользователя в чёрном списке у другого пользователя.")
-//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-in-blacklist")
     public ResponseEntity<Boolean> checkIfTheUserBlacklisted(@RequestBody Map<String, UUID> map) {
         UUID targetUserId = map.get("targetUserId");
