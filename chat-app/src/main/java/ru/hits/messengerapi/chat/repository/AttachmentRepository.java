@@ -20,4 +20,5 @@ public interface AttachmentRepository extends JpaRepository<AttachmentEntity, UU
      * @return список вложений сообщения.
      */
     List<AttachmentEntity> findAllByMessageId(UUID messageId);
+
 }

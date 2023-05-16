@@ -23,7 +23,14 @@ import java.util.Objects;
 @Slf4j
 public class SecurityConfig {
 
+    /**
+     * Фильтр для обработки JWT-токена.
+     */
     private final JWTFilter jwtFilter;
+
+    /**
+     * Свойства безопасности приложения.
+     */
     private final SecurityProps securityProps;
 
     /**

@@ -30,11 +30,14 @@ public class IntegrationRequestsService {
     private final SecurityProps securityProps;
 
     /**
-     * URL, куда отправляет интеграционный запрос на проверку существования пользователя.
+     * URL, куда отправляется интеграционный запрос на проверку существования пользователя.
      */
     @Value("${integration.request.check-existence-in-blacklist}")
     private String integrationUsersRequestCheckExistenceInBlacklist;
 
+    /**
+     * URL, куда отправляется интеграционный запрос на проверку существования аватарки с указанным ID.
+     */
     @Value("${integration.request.check-avatar-id-existence}")
     private String integrationFileStorageRequestCheckAvatarIdExistence;
 
@@ -70,6 +73,11 @@ public class IntegrationRequestsService {
         return isBlocked;
     }
 
+    /**
+     * Метод для проверки существования аватарки (файла) с указанным ID.
+     *
+     * @param id идентификатор аватарки.
+     */
     public void checkAvatarIdExistence(UUID id) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

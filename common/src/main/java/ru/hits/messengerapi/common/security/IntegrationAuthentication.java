@@ -34,4 +34,5 @@ public class IntegrationAuthentication extends AbstractAuthenticationToken {
     public Object getPrincipal() {
         return null;
     }
+
 }

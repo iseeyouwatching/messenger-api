@@ -48,7 +48,8 @@ public class MessageInCorrespondenceDto {
     private List<FileDto> files;
 
     /**
-     * Создает объект класса {@link MessageInCorrespondenceDto} на основе сущности {@link MessageEntity}.
+     * Создает объект класса {@link MessageInCorrespondenceDto} на основе сущности {@link MessageEntity}
+     * и списка {@link FileDto}.
      *
      * @param message сущность сообщения.
      * @param fileDto список файлов.

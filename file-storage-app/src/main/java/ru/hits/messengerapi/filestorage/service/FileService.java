@@ -23,20 +23,52 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Сервис файлов.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileService {
 
+    /**
+     * Клиент MinIO.
+     */
     private final MinioClient minioClient;
+
+    /**
+     * Конфигурация MinIO.
+     */
     private final MinioConfiguration minioConfig;
+
+    /**
+     * Репозиторий для работы с метаданными файлов.
+     */
     private final FileMetadataRepository fileMetadataRepository;
 
+    /**
+     * Инициализация сервиса.
+     */
     @PostConstruct
     public void init() {
         log.info("Minio configs: {}", minioConfig);
     }
 
+    /**
+     * Загрузка файла.
+     *
+     * @param file загружаемый файл.
+     * @return уникальный идентификатор файла.
+     * @throws ServerException            если произошла ошибка на сервере MinIO.
+     * @throws InsufficientDataException  если данные файла недостаточны.
+     * @throws ErrorResponseException     если получен неправильный ответ от сервера MinIO.
+     * @throws IOException                если произошла ошибка ввода-вывода.
+     * @throws NoSuchAlgorithmException  если используется неподдерживаемый алгоритм хэширования.
+     * @throws InvalidKeyException        если предоставлен неверный ключ.
+     * @throws InvalidResponseException   если получен неверный ответ от сервера MinIO.
+     * @throws XmlParserException         если произошла ошибка парсинга XML.
+     * @throws InternalException          если произошла внутренняя ошибка сервера MinIO.
+     */
     @Transactional
     public String upload(MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         var id = UUID.randomUUID().toString();
@@ -63,6 +95,13 @@ public class FileService {
         return id;
     }
 
+    /**
+     * Загрузка файла по уникальному идентификатору.
+     *
+     * @param id уникальный идентификатор файла.
+     * @return объект {@link FileDownloadDto}, содержащий данные файла для скачивания.
+     * @throws NotFoundException если файл с указанным идентификатором не найден.
+     */
     public FileDownloadDto download(UUID id) {
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByObjectName(id)
                 .orElseThrow(() -> new NotFoundException("Файл с ID " + id + " не найден."));

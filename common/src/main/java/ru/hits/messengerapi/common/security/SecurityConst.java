@@ -7,7 +7,15 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class SecurityConst {
+
+    /**
+     * Название заголовка для токена.
+     */
     public static final String HEADER_JWT = "Authorization";
+
+    /**
+     * Название заголовка для API-ключа.
+     */
     public static final String HEADER_API_KEY = "API_KEY";
 
 }

@@ -1,5 +1,6 @@
 package ru.hits.messengerapi.friends.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +24,7 @@ import java.util.UUID;
 @RequestMapping("/integration/friends")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Интеграционные запросы, связанные с друзьями.")
+@Hidden
 public class IntegrationFriendsController {
 
     /**
@@ -37,8 +38,8 @@ public class IntegrationFriendsController {
      * @param uuids список идентификаторов пользователей.
      * @return true - если пользователь находится в друзьях у другого пользователя.
      */
-    @Operation(summary = "Проверить нахождение пользователя в друзьях у другого пользователя.")
-    @SecurityRequirement(name = "api_key")
+//    @Operation(summary = "Проверить нахождение пользователя в друзьях у другого пользователя.")
+//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-in-friends")
     public ResponseEntity<Boolean> checkExistenceInFriends(@RequestBody List<UUID> uuids) {
         log.info("Проверка нахождения пользователя в друзьях у другого пользователя: {}", uuids);
@@ -52,8 +53,8 @@ public class IntegrationFriendsController {
      * @param uuids список идентификаторов пользователей.
      * @return true - если пользователи находятся в друзьях у другого пользователя.
      */
-    @Operation(summary = "Проверить нахождение пользователей в друзьях у другого пользователя.")
-    @SecurityRequirement(name = "api_key")
+//    @Operation(summary = "Проверить нахождение пользователей в друзьях у другого пользователя.")
+//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-multi-existence-in-friends")
     public ResponseEntity<Boolean> checkMultiExistenceInFriends(@RequestBody List<UUID> uuids) {
         log.info("Проверка нахождения пользователей в друзьях у другого пользователя: {}", uuids);

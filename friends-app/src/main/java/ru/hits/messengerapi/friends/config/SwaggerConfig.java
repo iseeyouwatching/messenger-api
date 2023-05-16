@@ -18,11 +18,11 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT",
         scheme = "Bearer"
 )
-@SecurityScheme(
-        name = "api_key",
-        type = SecuritySchemeType.APIKEY,
-        in = SecuritySchemeIn.HEADER,
-        paramName = "API_KEY"
-)
+//@SecurityScheme(
+//        name = "api_key",
+//        type = SecuritySchemeType.APIKEY,
+//        in = SecuritySchemeIn.HEADER,
+//        paramName = "API_KEY"
+//)
 public class SwaggerConfig {
 }

@@ -250,6 +250,8 @@ public class IntegrationRequestsService {
         String url = integrationFileGetFilename;
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers),String.class, id);
+        log.debug("Response body: {}", response.getBody());
+
         return response.getBody();
     }
 
@@ -269,6 +271,8 @@ public class IntegrationRequestsService {
         String url = integrationFileGetFileSize;
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers),String.class, id);
+        log.debug("Response body: {}", response.getBody());
+
         return response.getBody();
     }
 

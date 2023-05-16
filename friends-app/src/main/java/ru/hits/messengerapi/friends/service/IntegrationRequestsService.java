@@ -80,30 +80,6 @@ public class IntegrationRequestsService {
     }
 
     /**
-     * Метод для получения ФИО пользователя по его ID.
-     *
-     * @param id идентификатор пользователя.
-     * @return ФИО пользователя.
-     */
-    public String getFullName(UUID id) {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setErrorHandler(new RestTemplateErrorHandler(new ObjectMapper()));
-        String url = integrationUsersRequestGetFullName;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HEADER_API_KEY, securityProps.getIntegrations().getApiKey());
-        HttpEntity<UUID> requestEntity = new HttpEntity<>(id, headers);
-
-        ResponseEntity<String> responseEntity = restTemplate
-                .exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-        String fullName = responseEntity.getBody();
-        log.info("Получено полное имя '{}' для пользователя с id = {}", fullName, id);
-        return fullName;
-    }
-
-    /**
      * Синхронизация данных заблокированного пользователя.
      *
      * @param userIdAndFullNameDto DTO с информацией о ID и ФИО пользователя.

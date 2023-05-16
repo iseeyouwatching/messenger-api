@@ -33,11 +33,6 @@ public class FriendsController {
     private final FriendsService friendsService;
 
     /**
-     * Сервис для логики интеграционных запросов.
-     */
-    private final IntegrationRequestsService integrationRequestsService;
-
-    /**
      * Метод для получения списка друзей пользователя.
      *
      * @param paginationWithFullNameFilterDto объект класса {@link PaginationWithFullNameFilterDto}
@@ -88,23 +83,6 @@ public class FriendsController {
         log.info("Запрос на добавление друга: {}", addPersonDto);
         return new ResponseEntity<>(friendsService.addToFriends(addPersonDto), HttpStatus.OK);
     }
-
-//    /**
-//     * Метод для синхронизации информации о пользователе, находящегося в друзьях.
-//     *
-//     * @param id идентификатор пользователя, находящегося в друзьях.
-//     * @return сообщение об успешной синхронизации данных.
-//     */
-//    @Operation(
-//            summary = "Синхронизация данных друга.",
-//            security = @SecurityRequirement(name = "bearerAuth")
-//    )
-//    @PatchMapping("/sync/{id}")
-//    public ResponseEntity<Map<String, String>> syncFriendData(@PathVariable("id") UUID id) {
-//        Map<String, String> response = integrationRequestsService.syncFriendData(id);
-//        log.info("Данные друга с идентификатором {} синхронизированы", id);
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//    }
 
     /**
      * Метод для удаления друга из списка друзей по его идентификатору.

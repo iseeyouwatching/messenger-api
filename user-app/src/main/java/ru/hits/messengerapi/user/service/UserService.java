@@ -69,7 +69,14 @@ public class UserService {
      */
     private final CheckPaginationInfoService checkPaginationInfoService;
 
+    /**
+     * Сервис с логикой отправки интеграционных запросов.
+     */
     private final IntegrationRequestsService integrationRequestsService;
+
+    /**
+     * Объект, позволяющий отправлять сообщения в RabbitMQ, используя Spring Cloud Stream.
+     */
     private final StreamBridge streamBridge;
 
     /**
@@ -375,6 +382,11 @@ public class UserService {
         streamBridge.send("newNotificationEvent-out-0", newNotificationDto);
     }
 
+    /**
+     * Отправляет объект типа {@link UserIdAndFullNameDto} посредством StreamBridge.
+     *
+     * @param userIdAndFullNameDto идентификатор и ФИО пользователя.
+     */
     private void synchronizeUserData(UserIdAndFullNameDto userIdAndFullNameDto) {
         log.info("Синхронизация данных пользователя по стриму: {}", userIdAndFullNameDto);
         streamBridge.send("userDataSynchronizationEvent-out-0", userIdAndFullNameDto);

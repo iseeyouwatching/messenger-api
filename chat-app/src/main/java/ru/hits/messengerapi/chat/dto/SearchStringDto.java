@@ -16,4 +16,5 @@ public class SearchStringDto {
      * Поисковая строка.
      */
     private String searchString;
+
 }

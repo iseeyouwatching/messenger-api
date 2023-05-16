@@ -68,6 +68,9 @@ public class MessageEntity {
     @Column(name = "sender_avatar_id")
     private UUID senderAvatarId;
 
+    /**
+     * Список вложений, относящихся к этому сообщению.
+     */
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AttachmentEntity> attachments;
 

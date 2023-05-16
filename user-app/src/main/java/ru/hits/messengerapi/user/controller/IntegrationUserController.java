@@ -1,5 +1,6 @@
 package ru.hits.messengerapi.user.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @RequestMapping("/integration/users")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Интеграционные запросы в сервис пользователя.")
+@Hidden
 public class IntegrationUserController {
 
     /**
@@ -35,8 +36,8 @@ public class IntegrationUserController {
      * @param userIdAndFullNameDto DTO с ФИО и ID пользователя.
      * @return exist - если пользователь существует, dont exist - если пользователя не существует.
      */
-    @Operation(summary = "Проверить существование пользователя по ID и ФИО.")
-    @SecurityRequirement(name = "api_key")
+//    @Operation(summary = "Проверить существование пользователя по ID и ФИО.")
+//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence")
     public ResponseEntity<Boolean> checkUserByIdAndFullName(
             @RequestBody UserIdAndFullNameDto userIdAndFullNameDto) {
@@ -58,8 +59,8 @@ public class IntegrationUserController {
      * @param id идентификатор пользователя.
      * @return true - если пользователь с таким ID существует.
      */
-    @Operation(summary = "Проверить существование пользователя по ID.")
-    @SecurityRequirement(name = "api_key")
+//    @Operation(summary = "Проверить существование пользователя по ID.")
+//    @SecurityRequirement(name = "api_key")
     @PostMapping("/check-existence-by-id")
     public ResponseEntity<Boolean> checkUserById(@RequestBody UUID id) {
         boolean result = integrationUserService.checkUserById(id);
@@ -74,8 +75,8 @@ public class IntegrationUserController {
      * @param id идентификатор пользователя.
      * @return ФИО пользователя.
      */
-    @Operation(summary = "Получить ФИО пользователя по его ID.")
-    @SecurityRequirement(name = "api_key")
+//    @Operation(summary = "Получить ФИО пользователя по его ID.")
+//    @SecurityRequirement(name = "api_key")
     @PostMapping ("/get-full-name")
     public ResponseEntity<String> getFullName(@RequestBody UUID id) {
         log.info("Получен запрос на получение полного имени пользователя с id = {}", id);
@@ -91,8 +92,8 @@ public class IntegrationUserController {
      * @param id идентификатор пользователя.
      * @return ФИО и аватарка пользователя.
      */
-    @Operation(summary = "Получить ФИО и аватарку пользователя по его ID.")
-    @SecurityRequirement(name = "api_key")
+//    @Operation(summary = "Получить ФИО и аватарку пользователя по его ID.")
+//    @SecurityRequirement(name = "api_key")
     @PostMapping ("/get-full-name-and-avatar")
     public ResponseEntity<List<String>> getFullNameAndAvatar(@RequestBody UUID id) {
         return new ResponseEntity<>(integrationUserService.getFullNameAndAvatar(id), HttpStatus.OK);

@@ -107,4 +107,5 @@ public class IntegrationUserService {
         log.info("Получены полное имя и аватар пользователя с ID {}: {}", id, result);
         return result;
     }
+
 }
