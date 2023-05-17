@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import ru.hits.messengerapi.common.dto.UserIdAndFullNameDto;
 import ru.hits.messengerapi.common.security.props.SecurityProps;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
@@ -31,9 +30,6 @@ class IntegrationRequestsServiceTest {
 
     @Mock
     private SecurityProps securityProps;
-
-    @Value("${integration.request.check-existence}")
-    private String integrationUsersRequestCheckExistence;
 
     @BeforeEach
     void setUp() {

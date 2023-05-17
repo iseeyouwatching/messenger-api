@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import ru.hits.messengerapi.common.dto.PageInfoDto;
 import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JwtUserData;
-import ru.hits.messengerapi.friends.dto.common.AddPersonDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.dto.friends.FriendDto;
 import ru.hits.messengerapi.friends.dto.friends.FriendsPageListDto;
