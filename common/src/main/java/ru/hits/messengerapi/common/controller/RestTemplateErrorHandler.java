@@ -91,7 +91,7 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
     /**
      * Класс для десериализации ответов от сервера.
      */
-    private static class ErrorResponse {
+    public static class ErrorResponse {
 
         /**
          * Список сообщений.
