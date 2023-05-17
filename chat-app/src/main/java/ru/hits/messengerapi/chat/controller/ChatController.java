@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hits.messengerapi.chat.dto.CreateChatDto;
 import ru.hits.messengerapi.chat.dto.UpdateChatDto;
@@ -38,9 +39,10 @@ public class ChatController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @PostMapping
-    public void createChat(@RequestBody @Valid CreateChatDto createChatDto) {
+    public ResponseEntity<Void> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         chatService.createChat(createChatDto);
         log.info("Чат успешно создан.");
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -53,9 +55,10 @@ public class ChatController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @PutMapping
-    public void updateChat(@RequestBody @Valid UpdateChatDto updateChatDto) {
+    public ResponseEntity<Void> updateChat(@RequestBody @Valid UpdateChatDto updateChatDto) {
         chatService.updateChat(updateChatDto);
         log.info("Чат успешно обновлен.");
+        return ResponseEntity.ok().build();
     }
 
 }
