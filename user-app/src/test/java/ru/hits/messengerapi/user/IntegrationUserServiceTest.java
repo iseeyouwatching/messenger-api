@@ -145,9 +145,6 @@ public class IntegrationUserServiceTest {
         Mockito.verify(userRepository, Mockito.times(1)).findById(id);
     }
 
-    /**
-     * Test for the getFullNameAndAvatar method when the user has no avatar.
-     */
     @Test
     public void testGetFullNameAndAvatar_userHasNoAvatar() {
         UUID id = UUID.randomUUID();
@@ -169,9 +166,6 @@ public class IntegrationUserServiceTest {
         Mockito.verify(userRepository, Mockito.times(1)).findById(id);
     }
 
-    /**
-     * Test for the getFullNameAndAvatar method when the user has an avatar.
-     */
     @Test
     public void testGetFullNameAndAvatar_userHasAvatar() {
         UUID id = UUID.randomUUID();
