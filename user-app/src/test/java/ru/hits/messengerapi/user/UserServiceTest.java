@@ -19,6 +19,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.client.RestTemplate;
 import ru.hits.messengerapi.common.dto.NewNotificationDto;
 import ru.hits.messengerapi.common.dto.PageInfoDto;
+import ru.hits.messengerapi.common.exception.ConflictException;
+import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.common.helpingservices.CheckPaginationInfoService;
 import ru.hits.messengerapi.common.security.JWTUtil;
 import ru.hits.messengerapi.common.security.JwtUserData;
@@ -30,6 +32,8 @@ import ru.hits.messengerapi.user.repository.UserRepository;
 import ru.hits.messengerapi.user.service.IntegrationRequestsService;
 import ru.hits.messengerapi.user.service.UserService;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
@@ -134,6 +138,113 @@ public class UserServiceTest {
         assertEquals(pageInfoDto, result.getPageInfo());
         assertEquals(filtersDto, result.getFilters());
         assertEquals(new ArrayList<>(), result.getSortings());
+    }
+
+    @Test
+    void getUserInfo_nonExistingUser_shouldThrowNotFoundException() {
+        String login = "john.doe";
+        Optional<UserEntity> userOptional = Optional.empty();
+
+        when(userRepository.findByLogin(login)).thenReturn(userOptional);
+
+        assertThrows(NotFoundException.class, () -> userService.getUserInfo(login));
+    }
+
+    @Test
+    void viewYourProfile_existingUser_shouldReturnUserProfileDto() {
+        UUID userId = UUID.randomUUID();
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+        Optional<UserEntity> userOptional = Optional.of(userEntity);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = mock(Authentication.class);
+
+        JwtUserData jwtUserData = new JwtUserData("gsagvxcvz", userId, "test");
+        when(authentication.getPrincipal()).thenReturn(jwtUserData);
+
+        securityContext.setAuthentication(authentication);
+
+        when(userRepository.findById(userId)).thenReturn(userOptional);
+
+        UserProfileDto userProfileDto = userService.viewYourProfile();
+
+        assertNotNull(userProfileDto);
+        assertEquals(userEntity.getId(), userProfileDto.getId());
+    }
+
+    @Test
+    void viewYourProfile_nonExistingUser_shouldThrowNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        Optional<UserEntity> userOptional = Optional.empty();
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = mock(Authentication.class);
+
+        JwtUserData jwtUserData = new JwtUserData("gsagvxcvz", userId, "test");
+        when(authentication.getPrincipal()).thenReturn(jwtUserData);
+
+        securityContext.setAuthentication(authentication);
+
+        when(userRepository.findById(userId)).thenReturn(userOptional);
+
+        assertThrows(NotFoundException.class, () -> userService.viewYourProfile());
+    }
+
+    @Test
+    void getUserById_existingUser_shouldReturnUserEntity() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        UUID userId = UUID.randomUUID();
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+        Optional<UserEntity> userOptional = Optional.of(userEntity);
+
+        when(userRepository.findById(userId)).thenReturn(userOptional);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = mock(Authentication.class);
+
+        JwtUserData jwtUserData = new JwtUserData("gsagvxcvz", userId, "test");
+        when(authentication.getPrincipal()).thenReturn(jwtUserData);
+
+        securityContext.setAuthentication(authentication);
+
+        Method getUserByIdMethod = UserService.class.getDeclaredMethod("getUserById");
+        getUserByIdMethod.setAccessible(true);
+
+        UserEntity result = (UserEntity) getUserByIdMethod.invoke(userService);
+
+        assertNotNull(result);
+        assertEquals(userEntity.getId(), result.getId());
+    }
+
+    @Test
+    void getUserById_nonExistingUser_shouldThrowNotFoundException() throws NoSuchMethodException {
+        UUID userId = UUID.randomUUID();
+        Optional<UserEntity> userOptional = Optional.empty();
+
+        when(userRepository.findById(userId)).thenReturn(userOptional);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = mock(Authentication.class);
+
+        JwtUserData jwtUserData = new JwtUserData("gsagvxcvz", userId, "test");
+        when(authentication.getPrincipal()).thenReturn(jwtUserData);
+
+        securityContext.setAuthentication(authentication);
+
+        Method getUserByIdMethod = UserService.class.getDeclaredMethod("getUserById");
+        getUserByIdMethod.setAccessible(true);
+
+        try {
+            getUserByIdMethod.invoke(userService);
+            fail("Должно быть выброшено исключение NotFoundException.");
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            assertEquals(NotFoundException.class, cause.getClass());
+            assertEquals("Пользователь с ID " + userId + " не найден.", cause.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
