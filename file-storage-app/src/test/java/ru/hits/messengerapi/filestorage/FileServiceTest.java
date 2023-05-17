@@ -42,7 +42,6 @@ public class FileServiceTest {
 
     @Test
     public void testUpload() throws Exception {
-        // Arrange
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test.txt",
