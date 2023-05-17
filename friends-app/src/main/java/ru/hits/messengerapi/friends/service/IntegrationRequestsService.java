@@ -2,6 +2,7 @@ package ru.hits.messengerapi.friends.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -51,12 +52,6 @@ public class IntegrationRequestsService {
      */
     @Value("${integration.request.check-existence}")
     private String integrationUsersRequestCheckExistence;
-
-    /**
-     * URL, куда отправляет интеграционный запрос для получения ФИО пользователя.
-     */
-    @Value("${integration.request.get-full-name}")
-    private String integrationUsersRequestGetFullName;
 
     /**
      * Метод для проверки существования пользователя по ФИО и ID.
