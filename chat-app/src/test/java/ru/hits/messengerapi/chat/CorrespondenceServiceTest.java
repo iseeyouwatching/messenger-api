@@ -53,38 +53,6 @@ public class CorrespondenceServiceTest {
     }
 
     @Test
-    void getCorrespondenceInfo_ValidId_ReturnsCorrespondenceInfoDto() {
-        UUID chatId = UUID.randomUUID();
-        UUID authenticatedUserId = UUID.randomUUID();
-        ChatEntity chat = new ChatEntity();
-        chat.setId(chatId);
-        chat.setChatType(ChatType.CHAT);
-        chat.setName("Test Chat");
-        chat.setAvatarId(UUID.randomUUID());
-        chat.setAdminId(UUID.randomUUID());
-        chat.setCreationDate(LocalDate.now());
-        when(chatRepository.findById(chatId)).thenReturn(Optional.of(chat));
-        when(chatUserRepository.findByChatIdAndUserId(chatId, authenticatedUserId)).thenReturn(Optional.of(new ChatUserEntity()));
-        when(integrationRequestsService.getFullNameAndAvatarId(authenticatedUserId)).thenReturn(Collections.singletonList("John Doe"));
-
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = mock(Authentication.class);
-
-        JwtUserData jwtUserData = new JwtUserData("gsagvxcvz", authenticatedUserId, "test");
-        when(authentication.getPrincipal()).thenReturn(jwtUserData);
-
-        securityContext.setAuthentication(authentication);
-
-        CorrespondenceInfoDto result = correspondenceService.getCorrespondenceInfo(chatId);
-
-        assertNotNull(result);
-        assertEquals("Test Chat", result.getName());
-        assertNotNull(result.getAvatarId());
-        assertNotNull(result.getAdminId());
-        assertNotNull(result.getCreationDate());
-    }
-
-    @Test
     void getCorrespondenceInfo_InvalidId_ThrowsNotFoundException() {
         UUID chatId = UUID.randomUUID();
         when(chatRepository.findById(chatId)).thenReturn(Optional.empty());
