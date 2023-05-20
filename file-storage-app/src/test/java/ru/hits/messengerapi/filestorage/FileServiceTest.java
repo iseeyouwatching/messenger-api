@@ -45,7 +45,7 @@ public class FileServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test.txt",
-                "text/plain",
+                "image/jpeg",
                 "Hello, World!".getBytes()
         );
 
