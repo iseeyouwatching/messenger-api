@@ -63,10 +63,11 @@ public class FileController {
      * @return файл.
      */
     @Operation(summary = "Получение файла по id.")
-    @GetMapping(value = "/download/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    @GetMapping(value = "/download/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<byte[]> download(@PathVariable("id") UUID id) {
             FileDownloadDto fileDownloadDto = fileService.download(id);
         return ResponseEntity.ok()
+                .header("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE)
                 .header("Content-Disposition", "filename=" + fileDownloadDto.getFilename())
                 .body(fileDownloadDto.getIn());
     }
