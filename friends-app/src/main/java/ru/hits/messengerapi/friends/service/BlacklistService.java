@@ -3,10 +3,7 @@ package ru.hits.messengerapi.friends.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -287,6 +284,8 @@ public class BlacklistService {
 
         Page<BlacklistEntity> pageBlockedUsers;
         Example<BlacklistEntity> example;
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher("blockedUserName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
         if (paginationAndFilters.getFilters() != null) {
             example = Example.of(BlacklistEntity
                     .builder()
@@ -295,13 +294,16 @@ public class BlacklistService {
                     .blockedUserName(paginationAndFilters.getFilters().getBlockedUserName())
                     .targetUserId(targetUserId)
                     .isDeleted(false)
-                    .build());
+                    .build(),
+                    matcher
+            );
         } else {
             example = Example.of(BlacklistEntity
                     .builder()
                     .targetUserId(targetUserId)
                     .isDeleted(false)
-                    .build());
+                    .build()
+            );
         }
         pageBlockedUsers = blacklistRepository.findAll(example, pageable);
 

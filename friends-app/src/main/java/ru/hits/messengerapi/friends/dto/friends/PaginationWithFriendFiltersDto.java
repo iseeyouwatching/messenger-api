@@ -1,7 +1,7 @@
 package ru.hits.messengerapi.friends.dto.friends;
 
 import lombok.*;
-import ru.hits.messengerapi.common.dto.PageInfoDto;
+import ru.hits.messengerapi.friends.dto.common.PageInfoDto;
 
 import javax.validation.constraints.NotNull;
 

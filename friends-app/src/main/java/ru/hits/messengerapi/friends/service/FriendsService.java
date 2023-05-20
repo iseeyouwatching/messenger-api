@@ -3,10 +3,7 @@ package ru.hits.messengerapi.friends.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -342,6 +339,8 @@ public class FriendsService {
 
         Page<FriendEntity> pageFriends;
         Example<FriendEntity> example;
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher("friendName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
         if (paginationAndFilters.getFilters() != null) {
             example = Example.of(FriendEntity
                     .builder()
@@ -350,7 +349,8 @@ public class FriendsService {
                     .friendName(paginationAndFilters.getFilters().getFriendName())
                     .targetUserId(targetUserId)
                     .isDeleted(false)
-                    .build()
+                    .build(),
+                    matcher
             );
         }
         else {

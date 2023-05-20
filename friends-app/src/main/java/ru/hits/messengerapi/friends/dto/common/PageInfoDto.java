@@ -1,5 +1,6 @@
-package ru.hits.messengerapi.common.dto;
+package ru.hits.messengerapi.friends.dto.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 /**
@@ -15,11 +16,13 @@ public class PageInfoDto {
     /**
      * Номер страницы.
      */
+    @Schema(defaultValue = "1")
     private Integer pageNumber;
 
     /**
      * Размер страницы.
      */
+    @Schema(defaultValue = "10")
     private Integer pageSize;
 
 }

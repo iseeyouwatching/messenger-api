@@ -1,5 +1,6 @@
 package ru.hits.messengerapi.user.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -35,6 +36,7 @@ public class UserSignUpDto {
      */
     @NotBlank(message = "Почта не может быть пустой.")
     @Email(message = "Некорректный формат почты.")
+    @Schema(description = "Почта", example = "string@gmail.com")
     private String email;
 
     /**

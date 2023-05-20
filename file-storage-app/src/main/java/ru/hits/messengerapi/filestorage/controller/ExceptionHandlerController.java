@@ -7,8 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.hits.messengerapi.common.dto.ApiError;
 import ru.hits.messengerapi.common.exception.*;
@@ -24,6 +27,7 @@ import java.util.Map;
  * который предоставляет базовую обработку исключений, связанных с {@link ResponseEntity}.
  */
 @ControllerAdvice
+@CrossOrigin
 @Slf4j
 public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
@@ -79,6 +83,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
      * @return объект ответа с ошибкой в формате JSON.
      */
     @ExceptionHandler(NotFoundException.class)
+    @ResponseBody
     public ResponseEntity<ApiError> handleNotFoundException(NotFoundException exception,
                                                             WebRequest request
     ) {
@@ -182,6 +187,15 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     ) {
         logError(request, exception);
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseBody
+    public ResponseEntity<ApiError> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception,
+                                                                       WebRequest request
+    ) {
+        logError(request, exception);
+        return new ResponseEntity<>(new ApiError("Загружаемый файл превышает максимально допустимый размер."), HttpStatus.BAD_REQUEST);
     }
 
     /**

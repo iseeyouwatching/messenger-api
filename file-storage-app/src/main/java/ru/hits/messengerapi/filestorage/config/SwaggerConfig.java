@@ -11,11 +11,5 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Сервис файлового хранилища", version = "v1"))
-@SecurityScheme(
-        name = "bearerAuth",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        scheme = "Bearer"
-)
 public class SwaggerConfig {
 }
