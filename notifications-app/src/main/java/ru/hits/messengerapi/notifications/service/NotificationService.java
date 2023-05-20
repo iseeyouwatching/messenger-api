@@ -135,12 +135,12 @@ public class NotificationService {
             if (paginationAndFiltersDto.getFilters().getPeriodFilter().getFromDateTime() != null) {
                 spec = spec.and(NotificationSpec
                         .receivedDateAfter(paginationAndFiltersDto.getFilters().getPeriodFilter()
-                                .getFromDateTime()));
+                                .getFromDateTime().atStartOfDay()));
             }
             if (paginationAndFiltersDto.getFilters().getPeriodFilter().getToDateTime() != null) {
                 spec = spec.and(NotificationSpec
                         .receivedDateBefore(paginationAndFiltersDto.getFilters().getPeriodFilter()
-                                .getToDateTime()));
+                                .getToDateTime().atStartOfDay()));
             }
             if (paginationAndFiltersDto.getFilters().getTextFilter() != null) {
                 spec = spec.and(NotificationSpec.textLike(paginationAndFiltersDto.getFilters().getTextFilter()));

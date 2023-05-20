@@ -90,10 +90,11 @@ public class MessageService {
             integrationRequestsService.checkExistenceInFriends(senderId, receiverId);
         }
 
-        Optional<ChatEntity> chat = chatRepository.findBySenderIdAndReceiverId(senderId, receiverId);
-        if (chat.isEmpty()) {
+        Optional<ChatEntity> chat1 = chatRepository.findBySenderIdAndReceiverId(senderId, receiverId);
+        Optional<ChatEntity> chat2 = chatRepository.findBySenderIdAndReceiverId(receiverId, senderId);
+        if (chat1.isEmpty() && chat2.isEmpty()) {
             ChatEntity newChat = chatService.createDialogue(receiverId);
-            chat = Optional.ofNullable(newChat);
+            chat1 = Optional.ofNullable(newChat);
         }
 
         List<String> fullNameAndAvatarId = integrationRequestsService.getFullNameAndAvatarId(senderId);
@@ -104,7 +105,7 @@ public class MessageService {
         }
         MessageEntity message = MessageEntity
                 .builder()
-                .chat(chat.get())
+                .chat(chat1.orElseGet(chat2::get))
                 .sendDate(LocalDateTime.now())
                 .messageText(dialogueMessageDto.getMessageText())
                 .senderId(senderId)
