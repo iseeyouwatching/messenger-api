@@ -4,6 +4,7 @@ import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +49,10 @@ public class FileController {
      * @throws XmlParserException если произошла ошибка при разборе XML.
      * @throws InternalException если произошла внутренняя ошибка сервера.
      */
+    @SneakyThrows
     @Operation(summary = "Загрузка файла.")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String upload(@RequestParam("file") MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public String upload(@RequestParam("file") MultipartFile file) {
         return fileService.upload(file);
     }
 
@@ -61,9 +63,9 @@ public class FileController {
      * @return файл.
      */
     @Operation(summary = "Получение файла по id.")
-    @GetMapping(value = "/download/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/download/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<byte[]> download(@PathVariable("id") UUID id) {
-        FileDownloadDto fileDownloadDto = fileService.download(id);
+            FileDownloadDto fileDownloadDto = fileService.download(id);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "filename=" + fileDownloadDto.getFilename())
                 .body(fileDownloadDto.getIn());

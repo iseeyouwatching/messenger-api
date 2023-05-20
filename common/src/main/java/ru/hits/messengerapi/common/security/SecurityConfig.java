@@ -110,6 +110,8 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .cors()
+                .and()
                 .build();
     }
 

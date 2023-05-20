@@ -1,21 +1,22 @@
 package ru.hits.messengerapi.filestorage.controller;
 
+import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.hits.messengerapi.common.dto.ApiError;
 import ru.hits.messengerapi.common.exception.*;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,6 @@ import java.util.Map;
  * который предоставляет базовую обработку исключений, связанных с {@link ResponseEntity}.
  */
 @ControllerAdvice
-@CrossOrigin
 @Slf4j
 public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
@@ -83,7 +83,6 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
      * @return объект ответа с ошибкой в формате JSON.
      */
     @ExceptionHandler(NotFoundException.class)
-    @ResponseBody
     public ResponseEntity<ApiError> handleNotFoundException(NotFoundException exception,
                                                             WebRequest request
     ) {
@@ -190,7 +189,6 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseBody
     public ResponseEntity<ApiError> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception,
                                                                        WebRequest request
     ) {

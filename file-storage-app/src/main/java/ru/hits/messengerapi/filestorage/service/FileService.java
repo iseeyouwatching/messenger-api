@@ -6,9 +6,11 @@ import io.minio.PutObjectArgs;
 import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.filestorage.config.MinioConfiguration;
 import ru.hits.messengerapi.filestorage.dto.FileDownloadDto;
@@ -70,16 +72,24 @@ public class FileService {
      * @throws InternalException          если произошла внутренняя ошибка сервера MinIO.
      */
     @Transactional
-    public String upload(MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public String upload(MultipartFile file) {
         var id = UUID.randomUUID().toString();
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                .bucket(minioConfig.getBucket())
-                .object(id)
-                .stream(new ByteArrayInputStream(file.getBytes()), file.getSize(), -1)
-                .contentType(file.getContentType())
-                .build()
-        );
+        String contentType = file.getContentType();
+        if (!contentType.startsWith("image/")) {
+            throw new BadRequestException("Загружаемый файл не является изображением.");
+        }
+        try {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                    .bucket(minioConfig.getBucket())
+                    .object(id)
+                    .stream(new ByteArrayInputStream(file.getBytes()), file.getSize(), -1)
+                    .contentType(file.getContentType())
+                    .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при загрузке файла с ID " + id + ".", e);
+        }
 
         FileMetadataEntity fileMetadata = new FileMetadataEntity();
         fileMetadata.setFilename(file.getOriginalFilename());
