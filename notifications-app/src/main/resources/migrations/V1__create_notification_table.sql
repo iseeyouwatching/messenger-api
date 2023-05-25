@@ -11,4 +11,4 @@ create table public.notification
 );
 
 alter table public.notification
-    owner to hits;
+    owner to postgres;

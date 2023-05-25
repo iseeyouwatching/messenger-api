@@ -88,6 +88,7 @@ public class IntegrationRequestsService {
         String url = integrationFileStorageRequestCheckAvatarIdExistence;
 
         ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Void.class, id);
+        log.info("Получен ответ от сервиса: status={}", response.getStatusCode());
     }
 
 }

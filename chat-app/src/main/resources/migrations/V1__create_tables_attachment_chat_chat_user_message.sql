@@ -12,7 +12,7 @@ create table public.chat
 );
 
 alter table public.chat
-    owner to hits;
+    owner to postgres;
 
 create table public.chat_user
 (
@@ -23,7 +23,7 @@ create table public.chat_user
 );
 
 alter table public.chat_user
-    owner to hits;
+    owner to postgres;
 
 create table public.message
 (
@@ -40,7 +40,7 @@ create table public.message
 );
 
 alter table public.message
-    owner to hits;
+    owner to postgres;
 
 create table public.attachment
 (
@@ -54,5 +54,5 @@ create table public.attachment
 );
 
 alter table public.attachment
-    owner to hits;
+    owner to postgres;
 

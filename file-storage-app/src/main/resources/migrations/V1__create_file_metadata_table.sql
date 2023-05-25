@@ -10,5 +10,5 @@ create table public.file_metadata
 );
 
 alter table public.file_metadata
-    owner to hits;
+    owner to postgres;
 

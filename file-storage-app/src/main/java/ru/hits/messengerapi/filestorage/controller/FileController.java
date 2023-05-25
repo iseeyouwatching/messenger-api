@@ -1,6 +1,5 @@
 package ru.hits.messengerapi.filestorage.controller;
 
-import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.hits.messengerapi.filestorage.dto.FileDownloadDto;
 import ru.hits.messengerapi.filestorage.service.FileService;
 
-import javax.validation.Valid;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -39,20 +37,12 @@ public class FileController {
      *
      * @param file загружаемый файл.
      * @return идентификатор загруженного файла.
-     * @throws IOException  если произошла ошибка ввода-вывода при загрузке файла.
-     * @throws ServerException если сервер вернул ошибку при загрузке файла.
-     * @throws InsufficientDataException если недостаточно данных для загрузки файла.
-     * @throws ErrorResponseException если сервер вернул ошибку при загрузке файла.
-     * @throws NoSuchAlgorithmException если алгоритм хэширования не поддерживается.
-     * @throws InvalidKeyException если указан недопустимый ключ.
-     * @throws InvalidResponseException если ответ сервера недопустим.
-     * @throws XmlParserException если произошла ошибка при разборе XML.
-     * @throws InternalException если произошла внутренняя ошибка сервера.
      */
     @SneakyThrows
     @Operation(summary = "Загрузка файла.")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String upload(@RequestParam("file") MultipartFile file) {
+        log.info("Запрос на загрузку файла: {}", file.getOriginalFilename());
         return fileService.upload(file);
     }
 
@@ -65,7 +55,9 @@ public class FileController {
     @Operation(summary = "Получение файла по id.")
     @GetMapping(value = "/download/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<byte[]> download(@PathVariable("id") UUID id) {
-            FileDownloadDto fileDownloadDto = fileService.download(id);
+        log.info("Запрос на скачивание файла с ID: {}", id);
+        FileDownloadDto fileDownloadDto = fileService.download(id);
+        log.info("Файл успешно загружен: {}", fileDownloadDto.getFilename());
         return ResponseEntity.ok()
                 .header("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE)
                 .header("Content-Disposition", "filename=" + fileDownloadDto.getFilename())

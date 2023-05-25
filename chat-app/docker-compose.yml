@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: chats_db
+    image: postgres:latest
+    ports:
+      - '5434:5432'
+    environment:
+      - POSTGRES_DB=chats_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres

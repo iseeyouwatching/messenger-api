@@ -61,22 +61,15 @@ public class FileService {
      *
      * @param file загружаемый файл.
      * @return уникальный идентификатор файла.
-     * @throws ServerException            если произошла ошибка на сервере MinIO.
-     * @throws InsufficientDataException  если данные файла недостаточны.
-     * @throws ErrorResponseException     если получен неправильный ответ от сервера MinIO.
-     * @throws IOException                если произошла ошибка ввода-вывода.
-     * @throws NoSuchAlgorithmException  если используется неподдерживаемый алгоритм хэширования.
-     * @throws InvalidKeyException        если предоставлен неверный ключ.
-     * @throws InvalidResponseException   если получен неверный ответ от сервера MinIO.
-     * @throws XmlParserException         если произошла ошибка парсинга XML.
-     * @throws InternalException          если произошла внутренняя ошибка сервера MinIO.
      */
     @Transactional
     public String upload(MultipartFile file) {
         var id = UUID.randomUUID().toString();
         String contentType = file.getContentType();
         if (!contentType.startsWith("image/")) {
-            throw new BadRequestException("Загружаемый файл не является изображением.");
+            String errorMessage = "Загружаемый файл не является изображением.";
+            log.error(errorMessage);
+            throw new BadRequestException(errorMessage);
         }
         try {
             minioClient.putObject(
@@ -88,7 +81,9 @@ public class FileService {
                     .build()
             );
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при загрузке файла с ID " + id + ".", e);
+            String errorMessage = "Ошибка при загрузке файла с ID " + id + ".";
+            log.error(errorMessage, e);
+            throw new RuntimeException(errorMessage, e);
         }
 
         FileMetadataEntity fileMetadata = new FileMetadataEntity();
@@ -114,7 +109,11 @@ public class FileService {
      */
     public FileDownloadDto download(UUID id) {
         FileMetadataEntity fileMetadata = fileMetadataRepository.findByObjectName(id)
-                .orElseThrow(() -> new NotFoundException("Файл с ID " + id + " не найден."));
+                .orElseThrow(() -> {
+                    String errorMessage = "Файл с ID " + id + " не найден.";
+                    log.error(errorMessage);
+                    return new NotFoundException(errorMessage);
+                });
 
         var args = GetObjectArgs.builder()
                 .bucket(fileMetadata.getBucket())
@@ -123,7 +122,9 @@ public class FileService {
         try (var in = minioClient.getObject(args)) {
             return new FileDownloadDto(in.readAllBytes(), fileMetadata.getFilename());
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при загрузке файла с ID " + id + ".", e);
+            String errorMessage = "Ошибка при загрузке файла с ID " + id + ".";
+            log.error(errorMessage, e);
+            throw new RuntimeException(errorMessage, e);
         }
     }
 

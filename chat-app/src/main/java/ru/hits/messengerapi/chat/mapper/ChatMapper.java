@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.chat.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.hits.messengerapi.chat.dto.CreateChatDto;
 import ru.hits.messengerapi.chat.entity.ChatEntity;
@@ -15,6 +16,7 @@ import java.util.UUID;
  * в объекты типа {@link ChatEntity } и наоборот.
  */
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class ChatMapper {
 
@@ -29,6 +31,8 @@ public class ChatMapper {
      * @return объект типа {@link ChatEntity} с заполненными атрибутами из переданных параметров.
      */
     public ChatEntity createChatDtoToChat(CreateChatDto createChatDto, UUID adminId) {
+        log.info("Преобразование объекта CreateChatDto и UUID в объект ChatEntity: createChatDto={}, adminId={}",
+                createChatDto, adminId);
         if (createChatDto.getAvatar() != null) {
             integrationRequestsService.checkAvatarIdExistence(createChatDto.getAvatar());
         }
@@ -53,6 +57,7 @@ public class ChatMapper {
      *         с указанными идентификаторами.
      */
     public ChatEntity senderIdAndreceiverIdToChat(UUID senderId, UUID receiverId) {
+        log.info("Преобразование двух UUID в объект ChatEntity: senderId={}, receiverId={}", senderId, receiverId);
         if (senderId.compareTo(receiverId) != 0) {
             return ChatEntity
                     .builder()

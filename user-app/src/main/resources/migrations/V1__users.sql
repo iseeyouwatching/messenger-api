@@ -18,5 +18,5 @@ create table public._user
 );
 
 alter table public._user
-    owner to hits;
+    owner to postgres;
 

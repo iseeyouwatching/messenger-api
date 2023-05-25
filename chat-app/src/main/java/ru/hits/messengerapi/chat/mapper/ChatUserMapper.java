@@ -1,6 +1,7 @@
 package ru.hits.messengerapi.chat.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.hits.messengerapi.chat.entity.ChatUserEntity;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
  * список сущностей "чат-пользователь".
  */
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class ChatUserMapper {
 
@@ -24,6 +26,8 @@ public class ChatUserMapper {
      * @return список сущностей "чат-пользователь".
      */
     public List<ChatUserEntity> chatAndUserIdToListOfChatAndUser(UUID chatId, List<UUID> userIDs) {
+        log.info("Преобразование идентификаторов пользователей и идентификатора чата в список сущностей ChatUserEntity: " +
+                "chatId={}, userIDs={}", chatId, userIDs);
         List<ChatUserEntity> chatUserEntityList = new ArrayList<>();
         for (UUID userId: userIDs) {
             chatUserEntityList.add(

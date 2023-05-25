@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  postgres:
+    container_name: file_storage_db
+    image: postgres:latest
+    ports:
+      - '5433:5432'
+    environment:
+      - POSTGRES_DB=file_storage_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   minio:
     image: bitnami/minio:2023.4.28
     container_name: minio

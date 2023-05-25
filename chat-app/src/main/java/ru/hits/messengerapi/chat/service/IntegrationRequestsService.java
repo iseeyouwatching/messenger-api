@@ -27,11 +27,6 @@ import static ru.hits.messengerapi.common.security.SecurityConst.HEADER_API_KEY;
 public class IntegrationRequestsService {
 
     /**
-     * Репозиторий для работы с сущностью {@link MessageEntity}.
-     */
-    private final MessageRepository messageRepository;
-
-    /**
      * Свойства безопасности приложения.
      */
     private final SecurityProps securityProps;
@@ -215,6 +210,8 @@ public class IntegrationRequestsService {
 
         ResponseEntity<Void> responseEntity = restTemplate
                 .exchange(url, HttpMethod.POST, requestEntity, Void.class);
+
+        log.info("Получен ответ от сервиса: status={}", responseEntity.getStatusCode());
     }
 
     /**
@@ -232,6 +229,8 @@ public class IntegrationRequestsService {
         String url = integrationFileStorageRequestCheckAvatarIdExistence;
 
         ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Void.class, id);
+
+        log.info("Получен ответ от сервиса: status={}", response.getStatusCode());
     }
 
     /**

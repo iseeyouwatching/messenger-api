@@ -88,7 +88,6 @@ public class IntegrationUserService {
      * @return ФИО и аватарка пользователя.
      */
     public List<String> getFullNameAndAvatar(UUID id) {
-
         Optional<UserEntity> user = userRepository.findById(id);
 
         if (user.isEmpty()) {

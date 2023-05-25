@@ -32,6 +32,7 @@ public class IntegrationFileService {
      * @throws NotFoundException если аватарка с указанным идентификатором не существует.
      */
     public void checkAvatarIdExistence(UUID avatarId) {
+        log.info("Проверка существования аватарки с ID: {}", avatarId);
         if (fileMetadataRepository.findByObjectName(avatarId).isEmpty()) {
             throw new NotFoundException("Аватарки с ID " + avatarId + " не существует.");
         }
@@ -44,6 +45,7 @@ public class IntegrationFileService {
      * @throws NotFoundException если хотя бы одно вложение с указанным идентификатором не существует.
      */
     public void checkMultiAttachmentsIdsExistence(List<UUID> attachmentsIds) {
+        log.info("Проверка существования списка идентификаторов вложений: {}", attachmentsIds);
         List<UUID> badIds = new ArrayList<>();
         for (int i = 0; i < attachmentsIds.size(); i++) {
             if (fileMetadataRepository.findByObjectName(attachmentsIds.get(i)).isEmpty()) {
@@ -63,6 +65,7 @@ public class IntegrationFileService {
      * @throws NotFoundException если файл с указанным идентификатором не существует.
      */
     public String getFilename(UUID id) {
+        log.info("Получение имени файла по ID: {}", id);
         Optional<FileMetadataEntity> fileMetadata = fileMetadataRepository.findByObjectName(id);
         if (fileMetadata.isEmpty()) {
             throw new NotFoundException("Файла с ID " + id + " не существует.");
@@ -80,6 +83,7 @@ public class IntegrationFileService {
      * @throws NotFoundException если файл с указанным идентификатором не существует.
      */
     public String getFileSize(UUID id) {
+        log.info("Получение размера файла по ID: {}", id);
         Optional<FileMetadataEntity> fileMetadata = fileMetadataRepository.findByObjectName(id);
         if (fileMetadata.isEmpty()) {
             throw new NotFoundException("Файла с ID " + id + " не существует.");

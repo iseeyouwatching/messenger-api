@@ -19,17 +19,16 @@ spring:
     name: chat
   flyway:
     locations: classpath:migrations
-    url: jdbc:postgresql://localhost:5432/chats_db
-    user: hits
-    password: hits
+    enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/chats_db
-    username: hits
-    password: hits
+    url: jdbc:postgresql://localhost:5434/chats_db
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}

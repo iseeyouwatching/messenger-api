@@ -33,6 +33,7 @@ public class IntegrationFileController {
      */
     @GetMapping("/check-avatar-id-existence/{id}")
     public void checkAvatarIdExistence(@PathVariable("id") UUID id) {
+        log.info("Проверка существования файла (аватарки) с ID: {}", id);
         integrationFileService.checkAvatarIdExistence(id);
     }
 
@@ -43,6 +44,7 @@ public class IntegrationFileController {
      */
     @PostMapping("/check-multi-attachment-existence")
     public void checkMultiAttachmentExistence(@RequestBody List<UUID> attachmentsIds) {
+        log.info("Проверка существования списка идентификаторов вложений: {}", attachmentsIds);
         integrationFileService.checkMultiAttachmentsIdsExistence(attachmentsIds);
     }
 
@@ -54,6 +56,7 @@ public class IntegrationFileController {
      */
     @GetMapping("/get-filename/{id}")
     public ResponseEntity<String> getFilename(@PathVariable("id") UUID id) {
+        log.info("Запрос на получение названия файла с ID: {}", id);
         return new ResponseEntity<>(integrationFileService.getFilename(id), HttpStatus.OK);
     }
 
@@ -65,6 +68,7 @@ public class IntegrationFileController {
      */
     @GetMapping("/get-file-size/{id}")
     public ResponseEntity<String> getFileSize(@PathVariable("id") UUID id) {
+        log.info("Запрос на получение размера файла с ID: {}", id);
         return new ResponseEntity<>(integrationFileService.getFileSize(id), HttpStatus.OK);
     }
 

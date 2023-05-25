@@ -14,7 +14,7 @@ create table public.blacklist
 );
 
 alter table public.blacklist
-    owner to hits;
+    owner to postgres;
 
 create table public.friend
 (
@@ -29,4 +29,4 @@ create table public.friend
 );
 
 alter table public.friend
-    owner to hits;
+    owner to postgres;

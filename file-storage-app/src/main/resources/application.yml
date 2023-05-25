@@ -24,17 +24,16 @@ spring:
     name: file-storage
   flyway:
     locations: classpath:migrations
-    url: jdbc:postgresql://localhost:5432/file_storage_db
-    user: hits
-    password: hits
+    enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/file_storage_db
-    username: hits
-    password: hits
+    url: jdbc:postgresql://localhost:5433/file_storage_db
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
   servlet:
     multipart:
       max-file-size: 10MB
