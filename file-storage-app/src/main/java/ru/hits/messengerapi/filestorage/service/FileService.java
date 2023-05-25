@@ -65,12 +65,6 @@ public class FileService {
     @Transactional
     public String upload(MultipartFile file) {
         var id = UUID.randomUUID().toString();
-        String contentType = file.getContentType();
-        if (!contentType.startsWith("image/")) {
-            String errorMessage = "Загружаемый файл не является изображением.";
-            log.error(errorMessage);
-            throw new BadRequestException(errorMessage);
-        }
         try {
             minioClient.putObject(
                     PutObjectArgs.builder()

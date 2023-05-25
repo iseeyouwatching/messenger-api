@@ -3,6 +3,7 @@ package ru.hits.messengerapi.filestorage.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.hits.messengerapi.common.exception.BadRequestException;
 import ru.hits.messengerapi.common.exception.NotFoundException;
 import ru.hits.messengerapi.filestorage.entity.FileMetadataEntity;
 import ru.hits.messengerapi.filestorage.repository.FileMetadataRepository;
@@ -26,15 +27,20 @@ public class IntegrationFileService {
     private final FileMetadataRepository fileMetadataRepository;
 
     /**
-     * Проверяет существование аватарки по указанному идентификатору.
+     * Проверяет существование аватарки по указанному идентификатору и является ли аватарка картинкой.
      *
      * @param avatarId идентификатор аватарки.
      * @throws NotFoundException если аватарка с указанным идентификатором не существует.
      */
     public void checkAvatarIdExistence(UUID avatarId) {
         log.info("Проверка существования аватарки с ID: {}", avatarId);
-        if (fileMetadataRepository.findByObjectName(avatarId).isEmpty()) {
+        Optional<FileMetadataEntity> fileMetadata = fileMetadataRepository.findByObjectName(avatarId);
+        if (fileMetadata.isEmpty()) {
             throw new NotFoundException("Аватарки с ID " + avatarId + " не существует.");
+        }
+        String contentType = fileMetadata.get().getContentType();
+        if (!contentType.startsWith("image/")) {
+            throw new BadRequestException("На аватарку нельзя поставить что-то, кроме картинки.");
         }
     }
 

@@ -31,6 +31,7 @@ public class IntegrationFileServiceTest {
     public void testCheckAvatarIdExistence_FileExists() {
         UUID avatarId = UUID.randomUUID();
         FileMetadataEntity fileMetadata = new FileMetadataEntity();
+        fileMetadata.setContentType("image/png");
 
         when(fileMetadataRepository.findByObjectName(avatarId)).thenReturn(Optional.of(fileMetadata));
 

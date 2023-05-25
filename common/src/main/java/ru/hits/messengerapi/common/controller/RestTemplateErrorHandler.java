@@ -55,6 +55,7 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
      * @throws ForbiddenException если у пользователя нет прав на выполнение запроса.
      * @throws MultiForbiddenException если у пользователя нет прав на выполнение нескольких запросов.
      * @throws ServiceUnavailableException если сервис сейчас недоступен.
+     * @throws BadRequestException если сервер не смог обработать запрос из-за неверного синтаксиса.
      */
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
@@ -84,6 +85,11 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
                     String errorMessage = errorResponse.getMessages().get(0);
                     throw new ForbiddenException(errorMessage);
                 }
+            } else if (response.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                InputStream responseBody = response.getBody();
+                ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
+                String errorMessage = errorResponse.getMessages().get(0);
+                throw new BadRequestException(errorMessage);
             }
         }
     }
