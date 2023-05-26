@@ -3,16 +3,14 @@
 ### Как запустить?
 Необходимо клонировать репозиторий, запустить проект в среде разработки **IntelliJ IDEA**.
 
-Необходимо установить **RabbitMQ** через докер:
-
 ### Запуск RabbitMQ
-Установите RabbitMQ с помощью Docker. Выполните следующую команду в терминале:
+Установите **RabbitMQ** с помощью Docker. Выполните следующую команду в терминале:
 ```shell
 docker run -it --restart always --name rabbitmq -p 5672:5672 -p 15672:15672 -e RABBITMQ_DEFAULT_USER=rmq-user -e RABBITMQ_DEFAULT_PASS=rmq-pass rabbitmq:3
 ```
 
 ### Запуск сервисов
-Также потребуется перейти в модули user-app, notifications-app, friends-app, file-storage-app и chat-app, использовав команду `cd` и поднять **Docker Compose** с помощью `docker-compose up -d`.
+Также потребуется перейти в модули user-app, notifications-app, friends-app, file-storage-app и chat-app, использовав команду `cd`, и поднять **Docker Compose** с помощью `docker-compose up -d`.
 
 После чего можно запускать все сервисы, используя интерфейс среды разработки.
 
