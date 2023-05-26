@@ -1,11 +1,10 @@
 package ru.hits.messengerapi.friends;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,11 +16,11 @@ import ru.hits.messengerapi.friends.dto.common.PageInfoDto;
 import ru.hits.messengerapi.friends.dto.common.PaginationWithFullNameFilterDto;
 import ru.hits.messengerapi.friends.entity.BlacklistEntity;
 import ru.hits.messengerapi.friends.repository.BlacklistRepository;
-import ru.hits.messengerapi.friends.repository.FriendsRepository;
 import ru.hits.messengerapi.friends.service.BlacklistService;
 import ru.hits.messengerapi.friends.service.FriendsService;
 import ru.hits.messengerapi.friends.service.IntegrationRequestsService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,9 +28,10 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class BlacklistServiceTest {
+
+    @InjectMocks
+    private BlacklistService blacklistService;
 
     @Mock
     private BlacklistRepository blacklistRepository;
@@ -45,11 +45,10 @@ public class BlacklistServiceTest {
     @Mock
     private FriendsService friendsService;
 
-    @Mock
-    private FriendsRepository friendsRepository;
-
-    @InjectMocks
-    private BlacklistService blacklistService;
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     public void getBlockedUsers_WithValidPaginationAndNoFullNameFilter_ReturnsBlockedUsersPageListDto() {
@@ -66,7 +65,7 @@ public class BlacklistServiceTest {
         securityContext.setAuthentication(authentication);
 
         when(blacklistRepository.findAllByTargetUserIdAndDeletedDate(targetUserId, null, PageRequest.of(0, 10)))
-                .thenReturn(List.of(new BlacklistEntity()));
+                .thenReturn(Collections.singletonList(new BlacklistEntity()));
 
         BlockedUsersPageListDto result = blacklistService.getBlockedUsers(paginationWithFullNameFilterDto);
 
@@ -87,7 +86,7 @@ public class BlacklistServiceTest {
         securityContext.setAuthentication(authentication);
 
         when(blacklistRepository.findByTargetUserIdAndBlockedUserId(targetUserId, blockedUserId))
-                .thenReturn(Optional.of(new BlacklistEntity()));
+                .thenReturn(Optional.empty());
 
         boolean result = blacklistService.checkIfTheTargetUserBlacklisted(targetUserId, blockedUserId);
 
